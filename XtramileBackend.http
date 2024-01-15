@@ -1,0 +1,6 @@
+@XtramileBackend_HostAddress = http://localhost:5190
+
+GET {{XtramileBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
