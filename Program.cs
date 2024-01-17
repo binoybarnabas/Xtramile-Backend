@@ -3,6 +3,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Repositories;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
+using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.PriorityService;
 using XtramileBackend.Services.ProjectService;
 using XtramileBackend.UnitOfWork;
@@ -20,8 +21,11 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
+
+
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
+builder.Services.AddScoped<IEmployeeServices,EmployeeServices>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
