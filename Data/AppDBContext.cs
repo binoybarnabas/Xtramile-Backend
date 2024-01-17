@@ -10,9 +10,9 @@ namespace XtramileBackend.Data
         
         }
 
-        public DbSet<TBL_PROJECT> TBL_PROJECT { get; set; }
+        public DbSet<TBL_INVOICE> TBL_INVOICE { get; set; }
 
-        public DbSet<TBL_PRIORITY> TBL_PRIORITY { get; set; }
+        public DbSet<TBL_EXPENSE> TBL_EXPENSE { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
