@@ -4,9 +4,9 @@ namespace XtramileBackend.Services.ProjectService
 {
     public interface IProjectServices
 
-    { 
-        public IEnumerable<TBL_PROJECT> GetAllProjects();
-        public void AddProject(TBL_PROJECT project);
+    {
+        public Task<IEnumerable<TBL_PROJECT>> GetAllProjectsAsync();
+        public Task AddProjectAsync(TBL_PROJECT project);
 
     }
 }

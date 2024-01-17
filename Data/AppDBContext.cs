@@ -14,6 +14,7 @@ namespace XtramileBackend.Data
 
         public DbSet<TBL_PRIORITY> TBL_PRIORITY { get; set; }
 
+        public DbSet<TBL_DEPARTMENT> TBL_DEPARTMENT { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
           //migrations if needed.

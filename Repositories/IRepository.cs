@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XtramileBackend.Repositories
 {
     public interface IRepository<T>
     {
-        public void Add(T entity);
-        public IEnumerable<T> GetAll();
-        public T GetById(int id);
-        public void Update(T entity);
-        public void Delete(T entity);
+        Task AddAsync(T entity);
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        void Update(T entity);
+        void Delete(T entity);
     }
 }

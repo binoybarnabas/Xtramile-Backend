@@ -1,46 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
-namespace XtramileBackend.Services.PriorityService
+namespace XtramileBackend.Services.DepartmentService
 {
-    public class PriorityServices : IPriorityServices
+    public class DepartmentServices : IDepartmentServices
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public PriorityServices(IUnitOfWork unitOfWork)
+        public DepartmentServices(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_PRIORITY>> GetPrioritiesAsync()
+        public async Task<IEnumerable<TBL_DEPARTMENT>> GetDepartmentAsync()
         {
             try
             {
-                var priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
-                return priorityData;
+                var departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                return departmentData;
             }
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while getting priorities: {ex.Message}");
+                Console.WriteLine($"An error occurred while getting departments: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }
 
-        public async Task AddPriorityAsync(TBL_PRIORITY priority)
+        public async Task SetDepartmentAsync(TBL_DEPARTMENT department)
         {
             try
             {
-                await _unitOfWork.PriorityRepository.AddAsync(priority);
+                await _unitOfWork.DepartmentRepository.AddAsync(department);
                 _unitOfWork.Complete();
             }
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while adding a priority: {ex.Message}");
+                Console.WriteLine($"An error occurred while setting department: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }
