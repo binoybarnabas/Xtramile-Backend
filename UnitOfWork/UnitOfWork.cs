@@ -5,6 +5,7 @@ using XtramileBackend.Repositories.ExpenseRepository;
 using XtramileBackend.Repositories.InvoiceRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
+using XtramileBackend.Repositories.RoleRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -17,6 +18,7 @@ namespace XtramileBackend.UnitOfWork
         public IInvoiceRepository InvoiceRepository { get; }
         public IExpenseRepository ExpenseRepository { get; }
         public IEmployeeRepository EmployeeRepository { get; }
+        public IRoleRepository RoleRepository { get; }
 
         public readonly AppDBContext _dbContext;
         public UnitOfWork(AppDBContext dbContext) { 
@@ -27,6 +29,7 @@ namespace XtramileBackend.UnitOfWork
             InvoiceRepository = new InvoiceRepository(_dbContext);
             ExpenseRepository = new ExpenseRepository(_dbContext);
             EmployeeRepository = new EmployeeRepository(_dbContext);
+            RoleRepository = new RoleRepository(_dbContext);
         } 
 
         public int Complete() {

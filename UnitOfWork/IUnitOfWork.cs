@@ -5,6 +5,7 @@ using XtramileBackend.Repositories.ExpenseRepository;
 using XtramileBackend.Repositories.InvoiceRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
+using XtramileBackend.Repositories.RoleRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -15,8 +16,8 @@ namespace XtramileBackend.UnitOfWork
         public IDepartmentRepository DepartmentRepository { get; }
         public IInvoiceRepository InvoiceRepository { get; }
         public IExpenseRepository ExpenseRepository { get; }
-
         public IEmployeeRepository EmployeeRepository { get; }
+        public IRoleRepository RoleRepository { get; }
         public int Complete();
         //public void Dispose();
     }
