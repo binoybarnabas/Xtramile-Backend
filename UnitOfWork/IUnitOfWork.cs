@@ -1,5 +1,6 @@
 ﻿using XtramileBackend.Data;
 using XtramileBackend.Repositories.DepartmentRepository;
+using XtramileBackend.Repositories.EmployeeRepository;
 using XtramileBackend.Repositories.ExpenseRepository;
 using XtramileBackend.Repositories.InvoiceRepository;
 using XtramileBackend.Repositories.PriorityRepository;
@@ -15,6 +16,7 @@ namespace XtramileBackend.UnitOfWork
         public IInvoiceRepository InvoiceRepository { get; }
         public IExpenseRepository ExpenseRepository { get; }
 
+        public IEmployeeRepository EmployeeRepository { get; }
         public int Complete();
         //public void Dispose();
     }
