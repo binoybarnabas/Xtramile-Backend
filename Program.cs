@@ -15,6 +15,8 @@ using XtramileBackend.Repositories.ReasonRepository;
 using XtramileBackend.Repositories.RequestRepository;
 using XtramileBackend.Repositories.StatusRepository;
 using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
 using XtramileBackend.Services.CountryService;
 using XtramileBackend.Services.DepartmentService;
 using XtramileBackend.Services.EmployeeService;
@@ -27,6 +29,8 @@ using XtramileBackend.Services.RolesService;
 using XtramileBackend.Services.ReasonService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.StatusService;
+using XtramileBackend.Services.TravelModeService;
+using XtramileBackend.Services.TravelTypeService;
 using XtramileBackend.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +57,8 @@ builder.Services.AddScoped<IReasonRepository, ReasonRepository>();
 builder.Services.AddScoped<IFileTypeRepository, FileTypeRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<ITravelTypeRepository, TravelTypeRepository>();
+builder.Services.AddScoped<ITravelModeRepository, TravelModeRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -69,6 +75,8 @@ builder.Services.AddScoped<IStatusServices, StatusServices>();
 builder.Services.AddScoped<IRequestServices, RequestServices>();
 
 
+builder.Services.AddScoped<ITravelTypeService, TravelTypeService>();
+builder.Services.AddScoped<ITravelModeService, TravelModeService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

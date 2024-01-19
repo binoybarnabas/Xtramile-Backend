@@ -12,6 +12,8 @@ using XtramileBackend.Repositories.FileTypeRepository;
 using XtramileBackend.Repositories.ReasonRepository;
 using XtramileBackend.Repositories.RequestRepository;
 using XtramileBackend.Repositories.StatusRepository;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -32,6 +34,10 @@ namespace XtramileBackend.UnitOfWork
         public IStatusRepository StatusRepository { get; }
         public IRequestRepository RequestRepository { get; }
 
+        public ITravelTypeRepository TravelTypeRepository { get; }
+
+        public ITravelModeRepository TravelModeRepository { get; }
+
         public readonly AppDBContext _dbContext;
         public UnitOfWork(AppDBContext dbContext)
         {
@@ -49,7 +55,9 @@ namespace XtramileBackend.UnitOfWork
             ReasonRepository = new ReasonRepository(_dbContext);
             StatusRepository = new StatusRepository(_dbContext);
             RequestRepository = new RequestRepository(_dbContext);
-        }
+            TravelModeRepository = new TravelModeRepository(_dbContext);
+            TravelTypeRepository = new TravelTypeRepository(_dbContext);    
+        } 
 
         public int Complete()
         {
