@@ -7,8 +7,9 @@ namespace XtramileBackend.Data
     public class AppDBContext : DbContext
     {
 
-        public AppDBContext(DbContextOptions options):base(options) {
-        
+        public AppDBContext(DbContextOptions options) : base(options)
+        {
+
         }
 
         public DbSet<TBL_PROJECT> TBL_PROJECT { get; set; }
@@ -24,10 +25,18 @@ namespace XtramileBackend.Data
         public DbSet<TBL_EMPLOYEE> TBL_EMPLOYEE { get; set; }
 
         public DbSet<TBL_ROLES> TBL_ROLES { get; set; }
-        
+
         public DbSet<TBL_COUNTRY> TBL_COUNTRY { get; set; }
 
         public DbSet<TBL_PER_DIUM> TBL_PER_DIUM { get; set; }
+
+        public DbSet<TBL_STATUS> TBL_STATUS { get; set; }
+
+        public DbSet<TBL_FILE_TYPE> TBL_FILE_TYPE { get; set; }
+
+        public DbSet<TBL_REASON> TBL_REASON { get; set; }
+
+        public DbSet<TBL_REQUEST> TBL_REQUEST { get; set; }
 
         public DbSet<TBL_TRAVEL_TYPE>TBL_TRAVEL_TYPE  { get; set; }
 
@@ -36,7 +45,7 @@ namespace XtramileBackend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-          //migrations if needed.
+            //migrations if needed.
         }
     }
 }

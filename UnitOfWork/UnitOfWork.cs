@@ -8,6 +8,10 @@ using XtramileBackend.Repositories.PerdiumRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
+using XtramileBackend.Repositories.FileTypeRepository;
+using XtramileBackend.Repositories.ReasonRepository;
+using XtramileBackend.Repositories.RequestRepository;
+using XtramileBackend.Repositories.StatusRepository;
 using XtramileBackend.Repositories.TravelModeRepository;
 using XtramileBackend.Repositories.TravelTypeRepository;
 
@@ -25,13 +29,18 @@ namespace XtramileBackend.UnitOfWork
         public IRoleRepository RoleRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IPerdiumRepository PerdiumRepository { get; }
+        public IFileTypeRepository FileTypeRepository { get; }
+        public IReasonRepository ReasonRepository { get; }
+        public IStatusRepository StatusRepository { get; }
+        public IRequestRepository RequestRepository { get; }
 
         public ITravelTypeRepository TravelTypeRepository { get; }
 
         public ITravelModeRepository TravelModeRepository { get; }
 
         public readonly AppDBContext _dbContext;
-        public UnitOfWork(AppDBContext dbContext) { 
+        public UnitOfWork(AppDBContext dbContext)
+        {
             _dbContext = dbContext;
             PriorityRepository = new PriorityRepository(_dbContext);
             ProjectRepository = new ProjectRepository(_dbContext);
@@ -42,11 +51,17 @@ namespace XtramileBackend.UnitOfWork
             RoleRepository = new RoleRepository(_dbContext);
             CountryRepository = new CountryRepository(_dbContext);
             PerdiumRepository = new PerdiumRepository(_dbContext);
+            FileTypeRepository = new FileTypeRepository(_dbContext);
+            ReasonRepository = new ReasonRepository(_dbContext);
+            StatusRepository = new StatusRepository(_dbContext);
+            RequestRepository = new RequestRepository(_dbContext);
+        }
             TravelModeRepository = new TravelModeRepository(_dbContext);
             TravelTypeRepository = new TravelTypeRepository(_dbContext);    
         } 
 
-        public int Complete() {
+        public int Complete()
+        {
             return _dbContext.SaveChanges();
         }
 
