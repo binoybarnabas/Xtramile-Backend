@@ -10,6 +10,8 @@ using XtramileBackend.Repositories.PerdiumRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
 using XtramileBackend.Services.CountryService;
 using XtramileBackend.Services.DepartmentService;
 using XtramileBackend.Services.EmployeeService;
@@ -19,6 +21,8 @@ using XtramileBackend.Services.PerdiumService;
 using XtramileBackend.Services.PriorityService;
 using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.RolesService;
+using XtramileBackend.Services.TravelModeService;
+using XtramileBackend.Services.TravelTypeService;
 using XtramileBackend.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +45,8 @@ builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<IPerdiumRepository,PerdiumRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<ITravelTypeRepository, TravelTypeRepository>();
+builder.Services.AddScoped<ITravelModeRepository, TravelModeRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -51,7 +57,8 @@ builder.Services.AddScoped<ICountryServices, CountryServices>();
 builder.Services.AddScoped<IPerdiumServices, PerdiumServices>();
 builder.Services.AddScoped<IInvoiceServices, InvoiceServices>();
 builder.Services.AddScoped<IExpenseServices, ExpenseServices>();
-
+builder.Services.AddScoped<ITravelTypeService, TravelTypeService>();
+builder.Services.AddScoped<ITravelModeService, TravelModeService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

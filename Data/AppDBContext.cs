@@ -28,6 +28,12 @@ namespace XtramileBackend.Data
         public DbSet<TBL_COUNTRY> TBL_COUNTRY { get; set; }
 
         public DbSet<TBL_PER_DIUM> TBL_PER_DIUM { get; set; }
+
+        public DbSet<TBL_TRAVEL_TYPE>TBL_TRAVEL_TYPE  { get; set; }
+
+        public DbSet<TBL_TRAVEL_MODE> tBL_TRAVEL_MODE { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
           //migrations if needed.

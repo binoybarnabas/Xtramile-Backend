@@ -8,6 +8,8 @@ using XtramileBackend.Repositories.PerdiumRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -22,6 +24,9 @@ namespace XtramileBackend.UnitOfWork
         public IRoleRepository RoleRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IPerdiumRepository PerdiumRepository { get; }
+
+        public ITravelModeRepository TravelModeRepository { get; }
+        public ITravelTypeRepository TravelTypeRepository { get; }
         public int Complete();
         //public void Dispose();
     }
