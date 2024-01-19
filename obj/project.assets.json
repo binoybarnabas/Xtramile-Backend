@@ -4396,19 +4396,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\bivina.mv\\.nuget\\packages\\": {}
+    "C:\\Users\\abhinav.as\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\ILP\\Specialization\\Project\\MainProject\\Xtramile-Backend\\XtramileBackend.csproj",
+      "projectUniqueName": "D:\\Specialization\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj",
       "projectName": "XtramileBackend",
-      "projectPath": "D:\\ILP\\Specialization\\Project\\MainProject\\Xtramile-Backend\\XtramileBackend.csproj",
-      "packagesPath": "C:\\Users\\bivina.mv\\.nuget\\packages\\",
-      "outputPath": "D:\\ILP\\Specialization\\Project\\MainProject\\Xtramile-Backend\\obj\\",
+      "projectPath": "D:\\Specialization\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj",
+      "packagesPath": "C:\\Users\\abhinav.as\\.nuget\\packages\\",
+      "outputPath": "D:\\Specialization\\XtraMile\\Xtramile-Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\bivina.mv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\abhinav.as\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
