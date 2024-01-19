@@ -1,13 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
 using XtramileBackend.Repositories;
+using XtramileBackend.Repositories.CountryRepository;
 using XtramileBackend.Repositories.DepartmentRepository;
 using XtramileBackend.Repositories.EmployeeRepository;
+using XtramileBackend.Repositories.PerdiumRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
+using XtramileBackend.Services.CountryService;
 using XtramileBackend.Services.DepartmentService;
 using XtramileBackend.Services.EmployeeService;
+using XtramileBackend.Services.PerdiumService;
 using XtramileBackend.Services.PriorityService;
 using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.RolesService;
@@ -29,13 +33,18 @@ builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
 builder.Services.AddScoped<IDepartmentRepository,DepartmentRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+builder.Services.AddScoped<IPerdiumRepository,PerdiumRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
 builder.Services.AddScoped<IDepartmentServices,DepartmentServices>();
 builder.Services.AddScoped<IEmployeeServices, EmployeeServices>();
 builder.Services.AddScoped<IRolesServices, RolesServices>();
+builder.Services.AddScoped<ICountryServices, CountryServices>();
+builder.Services.AddScoped<IPerdiumServices, PerdiumServices>();
+
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

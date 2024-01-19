@@ -24,7 +24,10 @@ namespace XtramileBackend.Data
         public DbSet<TBL_EMPLOYEE> TBL_EMPLOYEE { get; set; }
 
         public DbSet<TBL_ROLES> TBL_ROLES { get; set; }
+        
+        public DbSet<TBL_COUNTRY> TBL_COUNTRY { get; set; }
 
+        public DbSet<TBL_PER_DIUM> TBL_PER_DIUM { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
           //migrations if needed.
