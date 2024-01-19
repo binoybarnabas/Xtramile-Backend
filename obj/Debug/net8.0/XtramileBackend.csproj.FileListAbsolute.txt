@@ -409,3 +409,6 @@ D:\Travel_Requisition\Xtramile-Backend\obj\Debug\net8.0\scopedcss\bundle\Xtramil
 D:\Travel_Requisition\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.csproj.CopyComplete
 D:\Travel_Requisition\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.genruntimeconfig.cache
 D:\Travel_Requisition\Xtramile-Backend\obj\Debug\net8.0\ref\XtramileBackend.dll
+D:\Xtramile - Project\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.dll
+D:\Xtramile - Project\Xtramile-Backend\obj\Debug\net8.0\refint\XtramileBackend.dll
+D:\Xtramile - Project\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.pdb
