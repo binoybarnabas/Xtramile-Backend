@@ -55,7 +55,6 @@ namespace XtramileBackend.UnitOfWork
             ReasonRepository = new ReasonRepository(_dbContext);
             StatusRepository = new StatusRepository(_dbContext);
             RequestRepository = new RequestRepository(_dbContext);
-        }
             TravelModeRepository = new TravelModeRepository(_dbContext);
             TravelTypeRepository = new TravelTypeRepository(_dbContext);    
         } 
