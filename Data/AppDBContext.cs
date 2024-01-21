@@ -46,6 +46,10 @@ namespace XtramileBackend.Data
 
         public DbSet<TBL_CATEGORY> TBL_CATEGORY { get; set; }
 
+        public DbSet<TBL_REQ_APPROVE> TBL_REQ_APPROVE { get; set; }
+
+        public DbSet<TBL_PROJECT_MAPPING> TBL_PROJECT_MAPPING { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //migrations if needed.

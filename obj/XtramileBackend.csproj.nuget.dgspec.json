@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Xtramile - Project\\Xtramile-Backend\\XtramileBackend.csproj": {}
+    "D:\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj": {}
   },
   "projects": {
-    "D:\\Xtramile - Project\\Xtramile-Backend\\XtramileBackend.csproj": {
+    "D:\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Xtramile - Project\\Xtramile-Backend\\XtramileBackend.csproj",
+        "projectUniqueName": "D:\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj",
         "projectName": "XtramileBackend",
-        "projectPath": "D:\\Xtramile - Project\\Xtramile-Backend\\XtramileBackend.csproj",
-        "packagesPath": "C:\\Users\\gopika.krishnan\\.nuget\\packages\\",
-        "outputPath": "D:\\Xtramile - Project\\Xtramile-Backend\\obj\\",
+        "projectPath": "D:\\XtraMile\\Xtramile-Backend\\XtramileBackend.csproj",
+        "packagesPath": "C:\\Users\\abhinav.as\\.nuget\\packages\\",
+        "outputPath": "D:\\XtraMile\\Xtramile-Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\gopika.krishnan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\abhinav.as\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
