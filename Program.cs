@@ -36,6 +36,10 @@ using XtramileBackend.Repositories.CategoryRepository;
 using XtramileBackend.Repositories.AvailableOptionRepository;
 using XtramileBackend.Services.AvailableOptionService;
 using XtramileBackend.Services.CategoryService;
+using XtramileBackend.Repositories.RequestStatusRepository;
+using XtramileBackend.Repositories.ProjectMappingRepository;
+using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.ProjectMappingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +69,8 @@ builder.Services.AddScoped<ITravelTypeRepository, TravelTypeRepository>();
 builder.Services.AddScoped<ITravelModeRepository, TravelModeRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
+builder.Services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
+builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -83,6 +89,8 @@ builder.Services.AddScoped<ITravelTypeService, TravelTypeService>();
 builder.Services.AddScoped<ITravelModeService, TravelModeService>();
 builder.Services.AddScoped<IAvailableOptionServices, AvailableOptionServices>();
 builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
+builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 
 builder.Services.AddCors(options =>
 {

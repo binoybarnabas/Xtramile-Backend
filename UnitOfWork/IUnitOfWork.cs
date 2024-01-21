@@ -16,6 +16,8 @@ using XtramileBackend.Repositories.TravelModeRepository;
 using XtramileBackend.Repositories.TravelTypeRepository;
 using XtramileBackend.Repositories.AvailableOptionRepository;
 using XtramileBackend.Repositories.CategoryRepository;
+using XtramileBackend.Repositories.ProjectMappingRepository;
+using XtramileBackend.Repositories.RequestStatusRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -38,6 +40,8 @@ namespace XtramileBackend.UnitOfWork
         public ITravelTypeRepository TravelTypeRepository { get; }
         public IAvailableOptionRepository AvailableOptionRepository { get; }
         public ICategoryRepository CategoryRepository { get; }
+        public IProjectMappingRepository ProjectMappingRepository { get; }
+        public IRequestStatusRepository RequestStatusRepository { get; }
         public int Complete();
         //public void Dispose();
     }
