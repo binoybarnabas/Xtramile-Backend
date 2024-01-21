@@ -15,6 +15,8 @@ using XtramileBackend.Repositories.ReasonRepository;
 using XtramileBackend.Repositories.RequestRepository;
 using XtramileBackend.Repositories.StatusRepository;
 using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
 using XtramileBackend.Services.CountryService;
 using XtramileBackend.Services.DepartmentService;
 using XtramileBackend.Services.EmployeeService;
@@ -27,7 +29,13 @@ using XtramileBackend.Services.RolesService;
 using XtramileBackend.Services.ReasonService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.StatusService;
+using XtramileBackend.Services.TravelModeService;
+using XtramileBackend.Services.TravelTypeService;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Repositories.CategoryRepository;
+using XtramileBackend.Repositories.AvailableOptionRepository;
+using XtramileBackend.Services.AvailableOptionService;
+using XtramileBackend.Services.CategoryService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +61,10 @@ builder.Services.AddScoped<IReasonRepository, ReasonRepository>();
 builder.Services.AddScoped<IFileTypeRepository, FileTypeRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<ITravelTypeRepository, TravelTypeRepository>();
+builder.Services.AddScoped<ITravelModeRepository, TravelModeRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -67,10 +79,18 @@ builder.Services.AddScoped<IFileTypeServices, FileTypeServices>();
 builder.Services.AddScoped<IReasonServices, ReasonServices>();
 builder.Services.AddScoped<IStatusServices, StatusServices>();
 builder.Services.AddScoped<IRequestServices, RequestServices>();
+builder.Services.AddScoped<ITravelTypeService, TravelTypeService>();
+builder.Services.AddScoped<ITravelModeService, TravelModeService>();
+builder.Services.AddScoped<IAvailableOptionServices, AvailableOptionServices>();
+builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 
-
-
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -83,6 +103,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAngularDev");
 
 app.UseHttpsRedirection();
 

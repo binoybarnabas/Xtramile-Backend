@@ -37,6 +37,15 @@ namespace XtramileBackend.Data
         public DbSet<TBL_REASON> TBL_REASON { get; set; }
 
         public DbSet<TBL_REQUEST> TBL_REQUEST { get; set; }
+
+        public DbSet<TBL_TRAVEL_TYPE>TBL_TRAVEL_TYPE  { get; set; }
+
+        public DbSet<TBL_TRAVEL_MODE> tBL_TRAVEL_MODE { get; set; }
+
+        public DbSet<TBL_AVAIL_OPTION> TBL_AVAIL_OPTION { get; set; }
+
+        public DbSet<TBL_CATEGORY> TBL_CATEGORY { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //migrations if needed.

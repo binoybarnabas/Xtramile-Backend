@@ -7,8 +7,6 @@ namespace XtramileBackend.Models.EntityModels
         [Key]
         public int RequestId { get; set; }
         public string RequestCode { get; set; }
-        public string FromPlace { get; set; }
-        public string ToPlace { get; set; }
         public DateTime DepartureDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public int TravelTypeId { get; set; }
@@ -22,5 +20,11 @@ namespace XtramileBackend.Models.EntityModels
         public DateTime CreatedOn { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
+        public string SourceCity { get; set; }
+        public string? SourceState { get; set; }
+        public string SourceCountry { get; set; }
+        public string DestinationCity { get; set; }
+        public string? DestinationState { get; set; }
+        public string DestinationCountry { get; set; }
     }
 }

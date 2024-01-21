@@ -12,6 +12,10 @@ using XtramileBackend.Repositories.FileTypeRepository;
 using XtramileBackend.Repositories.ReasonRepository;
 using XtramileBackend.Repositories.RequestRepository;
 using XtramileBackend.Repositories.StatusRepository;
+using XtramileBackend.Repositories.TravelModeRepository;
+using XtramileBackend.Repositories.TravelTypeRepository;
+using XtramileBackend.Repositories.AvailableOptionRepository;
+using XtramileBackend.Repositories.CategoryRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -30,6 +34,10 @@ namespace XtramileBackend.UnitOfWork
         public IReasonRepository ReasonRepository { get; }
         public IStatusRepository StatusRepository { get; }
         public IRequestRepository RequestRepository { get; }
+        public ITravelModeRepository TravelModeRepository { get; }
+        public ITravelTypeRepository TravelTypeRepository { get; }
+        public IAvailableOptionRepository AvailableOptionRepository { get; }
+        public ICategoryRepository CategoryRepository { get; }
         public int Complete();
         //public void Dispose();
     }
