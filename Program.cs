@@ -36,6 +36,8 @@ using XtramileBackend.Repositories.CategoryRepository;
 using XtramileBackend.Repositories.AvailableOptionRepository;
 using XtramileBackend.Services.AvailableOptionService;
 using XtramileBackend.Services.CategoryService;
+using XtramileBackend.Services.ProjectMappingService;
+using XtramileBackend.Repositories.ProjectMappingRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +67,7 @@ builder.Services.AddScoped<ITravelTypeRepository, TravelTypeRepository>();
 builder.Services.AddScoped<ITravelModeRepository, TravelModeRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
-//builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
+builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -84,8 +86,15 @@ builder.Services.AddScoped<ITravelTypeService, TravelTypeService>();
 builder.Services.AddScoped<ITravelModeService, TravelModeService>();
 builder.Services.AddScoped<IAvailableOptionServices, AvailableOptionServices>();
 builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+builder.Services.AddScoped<IProjectMappingService, ProjectMappingService>();
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -98,6 +107,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAngularDev");
 
 app.UseHttpsRedirection();
 

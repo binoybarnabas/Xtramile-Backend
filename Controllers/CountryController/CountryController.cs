@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.CountryService;
 
 namespace XtramileBackend.Controllers.CountryControllers
 {
+    [EnableCors("AllowAngularDev")]
     [Route("api/[controller]")]
     [ApiController]
     public class CountryController : ControllerBase
@@ -25,7 +27,7 @@ namespace XtramileBackend.Controllers.CountryControllers
                 return Ok(countryData);
             }
             catch (Exception ex)
-            {               
+            {
                 return StatusCode(500, "An error occurred while retrieving countries.");
             }
         }

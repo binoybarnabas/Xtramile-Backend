@@ -3,7 +3,7 @@ using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Services.ProjectMappingService
 {
-    public class ProjectMappingService
+    public class ProjectMappingService: IProjectMappingService
     {
         private readonly IUnitOfWork _unitOfWork;
         public ProjectMappingService(IUnitOfWork unitOfWork)
