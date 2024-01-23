@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
+using XtramileBackend.Services.ProjectService;
 
 namespace XtramileBackend.Controllers.EmployeeController
 {
@@ -10,8 +12,7 @@ namespace XtramileBackend.Controllers.EmployeeController
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
-
-        public EmployeeController(IEmployeeServices employeeService)
+        public EmployeeController(IEmployeeServices employeeService, IProjectServices projectService)
         {
             _employeeService = employeeService;
         }
@@ -29,6 +30,19 @@ namespace XtramileBackend.Controllers.EmployeeController
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employees: {ex.Message}");
             }
+        }
+
+        [HttpGet("info/{id}")]
+        public async Task<IActionResult> GetEmployeeInfo(int id)
+        {
+            try {
+                EmployeeInfo EmployeeData = await _employeeService.GetEmployeeInfo(id);
+                return Ok(EmployeeData);
+            }
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
+            }
+            
         }
 
         [HttpPost]

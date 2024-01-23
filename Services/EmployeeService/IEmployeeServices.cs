@@ -1,4 +1,5 @@
-﻿using XtramileBackend.Models.EntityModels;
+﻿using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Services.EmployeeService
 {
@@ -8,5 +9,9 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync();
 
         public Task SetEmployeeAsync(TBL_EMPLOYEE employee);
+
+        public Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id);
+
+        public Task<EmployeeInfo> GetEmployeeInfo(int id);
     }
 }
