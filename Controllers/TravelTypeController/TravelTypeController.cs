@@ -44,8 +44,6 @@ namespace XtramileBackend.Controllers.TravelTypeController
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a travel types: {ex.Message}");
             }
-
-
         }
     }
 }

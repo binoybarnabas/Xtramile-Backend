@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XtramileBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+26c75393a01c3c49ddddfd354c8d6f2dec2ca740")]
 [assembly: System.Reflection.AssemblyProductAttribute("XtramileBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XtramileBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
