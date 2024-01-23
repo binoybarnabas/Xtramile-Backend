@@ -40,6 +40,7 @@ using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
+using XtramileBackend.Services.EmployeeViewPenReqService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +92,7 @@ builder.Services.AddScoped<IAvailableOptionServices, AvailableOptionServices>();
 builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
+builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 
 builder.Services.AddCors(options =>
 {
