@@ -683,3 +683,5 @@ D:\XtraMile\Xtramile-Backend\obj\Debug\net8.0\refint\XtramileBackend.dll
 D:\XtraMile\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.pdb
 D:\XtraMile\Xtramile-Backend\obj\Debug\net8.0\XtramileBackend.genruntimeconfig.cache
 D:\XtraMile\Xtramile-Backend\obj\Debug\net8.0\ref\XtramileBackend.dll
+D:\XtraMile\Xtramile-Backend\bin\Debug\net8.0\DotNetEnv.dll
+D:\XtraMile\Xtramile-Backend\bin\Debug\net8.0\Sprache.dll

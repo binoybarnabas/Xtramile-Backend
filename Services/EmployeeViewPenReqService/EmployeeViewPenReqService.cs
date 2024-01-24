@@ -1,34 +1,43 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Services.EmployeeViewPenReqService
 {
     public class EmployeeViewPenReqService : IEmployeeViewPenReqService
     {
-        private readonly AppDBContext _context;
-        public EmployeeViewPenReqService(AppDBContext context)
+        private IUnitOfWork _unitOfWork;
+        public EmployeeViewPenReqService(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         }
-        public async Task<IEnumerable<object>> GetPendingRequestsByEmpId(int empId)
+        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId)
         {
             try
             {
-                var result = await (from request in _context.TBL_REQUEST
-                                    join project in _context.TBL_PROJECT on request.ProjectId equals project.ProjectId
-                                    join statusApproval in _context.TBL_REQ_APPROVE on request.RequestId equals statusApproval.RequestId
-                                    join status in _context.TBL_STATUS on statusApproval.SecondaryStatusId equals status.StatusId
-                                    join reason in _context.TBL_REASON on request.ReasonId equals reason.ReasonId
-                                    where status.StatusCode == "PE" && request.CreatedBy == empId
-                                    select new
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REASON> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
+
+                var result = (from request in requestData
+                                    join project in projectData on request.ProjectId equals project.ProjectId
+                                    join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
+                                    join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                                    join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                                    join reason in reasonData on request.ReasonId equals reason.ReasonId
+                                    where secondarystatus.StatusCode == "PE" && request.CreatedBy == empId
+                                    select new PendingRequetsViewEmployee
                                     {
-                                        RequestCode = request.RequestCode,
-                                        ProjectCode = project.ProjectCode,
-                                        ProjectName = project.ProjectName,
-                                        ReasonOfTravel = reason.Description,
-                                        DateOfTravel = statusApproval.date
-                                    }).ToListAsync();
+                                        statusName = primarystatus.StatusName,
+                                        requestCode = request.RequestCode,
+                                        projectName = project.ProjectName,
+                                        reasonOfTravel = reason.Description,
+                                        dateOfTravel = request.DepartureDate
+                                    }).ToList();
                 return result;
             }
             catch (Exception ex)
