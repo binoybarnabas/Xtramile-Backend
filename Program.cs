@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
-using XtramileBackend.Repositories;
 using XtramileBackend.Repositories.CountryRepository;
 using XtramileBackend.Repositories.DepartmentRepository;
 using XtramileBackend.Repositories.EmployeeRepository;
@@ -43,6 +42,11 @@ using XtramileBackend.Services.ProjectMappingService;
 using XtramileBackend.Services.EmployeeViewPenReqService;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotNetEnv.Env.Load();
+var dbConnectionString = DotNetEnv.Env.GetString("DATABASE_CONNECTION_STRING");
+
+builder.Configuration["ConnectionStrings:DB_KEY"] = dbConnectionString;
 
 
 builder.Services.AddDbContext<AppDBContext>(options =>
