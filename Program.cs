@@ -47,6 +47,7 @@ using System.Text;
 using XtramileBackend.Services.AuthService;
 
 using XtramileBackend.Services.EmployeeViewPenReqService;
+using XtramileBackend.Services.FinanceDepartment;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -146,7 +147,7 @@ builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
-
+builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
 
 builder.Services.AddCors(options =>
 {
