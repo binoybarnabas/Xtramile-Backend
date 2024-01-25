@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Cors;
+
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
+using XtramileBackend.Services.ProjectService;
+using Microsoft.AspNetCore.Cors;
 using XtramileBackend.Services.EmployeeViewPenReqService;
+
 
 namespace XtramileBackend.Controllers.EmployeeController
 {
@@ -17,6 +22,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
 
         public EmployeeController(IEmployeeServices employeeService,IEmployeeViewPenReqService employeeViewPenReqService)
+
         {
             _employeeService = employeeService;
             _employeeViewPenReqService = employeeViewPenReqService;
@@ -28,6 +34,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
+               
                 return Ok(employeeData);
             }
             catch (Exception ex)
@@ -35,6 +42,20 @@ namespace XtramileBackend.Controllers.EmployeeController
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employees: {ex.Message}");
             }
+        }
+
+        [HttpGet("info/{id}")]
+        public async Task<IActionResult> GetEmployeeInfo(int id)
+        {
+            try {   
+                EmployeeInfo EmployeeData = await _employeeService.GetEmployeeInfo(id);
+                return Ok(EmployeeData);
+            
+            }
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
+            }
+            
         }
 
         [HttpPost]

@@ -50,6 +50,7 @@ namespace XtramileBackend.Data
 
         public DbSet<TBL_PROJECT_MAPPING> TBL_PROJECT_MAPPING { get; set; }
 
+        public DbSet<TBL_USER> TBL_USER { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //migrations if needed.
