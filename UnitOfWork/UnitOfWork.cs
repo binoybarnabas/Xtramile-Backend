@@ -44,7 +44,6 @@ namespace XtramileBackend.UnitOfWork
         public IRequestStatusRepository RequestStatusRepository { get; }
         public IProjectMappingRepository ProjectMappingRepository { get; }
 
-
         public readonly AppDBContext _dbContext;
         public UnitOfWork(AppDBContext dbContext)
         {

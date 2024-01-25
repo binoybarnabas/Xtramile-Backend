@@ -3,6 +3,13 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+#.gitignore
+obj/
+bin/Debug/net8.0/
+.vs/
+
+
+
 # dotenv files
 .env
 

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
 using XtramileBackend.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using XtramileBackend.Repositories.CountryRepository;
 using XtramileBackend.Repositories.DepartmentRepository;
 using XtramileBackend.Repositories.EmployeeRepository;
@@ -41,14 +43,65 @@ using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
 
+using System.Text;
+using XtramileBackend.Services.AuthService;
+
+using XtramileBackend.Services.EmployeeViewPenReqService;
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+DotNetEnv.Env.Load();
+
+
+var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
+var issuer = DotNetEnv.Env.GetString("ISSUER");
+
+builder.Configuration["Jwt:SecretKey"] = secretkey;
+builder.Configuration["Jwt:Issuer"] = issuer;
+
+var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
+var jwtKey = builder.Configuration.GetSection("Jwt:SecretKey").Get<string>();
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = "",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
+
+
+//adding policy for authorization
+builder.Services.AddAuthorization(
+    option => {
+        option.AddPolicy("Employee", policy => policy.RequireRole("Employee"));
+        option.AddPolicy("Manager", policy => policy.RequireRole("Manager"));
+        option.AddPolicy("Head", policy => policy.RequireRole("Head"));
+        option.AddPolicy("CXO", policy => policy.RequireRole("CXO"));
+
+    });
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+var dbConnectionString = DotNetEnv.Env.GetString("DB_STRING");
+
+builder.Configuration["ConnectionStrings:DB_KEY"] = dbConnectionString;
 
 
 builder.Services.AddDbContext<AppDBContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DB_KEY")));
-// Add services to the container.
 
-builder.Services.AddControllers();
 
 //Dependency injections
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -91,6 +144,9 @@ builder.Services.AddScoped<IAvailableOptionServices, AvailableOptionServices>();
 builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -99,11 +155,15 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod()
                           .AllowAnyHeader());
 });
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -111,10 +171,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowAngularDev");
+
 
 app.UseHttpsRedirection();
 
+
+app.UseCors("AllowAngularDev");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
