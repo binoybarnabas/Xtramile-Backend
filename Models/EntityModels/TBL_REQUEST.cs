@@ -10,9 +10,8 @@ namespace XtramileBackend.Models.EntityModels
         public DateTime DepartureDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public int TravelTypeId { get; set; }
-        public int ModelId { get; set; }
-        public int PerdiumId { get; set; }
-        public int CountryId { get; set; }
+        public int? ModeId { get; set; }
+        public int? PerdiumId { get; set; }
         public int ProjectId { get; set; }
         public int ReasonId { get; set; }
         public int? PriorityId { get; set; }
@@ -26,5 +25,7 @@ namespace XtramileBackend.Models.EntityModels
         public string DestinationCity { get; set; }
         public string? DestinationState { get; set; }
         public string DestinationCountry { get; set; }
+        public string CabRequired { get; set; }
+        public string AccommodationRequired { get; set; }
     }
 }

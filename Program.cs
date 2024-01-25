@@ -42,12 +42,17 @@ using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
+
 using System.Text;
 using XtramileBackend.Services.AuthService;
+
+using XtramileBackend.Services.EmployeeViewPenReqService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
+
 
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
@@ -92,6 +97,7 @@ builder.Services.AddControllers();
 var dbConnectionString = DotNetEnv.Env.GetString("DB_STRING");
 
 builder.Configuration["ConnectionStrings:DB_KEY"] = dbConnectionString;
+
 
 builder.Services.AddDbContext<AppDBContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DB_KEY")));
@@ -139,8 +145,7 @@ builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-
+builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 
 
 builder.Services.AddCors(options =>

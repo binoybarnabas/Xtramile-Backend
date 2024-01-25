@@ -35,7 +35,9 @@ namespace XtramileBackend.Controllers.RequestControllers
         [HttpPost]
         public async Task<IActionResult> AddRequestAsync([FromBody] TBL_REQUEST request)
         {
-            try
+            await _requestServices.AddRequestAsync(request);
+            return Ok(request);
+            /*try
             {
                 await _requestServices.AddRequestAsync(request);
                 return Ok(request);
@@ -45,7 +47,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a request" +
                     $": {ex.Message}");
-            }
+            }*/
         }
     }
 }

@@ -1,3 +1,4 @@
+
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,17 +7,25 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ProjectService;
+using Microsoft.AspNetCore.Cors;
+using XtramileBackend.Services.EmployeeViewPenReqService;
+
 
 namespace XtramileBackend.Controllers.EmployeeController
 {
+    [EnableCors("AllowAngularDev")]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
-        public EmployeeController(IEmployeeServices employeeService, IProjectServices projectService)
+        private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
+
+        public EmployeeController(IEmployeeServices employeeService,IEmployeeViewPenReqService employeeViewPenReqService)
+
         {
             _employeeService = employeeService;
+            _employeeViewPenReqService = employeeViewPenReqService;
         }
 
         [HttpGet]
@@ -61,6 +70,20 @@ namespace XtramileBackend.Controllers.EmployeeController
             {
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
+            }
+        }
+        [HttpGet("ViewPendingRequest/{empId}")]
+        public async Task<IActionResult> GetPendingRequestsByEmpId(int empId)
+        {
+            try
+            {
+                IEnumerable<PendingRequetsViewEmployee> pendingRequestData = await _employeeViewPenReqService.GetPendingRequestsByEmpId(empId);
+                return Ok(pendingRequestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
             }
         }
     }
