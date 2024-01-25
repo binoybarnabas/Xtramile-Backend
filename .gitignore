@@ -5,7 +5,7 @@
 #.gitignore
 obj/
 bin/Debug/net8.0/
-
+.vs/
 # dotenv files
 .env
 
