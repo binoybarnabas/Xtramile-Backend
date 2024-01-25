@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
@@ -23,6 +25,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
+               
                 return Ok(employeeData);
             }
             catch (Exception ex)
@@ -35,9 +38,10 @@ namespace XtramileBackend.Controllers.EmployeeController
         [HttpGet("info/{id}")]
         public async Task<IActionResult> GetEmployeeInfo(int id)
         {
-            try {
+            try {   
                 EmployeeInfo EmployeeData = await _employeeService.GetEmployeeInfo(id);
                 return Ok(EmployeeData);
+            
             }
             catch (Exception ex) {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
