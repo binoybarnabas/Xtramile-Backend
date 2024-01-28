@@ -4,7 +4,7 @@ using XtramileBackend.Services.FinanceDepartment;
 
 namespace XtramileBackend.Controllers.FinanceDepartmentControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class FinanceDepartmentController : ControllerBase
     {
@@ -14,7 +14,7 @@ namespace XtramileBackend.Controllers.FinanceDepartmentControllers
             _financeDepartmentService = financeDepartmentService;
         }
 
-        [HttpGet("/getrequests")]
+        [HttpGet("getrequests")]
         public async Task<IActionResult> GetRequests()
         {
             try
@@ -24,12 +24,12 @@ namespace XtramileBackend.Controllers.FinanceDepartmentControllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employees: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting requests: {ex.Message}");
             }
 
         }
 
-        [HttpGet("/getrequests/sort")]
+        [HttpGet("getrequests/sort")]
         public async Task<IActionResult> GetRequests([FromQuery] string sortField, bool isDescending)
         {
             try
@@ -39,7 +39,22 @@ namespace XtramileBackend.Controllers.FinanceDepartmentControllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employees: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting requests: {ex.Message}");
+            }
+
+        }
+
+        [HttpGet("invoices")]
+        public async Task<IActionResult> GetInvoiceAttachements()
+        {
+            try
+            {
+                var invoiceData = await _financeDepartmentService.GetAllInvoiceAttachments();
+                return Ok(invoiceData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting Invoices: {ex.Message}");
             }
 
         }

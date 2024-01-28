@@ -6,5 +6,7 @@ namespace XtramileBackend.Services.FinanceDepartment
     {
         public Task<IEnumerable<FinanceRequest>> GetIncomingRequests();
         public Task<IEnumerable<FinanceRequest>> SortIncomingList(string sortField, bool isDescending);
+
+        public Task<IEnumerable<InvoiceAttachment>> GetAllInvoiceAttachments();
     }
 }

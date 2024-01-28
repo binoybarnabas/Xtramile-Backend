@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
@@ -51,7 +53,16 @@ namespace XtramileBackend.Services.FinanceDepartment
                 throw;
             }
         }
-
+        /// <summary>
+        /// get all the informations for the requests
+        /// 
+        /// </summary>
+        /// <param name="sortField"></param>
+        /// <param name="isDescending"></param>
+        /// <returns>
+        ///  A list containing requestcode, firstname of employee, lastname of employee, email, request date, type of transportation in sorted order
+        ///  The sort can be done based on fields like request code, first name and date of request.
+        /// </returns>
         public async Task<IEnumerable<FinanceRequest>> SortIncomingList(string sortField, bool isDescending) {
             try { 
             IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -95,6 +106,40 @@ namespace XtramileBackend.Services.FinanceDepartment
             }
 
         }
+
+        public async Task<IEnumerable<InvoiceAttachment>> GetAllInvoiceAttachments()
+        {
+            try
+            {
+                IEnumerable<TBL_INVOICE> invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
+                IEnumerable<TBL_EXPENSE> expenses = await _unitOfWork.ExpenseRepository.GetAllAsync();
+
+                var invoiceAttachments = (from invoice in invoices
+                                                                     join expense in expenses
+                                                                     on invoice.InvoiceId equals expense.InvoiceId
+                                                                     select new InvoiceAttachment
+                                                                     {
+                                                                         InvoiceId = invoice.InvoiceId,
+                                                                         VendorName = expense.VendorName,
+                                                                         VendorEmail = expense.VendorEmail,
+                                                                         Amount = expense.InvoiceAmount,
+                                                                         PaidDate = expense.PaidOn
+                                                                     });
+                
+                return invoiceAttachments.ToList();
+
+            }
+
+            catch (Exception ex) {
+                Console.WriteLine($"An error occurred while getting incoming requests: {ex.Message}");
+                throw;
+            }
+            
+        
+          
+        }
+
+
 
     }
 }
