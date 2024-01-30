@@ -1,5 +1,5 @@
 
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -21,7 +21,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         private readonly IEmployeeServices _employeeService;
         private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
 
-        public EmployeeController(IEmployeeServices employeeService,IEmployeeViewPenReqService employeeViewPenReqService)
+        public EmployeeController(IEmployeeServices employeeService, IEmployeeViewPenReqService employeeViewPenReqService)
 
         {
             _employeeService = employeeService;
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
-               
+
                 return Ok(employeeData);
             }
             catch (Exception ex)
@@ -47,15 +47,17 @@ namespace XtramileBackend.Controllers.EmployeeController
         [HttpGet("info/{id}")]
         public async Task<IActionResult> GetEmployeeInfo(int id)
         {
-            try {   
+            try
+            {
                 EmployeeInfo EmployeeData = await _employeeService.GetEmployeeInfo(id);
                 return Ok(EmployeeData);
-            
+
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
             }
-            
+
         }
 
         [HttpPost]
@@ -84,6 +86,34 @@ namespace XtramileBackend.Controllers.EmployeeController
             {
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
+            }
+        }
+        [HttpGet("/api/employee/profile/details/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeProfileByIdAsync(int employeeId)
+        {
+            try
+            {
+                EmployeeProfile employeeData = await _employeeService.GetEmployeeProfileByIdAsync(employeeId);
+                return Ok(employeeData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employee profile details: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("/api/employee/edit/profile/details/{employeeId}")]
+        public async Task<IActionResult> UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
+        {
+            try
+            {
+                await _employeeService.UpdateEmployeeDetailsAsync(employeeId, profileEdit);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating employee details: {ex.Message}");
             }
         }
         [HttpGet("ViewOptionsByRequestId/{reqId}")]
