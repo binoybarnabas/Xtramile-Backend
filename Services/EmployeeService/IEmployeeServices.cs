@@ -13,5 +13,8 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id);
 
         public Task<EmployeeInfo> GetEmployeeInfo(int id);
+
+        public Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId);
+
     }
 }

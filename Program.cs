@@ -48,6 +48,8 @@ using XtramileBackend.Services.AuthService;
 
 using XtramileBackend.Services.EmployeeViewPenReqService;
 using XtramileBackend.Services.FinanceDepartment;
+using XtramileBackend.Repositories.RequestMappingRepository;
+using XtramileBackend.Services.RequestMappingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -125,6 +127,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
 builder.Services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
 builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
+builder.Services.AddScoped<IRequestMappingRepsitory, RequestMappingRepository>();
+
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -148,6 +152,8 @@ builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
+builder.Services.AddScoped<IRequestMappingService, RequestMappingService>();
+
 
 builder.Services.AddCors(options =>
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Data
@@ -49,6 +50,9 @@ namespace XtramileBackend.Data
         public DbSet<TBL_REQ_APPROVE> TBL_REQ_APPROVE { get; set; }
 
         public DbSet<TBL_PROJECT_MAPPING> TBL_PROJECT_MAPPING { get; set; }
+
+        public DbSet<TBL_REQ_MAPPING> TBL_REQ_MAPPING { get; set; }
+
 
         public DbSet<TBL_USER> TBL_USER { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

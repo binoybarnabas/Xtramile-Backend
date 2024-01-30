@@ -8,8 +8,8 @@ namespace XtramileBackend.Models.EntityModels
         public int OptionId { get; set; }
         public string OptionCode { get; set; }
         public string? Description { get; set; }
-        public string OptionInfo { get; set; }
-        public string ServiceOffered { get; set; }
+        public string Class { get; set; }
+        public string ServiceOfferedBy { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int RequestId { get; set; }
