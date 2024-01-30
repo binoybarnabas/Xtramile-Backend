@@ -1,4 +1,7 @@
-﻿using XtramileBackend.Models.APIModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using XtramileBackend.Data;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -6,11 +9,13 @@ namespace XtramileBackend.Services.EmployeeService
 {
     public class EmployeeServices : IEmployeeServices
     {
+
         private readonly IUnitOfWork _unitOfWork;
         public EmployeeServices(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
 
         public async Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync()
         {
@@ -36,11 +41,11 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> projectEmployeeMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
-          
+
                 //get the data of the employee
                 var employeeDetail = (from projectEmployee in projectEmployeeMap
                                       join project in projectData on projectEmployee.ProjectId equals project.ProjectId
-                                      join employee in employeeData.Where(e=>e.EmpId == id) on projectEmployee.EmpId equals employee.EmpId
+                                      join employee in employeeData.Where(e => e.EmpId == id) on projectEmployee.EmpId equals employee.EmpId
                                       join department in departmentData on project.DepartmentId equals department.DepartmentId
                                       join reportsToEmployee in employeeData on employee.ReportsTo equals reportsToEmployee.EmpId
                                       select new EmployeeInfo
@@ -54,10 +59,10 @@ namespace XtramileBackend.Services.EmployeeService
                                           ProjectCode = project.ProjectCode,
                                           ProjectName = project.ProjectName,
                                           ReportsTo = reportsToEmployee.FirstName
-                                          
+
                                       }).FirstOrDefault();
 
-                
+
                 return employeeDetail;
 
             }
@@ -86,10 +91,11 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id) {
+        public async Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id)
+        {
             try
             {
-                TBL_EMPLOYEE employeeData =  await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
                 return employeeData;
             }
             catch (Exception ex)
@@ -99,6 +105,82 @@ namespace XtramileBackend.Services.EmployeeService
                 throw; // Re-throw the exception to propagate it
             }
 
+        }
+
+        public async Task<EmployeeProfile> GetEmployeeProfileByIdAsync(int employeeId)
+        {
+            try
+            {
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+
+                var result = (
+                            from employee in employees
+                            join mapping in projectMappings on employee.EmpId equals mapping.EmpId
+                            join project in projects on mapping.ProjectId equals project.ProjectId
+                            join department in departments on project.DepartmentId equals department.DepartmentId
+                            join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId into reportsToJoin
+                            from reportsToEmployee in reportsToJoin.DefaultIfEmpty() // Perform left join
+                            where employee.EmpId == employeeId
+                            select new EmployeeProfile
+                            {
+                                EmpId = employee.EmpId,
+                                FirstName = employee.FirstName,
+                                LastName = employee.LastName,
+                                ContactNumber = employee.ContactNumber,
+                                Address = employee.Address,
+                                Email = employee.Email,
+                                ReportsTo = reportsToEmployee != null ? $"{reportsToEmployee.FirstName} {reportsToEmployee.LastName}" : "N/A",
+                                DepartmentName = department.DepartmentName,
+                                ProjectCode = project.ProjectCode,
+                                ProjectName = project.ProjectName,
+                            }
+                            ).FirstOrDefault();
+
+
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting employee profile by ID: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
+        {
+            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
+
+            if (employee != null)
+            {
+                if (profileEdit != null)
+                {
+                    if (profileEdit.ContactNumber != null)
+                    {
+                        employee.ContactNumber = profileEdit.ContactNumber;
+                    }
+
+                    if (profileEdit.Address != null)
+                    {
+                        employee.Address = profileEdit.Address;
+                    }
+
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
+            }
         }
 
 
@@ -111,7 +193,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="reqId"></param>
         /// <returns><IEnumerable<OptionCard></returns>
-        
+
         public async Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId)
         {
             try
@@ -162,7 +244,7 @@ namespace XtramileBackend.Services.EmployeeService
             {
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while getting options for request: {ex.Message}");
-                throw; 
+                throw;
             }
         }
     }

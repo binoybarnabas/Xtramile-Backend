@@ -46,6 +46,7 @@ namespace XtramileBackend.UnitOfWork
         public IRequestMappingRepsitory RequestMappingRepository { get; }
 
         public int Complete();
+        Task SaveChangesAsyn();
         //public void Dispose();
     }
 }

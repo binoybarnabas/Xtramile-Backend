@@ -77,6 +77,10 @@ namespace XtramileBackend.UnitOfWork
         {
             return _dbContext.SaveChanges();
         }
+        public Task SaveChangesAsyn()
+        {
+            return _dbContext.SaveChangesAsync();
+        }
 
     }
 }
