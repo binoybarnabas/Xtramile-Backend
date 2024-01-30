@@ -18,6 +18,7 @@ using XtramileBackend.Repositories.AvailableOptionRepository;
 using XtramileBackend.Repositories.CategoryRepository;
 using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
+using XtramileBackend.Repositories.RequestMappingRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -43,6 +44,8 @@ namespace XtramileBackend.UnitOfWork
         public ICategoryRepository CategoryRepository { get; }
         public IRequestStatusRepository RequestStatusRepository { get; }
         public IProjectMappingRepository ProjectMappingRepository { get; }
+        public IRequestMappingRepsitory RequestMappingRepository { get; }
+
 
         public readonly AppDBContext _dbContext;
         public UnitOfWork(AppDBContext dbContext)
@@ -67,6 +70,7 @@ namespace XtramileBackend.UnitOfWork
             CategoryRepository = new CategoryRepository(_dbContext);
             RequestStatusRepository = new RequestStatusRepository(_dbContext);
             ProjectMappingRepository = new ProjectMappingRepository(_dbContext);
+            RequestMappingRepository = new RequestMappingRepository(_dbContext);
         } 
 
         public int Complete()

@@ -86,5 +86,19 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
             }
         }
+        [HttpGet("ViewOptionsByRequestId/{reqId}")]
+        public async Task<IActionResult> GetOptionsByReqId(int reqId)
+        {
+            try
+            {
+                IEnumerable<OptionCard> optionsForRequestData = await _employeeService.GetOptionsByReqId(reqId);
+                return Ok(optionsForRequestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
+            }
+        }
     }
 }
