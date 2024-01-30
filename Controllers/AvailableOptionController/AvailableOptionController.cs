@@ -7,7 +7,7 @@ using XtramileBackend.Services.AvailableOptionService;
 
 namespace XtramileBackend.Controllers.AvailableOptionControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/availableoptions")]
     [ApiController]
     public class AvailableOptionController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
             _availableOptionServices = availableOptionServices;
         }
 
-        [HttpGet]
+        [HttpGet("traveloptions")]
         public async Task<IActionResult> GetAvailableOptionsAsync()
         {
             try
@@ -33,7 +33,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddAvailableOptionAsync([FromBody] TBL_AVAIL_OPTION availableOption)
         {
             try

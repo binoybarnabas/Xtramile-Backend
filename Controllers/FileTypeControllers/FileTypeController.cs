@@ -5,7 +5,7 @@ using XtramileBackend.Services.FileTypeService;
 
 namespace XtramileBackend.Controllers.FileTypeControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/filetype")]
     [ApiController]
     public class FileTypeController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace XtramileBackend.Controllers.FileTypeControllers
             _fileTypeServices = fileTypeServices;
         }
 
-        [HttpGet]
+        [HttpGet("filetypes")]
         public async Task<IActionResult> GetFileTypesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.FileTypeControllers
 
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddFileTypeAsync([FromBody] TBL_FILE_TYPE files)
         {
             try

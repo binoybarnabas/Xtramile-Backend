@@ -6,7 +6,7 @@ using XtramileBackend.Services.RolesService;
 
 namespace XtramileBackend.Controllers.RolesController
 {
-    [Route("api/[controller]")]
+    [Route("api/role")]
     [ApiController]
     public class RolesController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace XtramileBackend.Controllers.RolesController
             _roleServices = roleServices;
         }
 
-        [HttpGet]
+        [HttpGet("roles")]
         public async Task<IActionResult> GetRolesAsync()
         {
             try
@@ -33,7 +33,7 @@ namespace XtramileBackend.Controllers.RolesController
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddRolesAsync([FromBody] TBL_ROLES roles)
         {
             try

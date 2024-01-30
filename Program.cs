@@ -42,20 +42,28 @@ using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
-
 using System.Text;
 using XtramileBackend.Services.AuthService;
-
 using XtramileBackend.Services.EmployeeViewPenReqService;
 using XtramileBackend.Services.FinanceDepartment;
-using XtramileBackend.Repositories.RequestMappingRepository;
-using XtramileBackend.Services.RequestMappingService;
-
-
+using Microsoft.Data.SqlClient;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 
+string DB_SERVER = DotNetEnv.Env.GetString("DB_SERVER");
+string DB_NAME = DotNetEnv.Env.GetString("DB_NAME");
+string PERSIST_SECURITY_INFO = DotNetEnv.Env.GetString("PERSIST_SECURITY_INFO");
+string DB_USER_ID = DotNetEnv.Env.GetString("DB_USER_ID");
+string DB_PASSWORD = DotNetEnv.Env.GetString("DB_PASSWORD");
+string MULTIPLE_ACTIVE_RESULT_SETS = DotNetEnv.Env.GetString("MULTIPLE_ACTIVE_RESULT_SETS");
+string ENCRYPT = DotNetEnv.Env.GetString("ENCRYPT");
+string TRUST_SERVER_CERTIFICATE = DotNetEnv.Env.GetString("TRUST_SERVER_CERTIFICATE");
+string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");
+
+//string connectionString = $"Server={server};Initial Catalog={database};Encrypt={encrypt};TrustServerCertificate={trustServerCertificate};Connection Timeout={connectionTimeout};Authentication={authentication};";
+string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";
 
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
@@ -97,13 +105,19 @@ builder.Services.AddAuthorization(
 // Add services to the container.
 builder.Services.AddControllers();
 
+
+/*SqlConnection connection = new SqlConnection(connectionString);
+
 var dbConnectionString = DotNetEnv.Env.GetString("DB_STRING");
 
 builder.Configuration["ConnectionStrings:DB_KEY"] = dbConnectionString;
 
+builder.Services.AddDbContext<AppDBContext>(options =>
+      options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString)));*/
+
 
 builder.Services.AddDbContext<AppDBContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DB_KEY")));
+    options.UseSqlServer(connectionString));
 
 
 //Dependency injections
@@ -127,8 +141,6 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
 builder.Services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
 builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
-builder.Services.AddScoped<IRequestMappingRepsitory, RequestMappingRepository>();
-
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -152,8 +164,6 @@ builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
-builder.Services.AddScoped<IRequestMappingService, RequestMappingService>();
-
 
 builder.Services.AddCors(options =>
 {

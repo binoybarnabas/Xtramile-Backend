@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace XtramileBackend.Controllers.TravelAdminControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/traveladmin")]
     [ApiController]
     public class TravelAdminController : ControllerBase
     {

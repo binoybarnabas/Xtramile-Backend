@@ -5,7 +5,7 @@ using XtramileBackend.Services.PerdiumService;
 
 namespace XtramileBackend.Controllers.PerdiumController
 {
-    [Route("api/[controller]")]
+    [Route("api/perdium")]
     [ApiController]
     public class PerdiumController: ControllerBase
     {
@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.PerdiumController
             _perdiumServices = perdiumServices;
         }
 
-        [HttpGet]
+        [HttpGet("perdiums")]
         public async Task<IActionResult> GetPerdiumAsync()
         {
             try
@@ -31,7 +31,7 @@ namespace XtramileBackend.Controllers.PerdiumController
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddPerdiumAsync([FromBody] TBL_PER_DIUM perdium)
         {
             try

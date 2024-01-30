@@ -4,7 +4,7 @@ using XtramileBackend.Services.TravelTypeService;
 
 namespace XtramileBackend.Controllers.TravelTypeController
 {
-    [Route("api/[controller]")]
+    [Route("api/travletype")]
     [ApiController]
     public class TravelTypeController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace XtramileBackend.Controllers.TravelTypeController
             _travelTypeService = travelTypeService;
         }
 
-        [HttpGet]
+        [HttpGet("types")]
         public async Task<IActionResult> GetTravelTypeAsync()
         {
             try
@@ -31,7 +31,7 @@ namespace XtramileBackend.Controllers.TravelTypeController
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddTravelTypeAsync([FromBody] TBL_TRAVEL_TYPE travelType)
         {
             try

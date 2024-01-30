@@ -8,7 +8,7 @@ using XtramileBackend.Services.ExpenseService;
 
 namespace XtramileBackend.Controllers.ExpenseControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/expense")]
     [ApiController]
     public class ExpenseController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.ExpenseControllers
             _expenseServices = expenseServices;
         }
 
-        [HttpGet]
+        [HttpGet("expenses")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.ExpenseControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddExpenseAsync([FromBody] TBL_EXPENSE expense)
         {
             try
