@@ -5,7 +5,7 @@ using XtramileBackend.Services.TravelModeService;
 
 namespace XtramileBackend.Controllers.TravelModeController
 {
-    [Route("api/[controller]")]
+    [Route("api/travelmode")]
     [ApiController]
     public class TravelModeController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.TravelModeController
             _travelModeService = travelModeService;
         }
 
-        [HttpGet]
+        [HttpGet("modes")]
         public async Task<IActionResult> GetTravelModesAsync()
         {
             try
@@ -32,7 +32,7 @@ namespace XtramileBackend.Controllers.TravelModeController
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddTravelModeAsync([FromBody] TBL_TRAVEL_MODE travelMode)
         {
             try

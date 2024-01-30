@@ -14,7 +14,7 @@ using XtramileBackend.Services.EmployeeViewPenReqService;
 namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
-    [Route("api/[controller]")]
+    [Route("api/employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             _employeeViewPenReqService = employeeViewPenReqService;
         }
 
-        [HttpGet]
+        [HttpGet("employees")]
         public async Task<IActionResult> GetEmployeesAsync()
         {
             try
@@ -60,7 +60,7 @@ namespace XtramileBackend.Controllers.EmployeeController
 
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddEmployeeAsync([FromBody] TBL_EMPLOYEE employee)
         {
             try
@@ -74,7 +74,8 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
             }
         }
-        [HttpGet("ViewPendingRequest/{empId}")]
+
+        [HttpGet("viewpendingrequest/{empId}")]
         public async Task<IActionResult> GetPendingRequestsByEmpId(int empId)
         {
             try
@@ -88,6 +89,7 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
             }
         }
+
         [HttpGet("/api/employee/profile/details/{employeeId}")]
         public async Task<IActionResult> GetEmployeeProfileByIdAsync(int employeeId)
         {
@@ -116,7 +118,7 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating employee details: {ex.Message}");
             }
         }
-        [HttpGet("ViewOptionsByRequestId/{reqId}")]
+        [HttpGet("viewoptions/request/{reqId}")]
         public async Task<IActionResult> GetOptionsByReqId(int reqId)
         {
             try

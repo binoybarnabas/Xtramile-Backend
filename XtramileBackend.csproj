@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\TravelAdminServices\**" />
+    <Content Remove="Services\TravelAdminServices\**" />
+    <EmbeddedResource Remove="Services\TravelAdminServices\**" />
+    <None Remove="Services\TravelAdminServices\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
@@ -21,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\TravelAdminServices\" />
     <Folder Include="Tests\" />
     <Folder Include="Utils\" />
   </ItemGroup>

@@ -7,7 +7,7 @@ using XtramileBackend.Services.DepartmentService;
 
 namespace XtramileBackend.Controllers.DepartmentControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/department")]
     [ApiController]
     public class DepartmentController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace XtramileBackend.Controllers.DepartmentControllers
             _departmentServices = departmentServices;
         }
 
-        [HttpGet]
+        [HttpGet("departments")]
         public async Task<IActionResult> GetDepartmentsAsync()
         {
             try
@@ -33,7 +33,7 @@ namespace XtramileBackend.Controllers.DepartmentControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddDepartmentAsync([FromBody] TBL_DEPARTMENT department)
         {
             try

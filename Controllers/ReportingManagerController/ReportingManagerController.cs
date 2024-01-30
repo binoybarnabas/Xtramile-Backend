@@ -1,6 +1,11 @@
-﻿namespace XtramileBackend.Controllers.ReportingManagerController
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace XtramileBackend.Controllers.ReportingManagerController
 {
-    public class ReportingManagerController
+    [Route("api/reportingmanager")]
+    [ApiController]
+    public class ReportingManagerController : ControllerBase
     {
     }
 }

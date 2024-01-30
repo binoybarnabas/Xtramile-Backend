@@ -6,7 +6,7 @@ using XtramileBackend.Services.RequestService;
 
 namespace XtramileBackend.Controllers.RequestControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/request")]
     [ApiController]
     public class RequestController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.RequestControllers
             _requestServices = requestServices;
         }
 
-        [HttpGet]
+        [HttpGet("requests")]
         public async Task<IActionResult> GetAllRequestAsync()
         {
             try
@@ -32,7 +32,7 @@ namespace XtramileBackend.Controllers.RequestControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromBody] TBL_REQUEST request)
         {
             await _requestServices.AddRequestAsync(request);
