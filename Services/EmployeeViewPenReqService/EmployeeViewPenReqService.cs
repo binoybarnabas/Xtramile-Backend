@@ -22,23 +22,28 @@ namespace XtramileBackend.Services.EmployeeViewPenReqService
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_REASON> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
-                var result = (from request in requestData
-                                    join project in projectData on request.ProjectId equals project.ProjectId
-                                    join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
-                                    join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
-                                    join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
-                                    join reason in reasonData on request.ReasonId equals reason.ReasonId
-                                    where secondarystatus.StatusCode == "PE" && request.CreatedBy == empId
-                                    select new PendingRequetsViewEmployee
-                                    {
-                                        statusName = primarystatus.StatusName,
-                                        requestCode = request.RequestCode,
-                                        projectName = project.ProjectName,
-                                        reasonOfTravel = reason.Description,
-                                        dateOfTravel = request.DepartureDate
-                                    }).ToList();
-                return result;
+                var results = (from request in requestData
+                               join project in projectData on request.ProjectId equals project.ProjectId
+                               join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
+                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                               join reason in reasonData on request.ReasonId equals reason.ReasonId
+                               join employee in employeeData on statusApproval.EmpId equals employee.EmpId
+                               where secondarystatus.StatusCode == "PE" && request.CreatedBy == empId
+                               group new { request, project, statusApproval, primarystatus, secondarystatus, reason, employee } by request.RequestId into requestGroup
+                               select requestGroup.Last())
+               .Select(x => new PendingRequetsViewEmployee
+               {
+                   modifiedBy = x.employee.FirstName + x.employee.LastName,
+                   statusName = x.primarystatus.StatusName,
+                   requestCode = x.request.RequestCode,
+                   projectName = x.project.ProjectName,
+                   reasonOfTravel = x.reason.Description,
+                   dateOfTravel = x.request.DepartureDate
+               }).ToList();
+                return results;
             }
             catch (Exception ex)
             {

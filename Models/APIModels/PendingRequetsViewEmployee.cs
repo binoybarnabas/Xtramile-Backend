@@ -2,6 +2,7 @@
 {
     public class PendingRequetsViewEmployee
     {
+        public string modifiedBy { get; set; }
         public string statusName { get; set; }
         public string requestCode { get; set; }
         public string projectName { get; set; }
