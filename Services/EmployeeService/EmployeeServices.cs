@@ -50,6 +50,7 @@ namespace XtramileBackend.Services.EmployeeService
                                       join reportsToEmployee in employeeData on employee.ReportsTo equals reportsToEmployee.EmpId
                                       select new EmployeeInfo
                                       {
+                                          EmpId = employee.EmpId,
                                           FirstName = employee.FirstName,
                                           LastName = employee.LastName,
                                           Email = employee.Email,
