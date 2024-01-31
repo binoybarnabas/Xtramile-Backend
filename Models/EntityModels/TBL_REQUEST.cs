@@ -24,7 +24,7 @@ namespace XtramileBackend.Models.EntityModels
         public string SourceCountry { get; set; }
         public string DestinationCity { get; set; }
         public string? DestinationState { get; set; }
-        public string DestinationCountry { get; set; }
+        public string DestinationCountry { get; set; }  
         public string CabRequired { get; set; }
         public string AccommodationRequired { get; set; }
     }

@@ -193,7 +193,6 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="reqId"></param>
         /// <returns><IEnumerable<OptionCard></returns>
-
         public async Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId)
         {
             try

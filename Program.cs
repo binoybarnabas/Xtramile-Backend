@@ -48,6 +48,7 @@ using XtramileBackend.Services.EmployeeViewPenReqService;
 using XtramileBackend.Services.FinanceDepartment;
 using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using XtramileBackend.Services.TravelAdminService;
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
@@ -104,7 +105,6 @@ builder.Services.AddAuthorization(
 
 // Add services to the container.
 builder.Services.AddControllers();
-
 
 /*SqlConnection connection = new SqlConnection(connectionString);
 
@@ -164,6 +164,7 @@ builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
+builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 
 builder.Services.AddCors(options =>
 {
