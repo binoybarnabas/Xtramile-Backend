@@ -14,5 +14,6 @@ namespace XtramileBackend.Models.EntityModels
         public DateTime EndTime { get; set; }
         public int RequestId { get; set; }
         public int CategoryId { get; set; }
+        public int? ModeId { get; set; }
     }
 }

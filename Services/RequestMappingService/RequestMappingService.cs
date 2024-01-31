@@ -54,7 +54,7 @@ namespace XtramileBackend.Services.RequestMappingService
                 var result = (from reqMapping in reqMappingData
                               join option in availableOptions on reqMapping.OptionId equals option.OptionId
                               join request in requestData on option.RequestId equals request.RequestId
-                              join mode in travelModeData on request.ModeId equals mode.ModeId
+                              join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
@@ -75,7 +75,7 @@ namespace XtramileBackend.Services.RequestMappingService
                                   DestinationState = request.DestinationState,
                                   DestinationCountry = request.DestinationCountry,
                                   DestinationCountryCode = destinationCountry.CountryCode,
-                                  ModeId = request.ModeId,
+                                  ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
                                   TravelTypeId = request.TravelTypeId,
                                   TravelTypeName = travelType.TypeName,
