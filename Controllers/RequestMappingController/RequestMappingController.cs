@@ -7,7 +7,7 @@ namespace XtramileBackend.Controllers.RequestMappingController
 {
     [EnableCors("AllowAngularDev")]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/requestmapping")]
     public class RequestMappingController : ControllerBase
     {
         private IRequestMappingService _requestMappingService;
@@ -15,7 +15,7 @@ namespace XtramileBackend.Controllers.RequestMappingController
         {
             _requestMappingService = requestMappingService;
         }
-        [HttpGet]
+        [HttpGet("options/selected")]
         public async Task<IActionResult> GetSelectedOption(int reqId)
         {
             try
@@ -29,7 +29,7 @@ namespace XtramileBackend.Controllers.RequestMappingController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
             }
         }
-        [HttpPost]
+        [HttpPost("add/option")]
         public async Task<IActionResult> AddSelectedOptionForRequest([FromBody]  TBL_REQ_MAPPING option)
         {
             try

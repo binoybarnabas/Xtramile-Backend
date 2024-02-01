@@ -1,4 +1,7 @@
-﻿using XtramileBackend.Models.APIModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using XtramileBackend.Data;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -6,11 +9,13 @@ namespace XtramileBackend.Services.EmployeeService
 {
     public class EmployeeServices : IEmployeeServices
     {
+
         private readonly IUnitOfWork _unitOfWork;
         public EmployeeServices(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
 
         public async Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync()
         {
@@ -36,11 +41,11 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> projectEmployeeMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
-          
+
                 //get the data of the employee
                 var employeeDetail = (from projectEmployee in projectEmployeeMap
                                       join project in projectData on projectEmployee.ProjectId equals project.ProjectId
-                                      join employee in employeeData.Where(e=>e.EmpId == id) on projectEmployee.EmpId equals employee.EmpId
+                                      join employee in employeeData.Where(e => e.EmpId == id) on projectEmployee.EmpId equals employee.EmpId
                                       join department in departmentData on project.DepartmentId equals department.DepartmentId
                                       join reportsToEmployee in employeeData on employee.ReportsTo equals reportsToEmployee.EmpId
                                       select new EmployeeInfo
@@ -54,10 +59,10 @@ namespace XtramileBackend.Services.EmployeeService
                                           ProjectCode = project.ProjectCode,
                                           ProjectName = project.ProjectName,
                                           ReportsTo = reportsToEmployee.FirstName
-                                          
+
                                       }).FirstOrDefault();
 
-                
+
                 return employeeDetail;
 
             }
@@ -86,10 +91,11 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id) {
+        public async Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id)
+        {
             try
             {
-                TBL_EMPLOYEE employeeData =  await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
                 return employeeData;
             }
             catch (Exception ex)
@@ -99,6 +105,104 @@ namespace XtramileBackend.Services.EmployeeService
                 throw; // Re-throw the exception to propagate it
             }
 
+        }
+
+        /// <summary>
+        /// Retrieves an employee's profile by their ID.
+        /// Perform join operation on the tables TBL_EMPLOYEE, TBL_PROJECT_MAPPING, TBL_PROJECT and TBL_DEPARTMENT.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>An EmployeeProfile object representing the employee's details.</returns>
+        public async Task<EmployeeProfile> GetEmployeeProfileByIdAsync(int employeeId)
+        {
+            try
+            {
+                // Fetching data from repositories
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+
+                // Querying and joining data to get employee profile
+                var result = (
+                    from employee in employees
+                    join mapping in projectMappings on employee.EmpId equals mapping.EmpId
+                    join project in projects on mapping.ProjectId equals project.ProjectId
+                    join department in departments on project.DepartmentId equals department.DepartmentId
+                    join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId into reportsToJoin
+                    from reportsToEmployee in reportsToJoin.DefaultIfEmpty() // Perform left join inorder to the reports to person full name
+                    where employee.EmpId == employeeId
+                    select new EmployeeProfile
+                    {
+                        EmpId = employee.EmpId,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        ContactNumber = employee.ContactNumber,
+                        Address = employee.Address,
+                        Email = employee.Email,
+                        ReportsTo = reportsToEmployee != null ? $"{reportsToEmployee.FirstName} {reportsToEmployee.LastName}" : "N/A",
+                        DepartmentName = department.DepartmentName,
+                        ProjectCode = project.ProjectCode,
+                        ProjectName = project.ProjectName,
+                    }
+                ).FirstOrDefault();
+
+                // Checking if the result is not null and returning
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    // Throwing exception if the employee is not found
+                    throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while getting employee profile by ID: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Updates the details of an employee.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee to update.</param>
+        /// <param name="profileEdit">A ProfileEdit object containing the updated details.</param>
+        public async Task UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
+        {
+            // Retrieving the employee from the repository
+            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
+
+            // Checking if the employee is found
+            if (employee != null)
+            {
+                // Checking if there are updates in the profileEdit object
+                if (profileEdit != null)
+                {
+                    // Updating the contact number if provided
+                    if (profileEdit.ContactNumber != null)
+                    {
+                        employee.ContactNumber = profileEdit.ContactNumber;
+                    }
+
+                    // Updating the address if provided
+                    if (profileEdit.Address != null)
+                    {
+                        employee.Address = profileEdit.Address;
+                    }
+
+                    // Saving changes to the database
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+            }
+            else
+            {
+                // Throwing exception if the employee is not found
+                throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
+            }
         }
 
 
@@ -111,7 +215,6 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="reqId"></param>
         /// <returns><IEnumerable<OptionCard></returns>
-        
         public async Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId)
         {
             try
@@ -126,7 +229,7 @@ namespace XtramileBackend.Services.EmployeeService
                 // Perform the join and projection
                 var result = (from option in availableOptions
                               join request in requestData on option.RequestId equals request.RequestId
-                              join mode in travelModeData on request.ModeId equals mode.ModeId
+                              join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
@@ -147,7 +250,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationState = request.DestinationState,
                                   DestinationCountry = request.DestinationCountry,
                                   DestinationCountryCode = destinationCountry.CountryCode,
-                                  ModeId = request.ModeId,
+                                  ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
                                   TravelTypeId = request.TravelTypeId,
                                   TravelTypeName = travelType.TypeName
@@ -162,7 +265,44 @@ namespace XtramileBackend.Services.EmployeeService
             {
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while getting options for request: {ex.Message}");
-                throw; 
+                throw;
+            }
+
+        }
+
+        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+
+                var results = (from request in requestData
+                               join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
+                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                               join employee in employeeData on statusApproval.EmpId equals employee.EmpId
+                               join employeeProject in employeeProjectMap on employee.EmpId equals employeeProject.EmpId
+                               join project in projectData on employeeProject.ProjectId equals project.ProjectId
+                               where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
+                               select new PendingRequetsViewEmployee
+                               {
+                                   requestId = request.RequestId,
+                                   projectName = project.ProjectName,
+                                   reasonOfTravel = request.TripPurpose,
+                                   dateOfTravel = request.DepartureDate
+                               }).ToList();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
             }
         }
     }

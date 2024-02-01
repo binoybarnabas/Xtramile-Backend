@@ -2,11 +2,11 @@
 
 namespace XtramileBackend.Models.EntityModels
 {
-    public class TBL_PER_DIUM
+    public class TBL_PER_DIEM
     {
         [Key]
-        public int PerdiumId { get; set; }
-        public string? PerdiumName { get; set; }
+        public int PerdiemId { get; set; }
+        public string? PerdiemName { get; set; }
         public int CountryId { get; set; }
         public string? Description { get; set; }
         public int CreatedBy { get; set; }

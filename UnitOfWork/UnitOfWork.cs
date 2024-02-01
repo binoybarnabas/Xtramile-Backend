@@ -4,7 +4,7 @@ using XtramileBackend.Repositories.DepartmentRepository;
 using XtramileBackend.Repositories.EmployeeRepository;
 using XtramileBackend.Repositories.ExpenseRepository;
 using XtramileBackend.Repositories.InvoiceRepository;
-using XtramileBackend.Repositories.PerdiumRepository;
+using XtramileBackend.Repositories.PerdiemRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
@@ -33,7 +33,7 @@ namespace XtramileBackend.UnitOfWork
         public IEmployeeRepository EmployeeRepository { get; }
         public IRoleRepository RoleRepository { get; }
         public ICountryRepository CountryRepository { get; }
-        public IPerdiumRepository PerdiumRepository { get; }
+        public IPerdiemRepository PerdiemRepository { get; }
         public IFileTypeRepository FileTypeRepository { get; }
         public IReasonRepository ReasonRepository { get; }
         public IStatusRepository StatusRepository { get; }
@@ -59,7 +59,7 @@ namespace XtramileBackend.UnitOfWork
             EmployeeRepository = new EmployeeRepository(_dbContext);
             RoleRepository = new RoleRepository(_dbContext);
             CountryRepository = new CountryRepository(_dbContext);
-            PerdiumRepository = new PerdiumRepository(_dbContext);
+            PerdiemRepository = new PerdiemRepository(_dbContext);
             FileTypeRepository = new FileTypeRepository(_dbContext);
             ReasonRepository = new ReasonRepository(_dbContext);
             StatusRepository = new StatusRepository(_dbContext);
@@ -76,6 +76,10 @@ namespace XtramileBackend.UnitOfWork
         public int Complete()
         {
             return _dbContext.SaveChanges();
+        }
+        public Task SaveChangesAsyn()
+        {
+            return _dbContext.SaveChangesAsync();
         }
 
     }

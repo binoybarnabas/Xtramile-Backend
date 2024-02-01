@@ -8,7 +8,7 @@ using XtramileBackend.Services.ProjectMappingService;
 
 namespace XtramileBackend.Controllers.ProjectMappingControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/projectlist")]
     [ApiController]
     public class ProjectMappingController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.ProjectMappingControllers
             _projectMappingServices = projectMappingServices;
         }
 
-        [HttpGet]
+        [HttpGet("projectmap")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.ProjectMappingControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddProjectMappingAsync([FromBody] TBL_PROJECT_MAPPING projectMapping)
         {
             try

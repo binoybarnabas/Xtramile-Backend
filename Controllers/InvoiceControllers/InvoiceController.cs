@@ -8,7 +8,7 @@ using XtramileBackend.Services.InvoiceService;
 
 namespace XtramileBackend.Controllers.InvoiceControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/invoice")]
     [ApiController]
     public class InvoiceController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.InvoiceControllers
             _invoiceServices = invoiceServices;
         }
 
-        [HttpGet]
+        [HttpGet("invoices")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.InvoiceControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddInvoiceAsync([FromBody] TBL_INVOICE invoice)
         {
             try

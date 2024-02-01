@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.FinanceDepartment;
 
 namespace XtramileBackend.Controllers.FinanceDepartmentControllers
 {
-    [Route("api/")]
+    [Route("api/financedepartment")]
     [ApiController]
     public class FinanceDepartmentController : ControllerBase
     {
@@ -51,6 +52,39 @@ namespace XtramileBackend.Controllers.FinanceDepartmentControllers
             {
                 var invoiceData = await _financeDepartmentService.GetAllInvoiceAttachments();
                 return Ok(invoiceData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting Invoices: {ex.Message}");
+            }
+
+        }
+
+        [HttpPatch("updatestatus/{id}")]
+        public async Task<IActionResult> UpdateInvoiceStatus(int id, [FromBody] InvoiceStatus invoiceStatus)
+        {
+            try
+            {
+                var statusUpdate = await _financeDepartmentService.UpdateInvoiceStatus(id, invoiceStatus);
+
+                return Ok("Updated the list");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting Invoices: {ex.Message}");
+            }
+
+        }
+
+
+        [HttpGet("invoice/updatedstatus")]
+        public async Task<IActionResult> GetInvoiceOnStatus([FromQuery] bool isUtr)
+        {
+            try
+            {
+                var statusList = await _financeDepartmentService.GetInvoicesBasedOnStatus(isUtr);
+                return Ok(statusList);
             }
             catch (Exception ex)
             {

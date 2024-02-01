@@ -5,7 +5,7 @@ using XtramileBackend.Services.ReasonService;
 
 namespace XtramileBackend.Controllers.ReasonControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reasons")]
     [ApiController]
     public class ReasonController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace XtramileBackend.Controllers.ReasonControllers
             _reasonServices = reasonServices;
         }
 
-        [HttpGet]
+        [HttpGet("reasons")]
         public async Task<IActionResult> GetAllReasonsAsync()
         {
             try
@@ -31,7 +31,7 @@ namespace XtramileBackend.Controllers.ReasonControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddReasonAsync([FromBody] TBL_REASON reasons)
         {
             try

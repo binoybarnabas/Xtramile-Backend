@@ -8,7 +8,7 @@ using XtramileBackend.Services.ProjectService;
 
 namespace XtramileBackend.Controllers.ProductControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/project")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.ProductControllers
             _projectServices = projectServices;
         }
 
-        [HttpGet]
+        [HttpGet("projects")]
         public async Task<IActionResult> GetProjectsAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.ProductControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddProjectAsync([FromBody] TBL_PROJECT project)
         {
             try
