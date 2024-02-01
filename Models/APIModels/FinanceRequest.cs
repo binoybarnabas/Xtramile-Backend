@@ -3,7 +3,7 @@
     public class FinanceRequest
     {
 
-        public string RequestCode { get; set; }
+        public int requestId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

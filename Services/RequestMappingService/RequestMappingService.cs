@@ -33,9 +33,8 @@ namespace XtramileBackend.Services.RequestMappingService
         }
 
         /// <summary>
-        /// 
-        /// </summary>
         /// Retrieves the selected option details for a specific request ID.
+        /// </summary>
         /// <param name="reqId"></param>
         /// <returns>An instance of OptionCard representing the selected option details, or null if not found.</returns>
         public async Task<OptionCard> GetSelectedOptions(int reqId)

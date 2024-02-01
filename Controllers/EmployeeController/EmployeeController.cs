@@ -8,7 +8,6 @@ using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ProjectService;
 using Microsoft.AspNetCore.Cors;
-using XtramileBackend.Services.EmployeeViewPenReqService;
 
 
 namespace XtramileBackend.Controllers.EmployeeController
@@ -19,13 +18,11 @@ namespace XtramileBackend.Controllers.EmployeeController
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
-        private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
 
-        public EmployeeController(IEmployeeServices employeeService, IEmployeeViewPenReqService employeeViewPenReqService)
+        public EmployeeController(IEmployeeServices employeeService)
 
         {
             _employeeService = employeeService;
-            _employeeViewPenReqService = employeeViewPenReqService;
         }
 
         [HttpGet("employees")]
@@ -80,7 +77,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                IEnumerable<PendingRequetsViewEmployee> pendingRequestData = await _employeeViewPenReqService.GetPendingRequestsByEmpId(empId);
+                IEnumerable<PendingRequetsViewEmployee> pendingRequestData = await _employeeService.GetPendingRequestsByEmpId(empId);
                 return Ok(pendingRequestData);
             }
             catch (Exception ex)
