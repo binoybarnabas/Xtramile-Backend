@@ -107,78 +107,100 @@ namespace XtramileBackend.Services.EmployeeService
 
         }
 
+        /// <summary>
+        /// Retrieves an employee's profile by their ID.
+        /// Perform join operation on the tables TBL_EMPLOYEE, TBL_PROJECT_MAPPING, TBL_PROJECT and TBL_DEPARTMENT.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>An EmployeeProfile object representing the employee's details.</returns>
         public async Task<EmployeeProfile> GetEmployeeProfileByIdAsync(int employeeId)
         {
             try
             {
+                // Fetching data from repositories
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
+                // Querying and joining data to get employee profile
                 var result = (
-                            from employee in employees
-                            join mapping in projectMappings on employee.EmpId equals mapping.EmpId
-                            join project in projects on mapping.ProjectId equals project.ProjectId
-                            join department in departments on project.DepartmentId equals department.DepartmentId
-                            join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId into reportsToJoin
-                            from reportsToEmployee in reportsToJoin.DefaultIfEmpty() // Perform left join
-                            where employee.EmpId == employeeId
-                            select new EmployeeProfile
-                            {
-                                EmpId = employee.EmpId,
-                                FirstName = employee.FirstName,
-                                LastName = employee.LastName,
-                                ContactNumber = employee.ContactNumber,
-                                Address = employee.Address,
-                                Email = employee.Email,
-                                ReportsTo = reportsToEmployee != null ? $"{reportsToEmployee.FirstName} {reportsToEmployee.LastName}" : "N/A",
-                                DepartmentName = department.DepartmentName,
-                                ProjectCode = project.ProjectCode,
-                                ProjectName = project.ProjectName,
-                            }
-                            ).FirstOrDefault();
+                    from employee in employees
+                    join mapping in projectMappings on employee.EmpId equals mapping.EmpId
+                    join project in projects on mapping.ProjectId equals project.ProjectId
+                    join department in departments on project.DepartmentId equals department.DepartmentId
+                    join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId into reportsToJoin
+                    from reportsToEmployee in reportsToJoin.DefaultIfEmpty() // Perform left join inorder to the reports to person full name
+                    where employee.EmpId == employeeId
+                    select new EmployeeProfile
+                    {
+                        EmpId = employee.EmpId,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        ContactNumber = employee.ContactNumber,
+                        Address = employee.Address,
+                        Email = employee.Email,
+                        ReportsTo = reportsToEmployee != null ? $"{reportsToEmployee.FirstName} {reportsToEmployee.LastName}" : "N/A",
+                        DepartmentName = department.DepartmentName,
+                        ProjectCode = project.ProjectCode,
+                        ProjectName = project.ProjectName,
+                    }
+                ).FirstOrDefault();
 
-
+                // Checking if the result is not null and returning
                 if (result != null)
                 {
                     return result;
                 }
                 else
                 {
+                    // Throwing exception if the employee is not found
                     throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
                 }
             }
             catch (Exception ex)
             {
+                // Logging and rethrowing the exception
                 Console.WriteLine($"An error occurred while getting employee profile by ID: {ex.Message}");
                 throw;
             }
         }
 
+        /// <summary>
+        /// Updates the details of an employee.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee to update.</param>
+        /// <param name="profileEdit">A ProfileEdit object containing the updated details.</param>
         public async Task UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
         {
+            // Retrieving the employee from the repository
             TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
 
+            // Checking if the employee is found
             if (employee != null)
             {
+                // Checking if there are updates in the profileEdit object
                 if (profileEdit != null)
                 {
+                    // Updating the contact number if provided
                     if (profileEdit.ContactNumber != null)
                     {
                         employee.ContactNumber = profileEdit.ContactNumber;
                     }
 
+                    // Updating the address if provided
                     if (profileEdit.Address != null)
                     {
                         employee.Address = profileEdit.Address;
                     }
 
+                    // Saving changes to the database
                     await _unitOfWork.SaveChangesAsyn();
                 }
             }
             else
             {
+                // Throwing exception if the employee is not found
                 throw new FileNotFoundException($"Employee with ID {employeeId} not found.");
             }
         }

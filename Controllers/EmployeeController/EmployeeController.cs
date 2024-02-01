@@ -88,31 +88,49 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Gets the profile details of an employee by their ID.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>An IActionResult containing the employee's profile details or an error message.</returns>
         [HttpGet("/api/employee/profile/details/{employeeId}")]
         public async Task<IActionResult> GetEmployeeProfileByIdAsync(int employeeId)
         {
             try
             {
+                // Call the EmployeeService to get the employee's profile details
                 EmployeeProfile employeeData = await _employeeService.GetEmployeeProfileByIdAsync(employeeId);
+
+                // Return a 200 OK response with the employee's profile data
                 return Ok(employeeData);
             }
             catch (Exception ex)
             {
+                // Return a 500 Internal Server Error response with an error message
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting employee profile details: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Updates the profile details of an employee.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <param name="profileEdit">A ProfileEdit object containing the updated details.</param>
+        /// <returns>An IActionResult indicating success or failure of the update operation.</returns>
         [HttpPatch("/api/employee/edit/profile/details/{employeeId}")]
         public async Task<IActionResult> UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
         {
             try
             {
+                // Call the EmployeeService to update the employee's profile details
                 await _employeeService.UpdateEmployeeDetailsAsync(employeeId, profileEdit);
-                return Ok();
+
+                // Return a 200 OK response indicating a successful update
+                return Ok(profileEdit);
             }
             catch (Exception ex)
             {
-                // Handle or log the exception
+                // Handle or log the exception, then return a 500 Internal Server Error response with an error message
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating employee details: {ex.Message}");
             }
         }
