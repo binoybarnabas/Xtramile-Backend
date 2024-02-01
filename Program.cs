@@ -44,7 +44,7 @@ using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
 using System.Text;
 using XtramileBackend.Services.AuthService;
-using XtramileBackend.Services.EmployeeViewPenReqService;
+//using XtramileBackend.Services.EmployeeViewPenReqService;
 using XtramileBackend.Services.FinanceDepartment;
 using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -53,7 +53,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 
-string DB_SERVER = DotNetEnv.Env.GetString("DB_SERVER");
+/*string DB_SERVER = DotNetEnv.Env.GetString("DB_SERVER");
 string DB_NAME = DotNetEnv.Env.GetString("DB_NAME");
 string PERSIST_SECURITY_INFO = DotNetEnv.Env.GetString("PERSIST_SECURITY_INFO");
 string DB_USER_ID = DotNetEnv.Env.GetString("DB_USER_ID");
@@ -65,6 +65,12 @@ string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");
 
 //string connectionString = $"Server={server};Initial Catalog={database};Encrypt={encrypt};TrustServerCertificate={trustServerCertificate};Connection Timeout={connectionTimeout};Authentication={authentication};";
 string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";
+*/
+
+
+string connectionString = DotNetEnv.Env.GetString("DB_STRING");
+
+
 
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
@@ -162,7 +168,7 @@ builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
+//builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
 builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 

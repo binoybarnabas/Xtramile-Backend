@@ -8,7 +8,7 @@ using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ProjectService;
 using Microsoft.AspNetCore.Cors;
-using XtramileBackend.Services.EmployeeViewPenReqService;
+//using XtramileBackend.Services.EmployeeViewPenReqService;
 
 
 namespace XtramileBackend.Controllers.EmployeeController
@@ -19,14 +19,22 @@ namespace XtramileBackend.Controllers.EmployeeController
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
-        private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
-
-        public EmployeeController(IEmployeeServices employeeService, IEmployeeViewPenReqService employeeViewPenReqService)
+       // private readonly IEmployeeViewPenReqService _employeeViewPenReqService;
+/*
+       public EmployeeController(IEmployeeServices employeeService, IEmployeeViewPenReqService employeeViewPenReqService)
 
         {
             _employeeService = employeeService;
             _employeeViewPenReqService = employeeViewPenReqService;
+        }*/
+
+        public EmployeeController(IEmployeeServices employeeService)
+
+        {
+            _employeeService = employeeService;
+//            _employeeViewPenReqService = employeeViewPenReqService;
         }
+
 
         [HttpGet("employees")]
         public async Task<IActionResult> GetEmployeesAsync()
@@ -75,7 +83,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
-        [HttpGet("viewpendingrequest/{empId}")]
+   /*     [HttpGet("viewpendingrequest/{empId}")]
         public async Task<IActionResult> GetPendingRequestsByEmpId(int empId)
         {
             try
@@ -89,7 +97,7 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
             }
         }
-
+*/
         [HttpGet("/api/employee/profile/details/{employeeId}")]
         public async Task<IActionResult> GetEmployeeProfileByIdAsync(int employeeId)
         {

@@ -4,6 +4,6 @@ namespace XtramileBackend.Services.TravelAdminService
 {
     public interface ITravelAdminService
     {
-        public Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel();
-    }
+/*        public Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel();
+*/    }
 }

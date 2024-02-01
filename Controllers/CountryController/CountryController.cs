@@ -37,7 +37,8 @@ namespace XtramileBackend.Controllers.CountryControllers
         {
             try
             {
-                await _countryServices.AddCountryAsync(country);
+                //await _countryServices.AddCountryAsync(country);
+                Console.WriteLine(country);
                 return Ok(country);
             }
             catch (Exception ex)

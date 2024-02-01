@@ -12,7 +12,7 @@ namespace XtramileBackend.Services.TravelAdminService
         _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel() {
+/*        public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel() {
 
             try
             {
@@ -52,6 +52,6 @@ namespace XtramileBackend.Services.TravelAdminService
           
 
 
-        }
+        }*/
     }
 }

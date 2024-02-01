@@ -29,6 +29,13 @@
 
   <ItemGroup>
     <Folder Include="Tests\" />
+    <Folder Include="Uploads\EmployeeUploads\IDCards\" />
+    <Folder Include="Uploads\EmployeeUploads\MailScreenshots\" />
+    <Folder Include="Uploads\EmployeeUploads\Bills\" />
+    <Folder Include="Uploads\EmployeeUploads\Passports\" />
+    <Folder Include="Uploads\ManagerUploads\" />
+    <Folder Include="Uploads\FinancePersonnelUploads\" />
+    <Folder Include="Uploads\TravelAdminUploads\Bills\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 
