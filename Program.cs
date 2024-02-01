@@ -62,13 +62,11 @@ string DB_PASSWORD = DotNetEnv.Env.GetString("DB_PASSWORD");
 string MULTIPLE_ACTIVE_RESULT_SETS = DotNetEnv.Env.GetString("MULTIPLE_ACTIVE_RESULT_SETS");
 string ENCRYPT = DotNetEnv.Env.GetString("ENCRYPT");
 string TRUST_SERVER_CERTIFICATE = DotNetEnv.Env.GetString("TRUST_SERVER_CERTIFICATE");
-string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");
+string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");*/
 
 //string connectionString = $"Server={server};Initial Catalog={database};Encrypt={encrypt};TrustServerCertificate={trustServerCertificate};Connection Timeout={connectionTimeout};Authentication={authentication};";
-string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";*/
-
-string connectionString = DotNetEnv.Env.GetString("DB_STRING");
-
+/*string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";
+*/
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
 
@@ -110,17 +108,12 @@ builder.Services.AddAuthorization(
 builder.Services.AddControllers();
 
 /*SqlConnection connection = new SqlConnection(connectionString);
-
-var dbConnectionString = DotNetEnv.Env.GetString("DB_STRING");
-
-builder.Configuration["ConnectionStrings:DB_KEY"] = dbConnectionString;
-
-builder.Services.AddDbContext<AppDBContext>(options =>
-      options.UseSqlServer(builder.Configuration.GetConnectionString(connectionString)));*/
+*/
+var connectionString = DotNetEnv.Env.GetString("DB_STRING");
 
 
 builder.Services.AddDbContext<AppDBContext>(options =>
-    options.UseSqlServer(connectionString));
+      options.UseSqlServer(connectionString));
 
 
 //Dependency injections
