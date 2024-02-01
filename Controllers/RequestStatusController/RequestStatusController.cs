@@ -8,7 +8,7 @@ using XtramileBackend.Services.RequestStatusService;
 
 namespace XtramileBackend.Controllers.RequestStatusControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/requeststatus")]
     [ApiController]
     public class RequestStatusController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.RequestStatusControllers
             _requestStatusServices = requestStatusServices;
         }
 
-        [HttpGet]
+        [HttpGet("reqstatus")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.RequestStatusControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddRequestStatusAsync([FromBody] TBL_REQ_APPROVE requestStatus)
         {
             try

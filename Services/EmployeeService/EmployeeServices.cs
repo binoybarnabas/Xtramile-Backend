@@ -215,7 +215,6 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="reqId"></param>
         /// <returns><IEnumerable<OptionCard></returns>
-
         public async Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId)
         {
             try
@@ -230,7 +229,7 @@ namespace XtramileBackend.Services.EmployeeService
                 // Perform the join and projection
                 var result = (from option in availableOptions
                               join request in requestData on option.RequestId equals request.RequestId
-                              join mode in travelModeData on request.ModeId equals mode.ModeId
+                              join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
@@ -251,7 +250,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationState = request.DestinationState,
                                   DestinationCountry = request.DestinationCountry,
                                   DestinationCountryCode = destinationCountry.CountryCode,
-                                  ModeId = request.ModeId,
+                                  ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
                                   TravelTypeId = request.TravelTypeId,
                                   TravelTypeName = travelType.TypeName
@@ -268,6 +267,7 @@ namespace XtramileBackend.Services.EmployeeService
                 Console.WriteLine($"An error occurred while getting options for request: {ex.Message}");
                 throw;
             }
+
         }
     }
 }

@@ -8,7 +8,7 @@ using XtramileBackend.Services.CategoryService;
 
 namespace XtramileBackend.Controllers.CategoryControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.CategoryControllers
             _categoryServices = categoryServices;
         }
 
-        [HttpGet]
+        [HttpGet("category")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.CategoryControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddCategoryAsync([FromBody] TBL_CATEGORY category)
         {
             try

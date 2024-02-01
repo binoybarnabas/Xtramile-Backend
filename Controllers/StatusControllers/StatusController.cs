@@ -6,7 +6,7 @@ using XtramileBackend.Services.StatusService;
 
 namespace XtramileBackend.Controllers.StatusControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/status")]
     [ApiController]
     public class StatusController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.StatusControllers
             _statusServices = statusServices;
         }
 
-        [HttpGet]
+        [HttpGet("statuses")]
         public async Task<IActionResult> GetAllStatusAsync()
         {
             try
@@ -32,7 +32,7 @@ namespace XtramileBackend.Controllers.StatusControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddStatusAsync([FromBody] TBL_STATUS status)
         {
             try

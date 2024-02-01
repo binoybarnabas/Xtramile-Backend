@@ -9,5 +9,7 @@
         public DateTime? PaidDate { get; set; }
         public string status { get; set; }
 
+        public string UtrId { get; set; }
+
     }
 }

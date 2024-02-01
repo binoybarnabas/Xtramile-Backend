@@ -8,7 +8,7 @@ using XtramileBackend.Services.PriorityService;
 
 namespace XtramileBackend.Controllers.PriorityControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/priority")]
     [ApiController]
     public class PriorityController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace XtramileBackend.Controllers.PriorityControllers
             _priorityServices = priorityServices;
         }
 
-        [HttpGet]
+        [HttpGet("priorities")]
         public async Task<IActionResult> GetPrioritiesAsync()
         {
             try
@@ -34,7 +34,7 @@ namespace XtramileBackend.Controllers.PriorityControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddPriorityAsync([FromBody] TBL_PRIORITY priority)
         {
             try

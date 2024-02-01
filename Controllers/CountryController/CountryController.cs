@@ -6,7 +6,7 @@ using XtramileBackend.Services.CountryService;
 namespace XtramileBackend.Controllers.CountryControllers
 {
     [EnableCors("AllowAngularDev")]
-    [Route("api/[controller]")]
+    [Route("api/country")]
     [ApiController]
     public class CountryController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace XtramileBackend.Controllers.CountryControllers
             _countryServices = countryServices;
         }
 
-        [HttpGet]
+        [HttpGet("countries")]
         public async Task<IActionResult> GetCountriesAsync()
         {
             try
@@ -32,7 +32,7 @@ namespace XtramileBackend.Controllers.CountryControllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddCountryAsync([FromBody] TBL_COUNTRY country)
         {
             try
