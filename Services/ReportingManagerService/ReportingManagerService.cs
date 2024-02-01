@@ -25,7 +25,7 @@ namespace XtramileBackend.Services.ManagerService
                select new EmployeeRequestDto
                {
                    RequestId = TBL_REQUEST.RequestId,
-                   EmployeeName = TBL_EMPLOYEE.FirstName + TBL_EMPLOYEE.LastName,
+                   EmployeeName = TBL_EMPLOYEE.FirstName + "  " +TBL_EMPLOYEE.LastName,
                    Email = TBL_EMPLOYEE.Email,
                    ProjectCode = TBL_PROJECT.ProjectCode,
                    Date = TBL_REQUEST.CreatedOn,  // Assuming TBL_REQUEST has a 'date' property
