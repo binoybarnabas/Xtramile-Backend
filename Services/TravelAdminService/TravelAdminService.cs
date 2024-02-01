@@ -33,7 +33,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                   where status.StatusCode == "OG"
                                   select new OngoingTravelAdmin
                                   {
-                                      RequestCode = request.RequestCode,
+                                      requestId = request.RequestId,
                                       ProjectCode = project.ProjectCode,
                                       ProjectName = project.ProjectName,
                                       FirstName = employee.FirstName,

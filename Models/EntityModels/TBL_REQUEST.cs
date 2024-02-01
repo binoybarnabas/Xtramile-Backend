@@ -6,7 +6,6 @@ namespace XtramileBackend.Models.EntityModels
     {
         [Key]
         public int RequestId { get; set; }
-        public string RequestCode { get; set; }
         public DateTime DepartureDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public int TravelTypeId { get; set; }     

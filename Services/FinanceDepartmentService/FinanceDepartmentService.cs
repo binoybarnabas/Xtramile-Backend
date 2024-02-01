@@ -38,7 +38,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                            join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
-                                               RequestCode = request.RequestCode,
+                                               requestId = request.RequestId,
                                                FirstName = employee.FirstName,
                                                LastName = employee.LastName,
                                                Email = employee.Email,
@@ -76,7 +76,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                            join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
-                                               RequestCode = request.RequestCode,
+                                               requestId = request.RequestId,
                                                FirstName = employee.FirstName,
                                                LastName = employee.LastName,
                                                Email = employee.Email,
@@ -88,7 +88,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                 switch (sortField.ToLowerInvariant())
                 {
                     case "requestcode":
-                        incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.RequestCode) : incomingRequestData.OrderBy(data => data.RequestCode);
+                        incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.requestId) : incomingRequestData.OrderBy(data => data.requestId);
                         break;
                     case "firstname":
                         incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.FirstName) : incomingRequestData.OrderBy(data => data.FirstName);

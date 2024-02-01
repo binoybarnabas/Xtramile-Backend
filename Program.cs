@@ -8,7 +8,7 @@ using XtramileBackend.Repositories.DepartmentRepository;
 using XtramileBackend.Repositories.EmployeeRepository;
 using XtramileBackend.Repositories.ExpenseRepository;
 using XtramileBackend.Repositories.InvoiceRepository;
-using XtramileBackend.Repositories.PerdiumRepository;
+using XtramileBackend.Repositories.PerdiemRepository;
 using XtramileBackend.Repositories.PriorityRepository;
 using XtramileBackend.Repositories.ProjectRepository;
 using XtramileBackend.Repositories.RoleRepository;
@@ -24,7 +24,7 @@ using XtramileBackend.Services.DepartmentService;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ExpenseService;
 using XtramileBackend.Services.InvoiceService;
-using XtramileBackend.Services.PerdiumService;
+using XtramileBackend.Services.PerdiemService;
 using XtramileBackend.Services.PriorityService;
 using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.RolesService;
@@ -44,7 +44,6 @@ using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.ProjectMappingService;
 using System.Text;
 using XtramileBackend.Services.AuthService;
-using XtramileBackend.Services.EmployeeViewPenReqService;
 using XtramileBackend.Services.FinanceDepartment;
 using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -67,6 +66,8 @@ string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");*/
 //string connectionString = $"Server={server};Initial Catalog={database};Encrypt={encrypt};TrustServerCertificate={trustServerCertificate};Connection Timeout={connectionTimeout};Authentication={authentication};";
 /*string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";
 */
+string connectionString = DotNetEnv.Env.GetString("DB_STRING");
+
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
 
@@ -109,8 +110,6 @@ builder.Services.AddControllers();
 
 /*SqlConnection connection = new SqlConnection(connectionString);
 */
-var connectionString = DotNetEnv.Env.GetString("DB_STRING");
-
 
 builder.Services.AddDbContext<AppDBContext>(options =>
       options.UseSqlServer(connectionString));
@@ -124,7 +123,7 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
-builder.Services.AddScoped<IPerdiumRepository, PerdiumRepository>();
+builder.Services.AddScoped<IPerdiemRepository, PerdiemRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IReasonRepository, ReasonRepository>();
@@ -144,7 +143,7 @@ builder.Services.AddScoped<IDepartmentServices, DepartmentServices>();
 builder.Services.AddScoped<IEmployeeServices, EmployeeServices>();
 builder.Services.AddScoped<IRolesServices, RolesServices>();
 builder.Services.AddScoped<ICountryServices, CountryServices>();
-builder.Services.AddScoped<IPerdiumServices, PerdiumServices>();
+builder.Services.AddScoped<IPerdiemServices, PerdiemServices>();
 builder.Services.AddScoped<IInvoiceServices, InvoiceServices>();
 builder.Services.AddScoped<IExpenseServices, ExpenseServices>();
 builder.Services.AddScoped<IFileTypeServices, FileTypeServices>();
@@ -158,7 +157,6 @@ builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 builder.Services.AddScoped<IRequestStatusServices, RequestStatusServices>();
 builder.Services.AddScoped<IProjectMappingServices, ProjectMappingServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
 builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 builder.Services.AddScoped<IReportingManagerService, ReportingManagerService>();
