@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Services\NewFolder\" />
     <Folder Include="Tests\" />
     <Folder Include="Utils\" />
   </ItemGroup>
