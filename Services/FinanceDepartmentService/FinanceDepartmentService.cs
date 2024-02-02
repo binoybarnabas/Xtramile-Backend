@@ -38,7 +38,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                            join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
-                                               RequestCode = request.RequestCode,
+                                               requestId = request.RequestId,
                                                FirstName = employee.FirstName,
                                                LastName = employee.LastName,
                                                Email = employee.Email,
@@ -54,6 +54,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                 throw;
             }
         }
+
         /// <summary>
         /// get all the informations for the requests
         /// </summary>
@@ -76,7 +77,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                            join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
-                                               RequestCode = request.RequestCode,
+                                               requestId = request.RequestId,
                                                FirstName = employee.FirstName,
                                                LastName = employee.LastName,
                                                Email = employee.Email,
@@ -88,7 +89,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                 switch (sortField.ToLowerInvariant())
                 {
                     case "requestcode":
-                        incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.RequestCode) : incomingRequestData.OrderBy(data => data.RequestCode);
+                        incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.requestId) : incomingRequestData.OrderBy(data => data.requestId);
                         break;
                     case "firstname":
                         incomingRequestData = isDescending ? incomingRequestData.OrderByDescending(data => data.FirstName) : incomingRequestData.OrderBy(data => data.FirstName);
@@ -116,7 +117,6 @@ namespace XtramileBackend.Services.FinanceDepartment
         /// <returns>
         /// A list which contains InvoiceId, VendorName, VendorEmail, Amount, date of payment for a particular invoice
         /// </returns>
-
         public async Task<IEnumerable<InvoiceAttachment>> GetAllInvoiceAttachments()
         {
             try
@@ -182,11 +182,13 @@ namespace XtramileBackend.Services.FinanceDepartment
         }
 
         /// <summary>
-        /// 
+        /// Get invoices based on status, Whether it is paid or not
         /// </summary>
         /// <param name="IsUtr"></param>
         /// string sortField, bool isDescending
-        /// <returns></returns>
+        /// <returns>
+        /// A list of invoice attachments which contains information like InvoiceId, VendorName, VendorEmail, Amount,Paid date and UTr Id.
+        /// </returns>
         public async Task<IEnumerable<InvoiceAttachment>> GetInvoicesBasedOnStatus(bool IsUtr)
         {
             try

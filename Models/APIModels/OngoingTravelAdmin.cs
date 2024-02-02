@@ -2,7 +2,7 @@
 {
     public class OngoingTravelAdmin
     {
-        public string RequestCode{ get; set; }
+        public int requestId { get; set; }
         public string ProjectCode { get; set; }
         public string ProjectName { get; set; }
         public string FirstName { get; set; }

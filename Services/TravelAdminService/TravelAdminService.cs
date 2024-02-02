@@ -12,25 +12,35 @@ namespace XtramileBackend.Services.TravelAdminService
         _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel() {
+        /// <summary>
+        /// To get a list of all the ongoing trips that can be seen by the travel admin.
+        /// </summary>
+        /// <returns>
+        /// return a list of data which consists of ongoingTrips which contains information like requestId, Project code
+        /// project name,first name and last name of the employee source city and destination city.
+        /// </returns>
+        public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel()
+        {
 
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> requestOptionMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> requestStatusMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
                 var onGoingData = from employee in employeeData
-                                  join requestOption in requestOptionMappingData on employee.EmpId equals requestOption.EmpId
-                                  join request in requestData on requestOption.RequestId equals request.RequestId
-                                  join project in projectData on request.ProjectId equals project.ProjectId
-                                  join status in statusData on requestOption.PrimaryStatusId equals status.StatusId
+                                  join requestStatus in requestStatusMappingData on employee.EmpId equals requestStatus.EmpId
+                                  join request in requestData on requestStatus.RequestId equals request.RequestId
+                                  join employeeProjectMapping in employeeProjectMappingData on employee.EmpId equals employeeProjectMapping.EmpId
+                                  join project in projectData on employeeProjectMapping.ProjectId equals project.ProjectId
+                                  join status in statusData on requestStatus.PrimaryStatusId equals status.StatusId
                                   where status.StatusCode == "OG"
                                   select new OngoingTravelAdmin
                                   {
-                                      RequestCode = request.RequestCode,
+                                      requestId = request.RequestId,
                                       ProjectCode = project.ProjectCode,
                                       ProjectName = project.ProjectName,
                                       FirstName = employee.FirstName,
@@ -39,17 +49,16 @@ namespace XtramileBackend.Services.TravelAdminService
                                       DestinationCity = request.DestinationCity
                                   };
 
-
-               return onGoingData.ToList();
+                return onGoingData.ToList();
             }
 
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while getting on Going travel requests: {ex.Message}");
                 throw;
-                
+
             }
-          
+
 
 
         }

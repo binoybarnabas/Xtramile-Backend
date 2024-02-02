@@ -29,7 +29,7 @@ namespace XtramileBackend.Data
 
         public DbSet<TBL_COUNTRY> TBL_COUNTRY { get; set; }
 
-        public DbSet<TBL_PER_DIUM> TBL_PER_DIUM { get; set; }
+        public DbSet<TBL_PER_DIEM> TBL_PER_DIEM { get; set; }
 
         public DbSet<TBL_STATUS> TBL_STATUS { get; set; }
 

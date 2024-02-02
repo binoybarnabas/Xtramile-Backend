@@ -6,7 +6,6 @@ namespace XtramileBackend.Models.EntityModels
     {
         [Key]
         public int OptionId { get; set; }
-        public string OptionCode { get; set; }
         public string? Description { get; set; }
         public string Class { get; set; }
         public string ServiceOfferedBy { get; set; }
