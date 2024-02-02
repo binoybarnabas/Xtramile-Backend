@@ -59,7 +59,6 @@ namespace XtramileBackend.Services.EmployeeService
                                           ProjectCode = project.ProjectCode,
                                           ProjectName = project.ProjectName,
                                           ReportsTo = reportsToEmployee.FirstName
-
                                       }).FirstOrDefault();
 
 
