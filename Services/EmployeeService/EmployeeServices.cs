@@ -307,7 +307,15 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<IEnumerable<EmployeeViewReq>> GeRequestsHistoryByEmpId(int empId)
+
+
+        /// <summary>
+        /// Retrieves closed requests for an employee
+        /// </summary>
+        /// <param name="empId"> Employee id for retrieving requests</param>
+        /// <returns>An asynchronous task return a collection of type EmpViewRequest</returns>
+
+        public async Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId)
         {
             try
             {
