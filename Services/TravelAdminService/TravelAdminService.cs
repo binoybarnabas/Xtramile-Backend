@@ -12,6 +12,13 @@ namespace XtramileBackend.Services.TravelAdminService
         _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// To get a list of all the ongoing trips that can be seen by the travel admin.
+        /// </summary>
+        /// <returns>
+        /// return a list of data which consists of ongoingTrips which contains information like requestId, Project code
+        /// project name,first name and last name of the employee source city and destination city.
+        /// </returns>
         public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel()
         {
 
@@ -41,7 +48,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity
                                   };
-
 
                 return onGoingData.ToList();
             }

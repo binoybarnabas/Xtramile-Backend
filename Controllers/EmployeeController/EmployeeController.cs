@@ -52,7 +52,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a employee: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting an employee: {ex.Message}");
             }
 
         }
