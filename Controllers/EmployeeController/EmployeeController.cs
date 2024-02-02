@@ -150,13 +150,13 @@ namespace XtramileBackend.Controllers.EmployeeController
         }
 
 
-        [HttpGet("requesthistory/{id}")]
+        [HttpGet("request/history")]
         public async Task<IActionResult> GetRequestHistory(int empId)
         {
             try
             {
-                IEnumerable<EmployeeViewReq> pendingRequestData = await _employeeService.GeRequestHistoryByEmpId(empId);
-                return Ok(pendingRequestData);
+                IEnumerable<EmployeeViewReq>requestData = await _employeeService.GeRequestHistoryByEmpId(empId);
+                return Ok(requestData);
             }
             catch (Exception ex)
             {

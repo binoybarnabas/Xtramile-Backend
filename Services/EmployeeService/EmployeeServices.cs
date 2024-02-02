@@ -324,18 +324,19 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
 
-                var result = (from request in requestData
-
+                var result =  (from request in requestData
                               join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                              join project in projectData on statusApproval.ProjectId equals project.ProjectId
                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                              join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
+                              join project in projectData on projectMapping.ProjectId equals project.ProjectId
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
-
-                              where secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL" && request.CreatedBy == empId
-                              select new EmployeeViewReq
+                              where request.CreatedBy == empId
+                              && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
+                               select new EmployeeViewReq
                               {
                                   RequestId = request.RequestId,
                                   ProjectCode = project.ProjectCode,
