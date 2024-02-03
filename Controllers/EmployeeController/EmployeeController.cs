@@ -149,6 +149,26 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+
+
+        [HttpGet("request/history")]
+        public async Task<IActionResult> GetRequestHistory(int empId)
+        {
+            try
+            {
+                IEnumerable<EmployeeViewReq>requestData = await _employeeService.GeRequestHistoryByEmpId(empId);
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
+            }
+
+        }
+
+
+
         [HttpPost("add/option")]
         public async Task<IActionResult> AddSelectedOptionForRequest([FromBody] TBL_REQ_MAPPING option)
         {
@@ -162,5 +182,6 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an option: {ex.Message}");
             }
         }
+
     }
 }

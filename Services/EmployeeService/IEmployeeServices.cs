@@ -1,4 +1,5 @@
-﻿using XtramileBackend.Models.APIModels;
+﻿        
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Services.EmployeeService
@@ -22,7 +23,10 @@ namespace XtramileBackend.Services.EmployeeService
         
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
 
+        public Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId);
+
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
+
 
     }
 }

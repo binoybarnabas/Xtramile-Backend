@@ -307,6 +307,56 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
+
+
+        /// <summary>
+        /// Retrieves closed requests for an employee
+        /// </summary>
+        /// <param name="empId"> Employee id for retrieving requests</param>
+        /// <returns>An asynchronous task return a collection of type EmpViewRequest</returns>
+
+        public async Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+
+
+                var result =  (from request in requestData
+                              join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                              join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                              join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                              join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
+                              join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              where request.CreatedBy == empId
+                              && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
+                               select new EmployeeViewReq
+                              {
+                                  RequestId = request.RequestId,
+                                  ProjectCode = project.ProjectCode,
+                                  ProjectName = project.ProjectName,
+                                  TravelType = travelType.TypeName,
+                                  ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
+                                  Status = "Closed"
+
+                              }).ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting closed requests: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+
         /// <summary>
         /// Adds a selected option from the listed available options for a specific request.
         /// </summary>
@@ -325,5 +375,6 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
     }
 }
