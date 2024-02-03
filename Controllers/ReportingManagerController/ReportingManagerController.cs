@@ -35,22 +35,6 @@ namespace XtramileBackend.Controllers.ReportingManagerController
             return Ok(empRequests);
         }
 
-        // Get employee requests for a specific email based on managerId and email
-        [HttpGet("email")]
-        public async Task<IActionResult> GetEmployeeRequestByEmailAsync([FromQuery] int managerId, string email)
-        {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsByEmailAsync(managerId, email);
-            return Ok(empRequests);
-        }
-
-        // Get employee requests sorted by request code based on managerId
-        [HttpGet("sort/requestcode")]
-        public async Task<IActionResult> GetEmployeeRequestSortByRequestCodeAsync([FromQuery] int managerId)
-        {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByRequestCodeAsync(managerId);
-            return Ok(empRequests);
-        }
-
         // Get employee requests sorted by date based on managerId
         [HttpGet("sort/date")]
         public async Task<IActionResult> GetEmployeeRequestSortByDateAsync([FromQuery] int managerId)
@@ -60,10 +44,18 @@ namespace XtramileBackend.Controllers.ReportingManagerController
         }
 
         // Get employee requests sorted by email based on managerId
-        [HttpGet("sort/email")]
+        [HttpGet("sort/employeename")]
         public async Task<IActionResult> GetEmployeeRequestSortEmailAsync([FromQuery] int managerId)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByEmailAsync(managerId);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByEmployeeNameAsync(managerId);
+            return Ok(empRequests);
+        }
+
+        // Get employee requests sorted by email based on managerId
+        [HttpGet("search/employeename")]
+        public async Task<IActionResult> GetEmployeeRequestByEmployeeNameAsync([FromQuery] int managerId,string employeeName)
+        {
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsByEmployeeNameAsync(managerId,employeeName);
             return Ok(empRequests);
         }
     }
