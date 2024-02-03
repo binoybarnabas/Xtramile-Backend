@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.ManagerService;
 
 // Controller for handling reporting manager related actions
 namespace XtramileBackend.Controllers.ReportingManagerController
 {
-    [EnableCors("AllowAngularDev")] 
-    [Route("api/reportingmanager")] 
+    [EnableCors("AllowAngularDev")]
+    [Route("api/reportingmanager")]
     [ApiController]
     public class ReportingManagerController : ControllerBase
     {
@@ -29,7 +30,7 @@ namespace XtramileBackend.Controllers.ReportingManagerController
 
         // Get employee requests for a specific date based on managerId and date
         [HttpGet("date")]
-        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, string     date)
+        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, string date)
         {
             var empRequests = await _reportingManagerService.GetEmployeeRequestsByDateAsync(managerId, date);
             return Ok(empRequests);
@@ -58,5 +59,32 @@ namespace XtramileBackend.Controllers.ReportingManagerController
             var empRequests = await _reportingManagerService.GetEmployeeRequestsByEmployeeNameAsync(managerId,employeeName);
             return Ok(empRequests);
         }
+
+        /// <summary>
+        /// Retrieves ongoing travel request details for employees reporting to a specific manager.
+        /// </summary>
+        /// <param name="managerId">The ID of the reporting manager.</param>
+        /// <returns>
+        /// 200 OK response with a collection of ongoing travel request details for employees reporting to the specified manager,
+        /// or 500 Internal Server Error response in case of an exception.
+        /// </returns>
+        [HttpGet("ongoing/travel/request/{managerId}")]
+        public async Task<IActionResult> GetManagerOngoingTravelRequest(int managerId)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                IEnumerable<ManagerOngoingTravelRequest> ongoingTravelRequestData = await _reportingManagerService.GetManagerOngoingTravelRequestDetails(managerId);
+
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(ongoingTravelRequestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
     }
 }

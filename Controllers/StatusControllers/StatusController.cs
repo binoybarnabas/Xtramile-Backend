@@ -46,5 +46,26 @@ namespace XtramileBackend.Controllers.StatusControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a status: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Function to return the status Id based on status Code
+        /// </summary>
+        /// <param name="statusCode"></param>
+        /// <returns>statusId</returns>
+        [HttpGet("staustId/{statusCode}")]
+        public async Task<IActionResult> GetStatusIdByCode(string statusCode)
+        {
+            try
+            {
+                int statusId = await _statusServices.GetStatusIdByCode(statusCode);
+                return Ok(statusId);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a status: {ex.Message}");
+            }
+
+
+        }
     }
 }

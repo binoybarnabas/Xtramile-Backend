@@ -93,7 +93,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         /// </summary>
         /// <param name="employeeId">The ID of the employee.</param>
         /// <returns>An IActionResult containing the employee's profile details or an error message.</returns>
-        [HttpGet("/api/employee/profile/details/{employeeId}")]
+        [HttpGet("profile/details/{employeeId}")]
         public async Task<IActionResult> GetEmployeeProfileByIdAsync(int employeeId)
         {
             try
@@ -117,7 +117,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         /// <param name="employeeId">The ID of the employee.</param>
         /// <param name="profileEdit">A ProfileEdit object containing the updated details.</param>
         /// <returns>An IActionResult indicating success or failure of the update operation.</returns>
-        [HttpPatch("/api/employee/edit/profile/details/{employeeId}")]
+        [HttpPatch("edit/profile/details/{employeeId}")]
         public async Task<IActionResult> UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
         {
             try
@@ -183,5 +183,27 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        /// <summary>
+        /// Controller for handling ongoing request details for an employee.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>An IActionResult indicating success or failure of the get operation.</returns>
+        [HttpGet("ongoing/request/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeOngoingRequest(int employeeId)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing request details for the specified employee
+                IEnumerable<EmployeeOngoingRequest> employeeOngoingData = await _employeeService.GetEmployeeOngoingRequestDetails(employeeId);
+
+                // Return a 200 OK response with the retrieved ongoing request details
+                return Ok(employeeOngoingData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing request details: {ex.Message}");
+            }
+        }
     }
 }

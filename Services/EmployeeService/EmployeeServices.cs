@@ -376,5 +376,68 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
+        /// <summary>
+        /// Gets details of ongoing requests for a specific employee based on the provided employee ID.
+        /// Perform join operation on the tables TBL_EMPLOYEE, TBL_PROJECT_MAPPING, TBL_PROJECT,TBL_STATUS, TBL_REQ_APPROVE and TBL_REQUEST.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>A collection of ongoing request details for the employee.</returns>
+        public async Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId)
+        {
+            try
+            {
+                // Fetching data from repositories
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+
+                // Querying for ongoing request details
+                var result = (
+                    from reqApproval in reqApprovals
+                    join request in travelRequests on reqApproval.RequestId equals request.RequestId
+                    join employee in employees on reqApproval.EmpId equals employee.EmpId
+                    join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
+                    join project in projects on projectMapping.ProjectId equals project.ProjectId
+                    join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
+                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                    where employee.EmpId == employeeId
+                        && request.PerdiemId != null
+                        && reqApproval.PrimaryStatusId == 5
+                        && primaryStatus.StatusCode == "OG"
+                        && secondaryStatus.StatusCode == "OG"
+                    select new EmployeeOngoingRequest
+                    {
+                        RequestId = request.RequestId,
+                        ProjectCode = project.ProjectCode,
+                        ProjectName = project.ProjectName,
+                        StartDate = request.DepartureDate,
+                        EndDate = request.ReturnDate,
+                        Reason = request.TripPurpose,
+                        StatusName = primaryStatus.StatusName
+                    }
+                );
+
+                // Checking if the result is not null and returning
+                if (result != null && result.Any()) // Check if there are any results
+                {
+                    return result.ToList(); // If there are results, return the list
+                }
+                else
+                {
+                    // Throwing exception if no employees are found or no matching requests
+                    throw new FileNotFoundException($"No employees found who report to Manager ID {employeeId} with the specified criteria.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while getting employee details for Manager ID {employeeId}: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

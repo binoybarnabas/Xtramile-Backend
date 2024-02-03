@@ -22,6 +22,7 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId);
         
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
+        public Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId);
 
         public Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId);
 
