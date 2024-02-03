@@ -11,14 +11,14 @@ namespace XtramileBackend.Services.ManagerService
     // Service for managing reporting-related functionality
     public class ReportingManagerService : IReportingManagerService
     {
-
+        
         private readonly IUnitOfWork _unitOfWork;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService(IUnitOfWork unitOfWork)
+        public ReportingManagerService( IUnitOfWork unitOfWork)
         {
-
+            
             _unitOfWork = unitOfWork;
         }
 
@@ -27,7 +27,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync(int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync( int managerId)
         {
             try
             {
@@ -38,23 +38,23 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
-                var EmpRequest = (
+                var EmpRequest =  (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
                   join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
                   join project in projectData on projectMapping.ProjectId equals project.ProjectId
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == "OP" 
                   select new EmployeeRequestDto
-                  {
-                      RequestId = request.RequestId,
-                      EmployeeName = employee.FirstName + " " + employee.LastName,
-                      Email = employee.Email,
-                      ProjectCode = project.ProjectCode,
-                      Date = request.CreatedOn,
-                      Mode = null,
-                      Status = status.StatusName
+                {
+                    RequestId = request.RequestId,
+                    EmployeeName = employee.FirstName + " " + employee.LastName,
+                    Email = employee.Email,
+                    ProjectCode = project.ProjectCode,
+                    Date = request.CreatedOn,
+                    Mode = null,
+                    Status = status.StatusName
                   }).ToList();
 
                 return EmpRequest;
@@ -71,7 +71,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync( int managerId)
         {
             try
             {
@@ -165,7 +165,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
 
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync(int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync( int managerId)
         {
             try
             {
@@ -198,6 +198,8 @@ namespace XtramileBackend.Services.ManagerService
                   }).ToList();
 
                 return EmpRequest;
+
+                return EmpRequest;
             }
             catch (Exception ex)
             {
@@ -212,10 +214,10 @@ namespace XtramileBackend.Services.ManagerService
         /// <param name="date">Date for filtering the requests</param>  
         /// <returns>List of EmployeeRequestDto</returns>
 
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync( int managerId, string date)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmailAsync([FromQuery] int managerId)
         {
             try
-            {
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -242,6 +244,7 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
+                }).ToListAsync();
 
                 return EmpRequest;
             }
@@ -251,17 +254,16 @@ namespace XtramileBackend.Services.ManagerService
                 return new List<EmployeeRequestDto>();
             }
         }
-
         /// <summary>
         /// Get employee requests for a specific email
         /// </summary>
         /// <param name="managerId">Manager ID for getting the requests</param>
         /// <param name="email">Email for filtering the requests</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmailAsync(int managerId, string email)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmailAsync( int managerId, string email)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync([FromQuery] int managerId)
         {
             try
-            {
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -276,7 +278,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on projectMapping.ProjectId equals project.ProjectId
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && employee.Email == email
+                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && employee.Email== email
                   select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
@@ -287,6 +289,7 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
+                }).ToListAsync();
 
                 return EmpRequest;
             }
@@ -305,7 +308,6 @@ namespace XtramileBackend.Services.ManagerService
         public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId)
         {
             try
-            {
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -313,7 +315,7 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
-                var EmpRequest = (
+                var EmpRequest =  (
                 from employee in employeeData
                 join request in requestData on employee.EmpId equals request.CreatedBy
                 join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
@@ -321,7 +323,8 @@ namespace XtramileBackend.Services.ManagerService
                 join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                 join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                 join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                where employee.ReportsTo == managerId && status.StatusCode == "FD" || status1.StatusCode == "FD"
+                where employee.ReportsTo == managerId && status.StatusCode=="FD" || status1.StatusCode=="FD"
+                where TBL_EMPLOYEE.ReportsTo == managerId && TBL_REQUEST.CreatedOn.Date == date.Date
                 select new EmployeeRequestDto
                 {
                     RequestId = request.RequestId,

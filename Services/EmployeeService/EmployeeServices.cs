@@ -268,7 +268,11 @@ namespace XtramileBackend.Services.EmployeeService
             }
 
         }
-
+        /// <summary>
+        /// Retrieves pending travel requests for a specific employee.
+        /// </summary>
+        /// <param name="empId">The employee ID for which to fetch pending requests.</param>
+        /// <returns>An asynchronous task returning a collection of PendingRequetsViewEmployee objects.</returns>
         public async Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId)
         {
             try
@@ -276,7 +280,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
 
@@ -284,8 +287,7 @@ namespace XtramileBackend.Services.EmployeeService
                                join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
                                join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                                join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
-                               join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               join employeeProject in employeeProjectMap on employee.EmpId equals employeeProject.EmpId
+                               join employeeProject in employeeProjectMap on statusApproval.EmpId equals employeeProject.EmpId
                                join project in projectData on employeeProject.ProjectId equals project.ProjectId
                                where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
                                select new PendingRequetsViewEmployee
@@ -304,6 +306,76 @@ namespace XtramileBackend.Services.EmployeeService
                 throw; // Re-throw the exception to propagate it
             }
         }
+
+
+
+        /// <summary>
+        /// Retrieves closed requests for an employee
+        /// </summary>
+        /// <param name="empId"> Employee id for retrieving requests</param>
+        /// <returns>An asynchronous task return a collection of type EmpViewRequest</returns>
+
+        public async Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+
+
+                var result =  (from request in requestData
+                              join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                              join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                              join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                              join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
+                              join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              where request.CreatedBy == empId
+                              && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
+                               select new EmployeeViewReq
+                              {
+                                  RequestId = request.RequestId,
+                                  ProjectCode = project.ProjectCode,
+                                  ProjectName = project.ProjectName,
+                                  TravelType = travelType.TypeName,
+                                  ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
+                                  Status = "Closed"
+
+                              }).ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting closed requests: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+
+        /// <summary>
+        /// Adds a selected option from the listed available options for a specific request.
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns>The TBL_REQ_MAPPING object representing the selected option to be added.</returns>
+        public async Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option)
+        {
+            try
+            {
+                await _unitOfWork.RequestMappingRepository.AddAsync(option);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while adding options : {ex.Message}");
+                throw;
+            }
+        }
+
         /// <summary>
         /// Gets details of ongoing requests for a specific employee based on the provided employee ID.
         /// Perform join operation on the tables TBL_EMPLOYEE, TBL_PROJECT_MAPPING, TBL_PROJECT,TBL_STATUS, TBL_REQ_APPROVE and TBL_REQUEST.

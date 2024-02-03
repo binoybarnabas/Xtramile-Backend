@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.RequestStatusService;
 
@@ -48,5 +49,20 @@ namespace XtramileBackend.Controllers.RequestStatusControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a request status: {ex.Message}");
             }
         }
+        [HttpGet("name/{requestId}")]
+        public async Task<IActionResult> GetStatusNameAsync(int requestId)
+        {
+            try
+            {
+                var statusName =  await _requestStatusServices.GetRequestStatusNameAsync(requestId);
+                return Ok(statusName);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a request status: {ex.Message}");
+            }
+        }
     }
 }
+

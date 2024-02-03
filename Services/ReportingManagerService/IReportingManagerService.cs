@@ -14,6 +14,6 @@ namespace XtramileBackend.Services.ManagerService
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date);
 
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmailAsync(int managerId, string email);
-        public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
+        public Task<List<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
     }
 }
