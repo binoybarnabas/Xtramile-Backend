@@ -11,7 +11,7 @@ namespace XtramileBackend.Controllers.RequestMappingController
     public class RequestMappingController : ControllerBase
     {
         private IRequestMappingService _requestMappingService;
-        public RequestMappingController(IRequestMappingService requestMappingService) 
+        public RequestMappingController(IRequestMappingService requestMappingService)
         {
             _requestMappingService = requestMappingService;
         }
@@ -30,14 +30,14 @@ namespace XtramileBackend.Controllers.RequestMappingController
             }
         }
         [HttpPost("add/option")]
-        public async Task<IActionResult> AddSelectedOptionForRequest([FromBody]  TBL_REQ_MAPPING option)
+        public async Task<IActionResult> AddSelectedOptionForRequest([FromBody] TBL_REQ_MAPPING option)
         {
             try
             {
                 await _requestMappingService.AddSelectedOptionForRequest(option);
                 return Ok(option);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an option: {ex.Message}");
             }

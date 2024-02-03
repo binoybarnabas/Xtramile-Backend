@@ -5,5 +5,7 @@ namespace XtramileBackend.Services.TravelAdminService
     public interface ITravelAdminService
     {
         public Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel();
+        public Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequests();
+        public Task<OptionCard> GetSelectedOptionFromEmployee(int reqId);
     }
 }
