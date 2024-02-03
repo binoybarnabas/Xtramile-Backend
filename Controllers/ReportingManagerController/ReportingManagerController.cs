@@ -29,7 +29,7 @@ namespace XtramileBackend.Controllers.ReportingManagerController
 
         // Get employee requests for a specific date based on managerId and date
         [HttpGet("date")]
-        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, DateTime date)
+        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, string     date)
         {
             var empRequests = await _reportingManagerService.GetEmployeeRequestsByDateAsync(managerId, date);
             return Ok(empRequests);
