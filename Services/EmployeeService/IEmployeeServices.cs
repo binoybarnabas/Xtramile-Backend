@@ -20,9 +20,12 @@ namespace XtramileBackend.Services.EmployeeService
         public Task UpdateEmployeeDetailsAsync(int employeeId, ProfileEdit profileEdit);
 
         public Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId);
+        
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
 
         public Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId);
+
+        public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
 
 
     }

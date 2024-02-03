@@ -150,6 +150,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         }
 
 
+
         [HttpGet("request/history")]
         public async Task<IActionResult> GetRequestHistory(int empId)
         {
@@ -166,6 +167,21 @@ namespace XtramileBackend.Controllers.EmployeeController
 
         }
 
+
+
+        [HttpPost("add/option")]
+        public async Task<IActionResult> AddSelectedOptionForRequest([FromBody] TBL_REQ_MAPPING option)
+        {
+            try
+            {
+                await _employeeService.AddSelectedOptionForRequest(option);
+                return Ok(option);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an option: {ex.Message}");
+            }
+        }
 
     }
 }

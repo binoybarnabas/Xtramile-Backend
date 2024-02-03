@@ -50,7 +50,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using XtramileBackend.Services.TravelAdminService;
 using XtramileBackend.Services.ManagerService;
 using XtramileBackend.Repositories.RequestMappingRepository;
-using XtramileBackend.Services.RequestMappingService;
+
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
@@ -163,7 +163,6 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
 builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 builder.Services.AddScoped<IReportingManagerService, ReportingManagerService>();
-builder.Services.AddScoped<IRequestMappingService,RequestMappingService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
@@ -7,6 +8,9 @@ using XtramileBackend.Services.AvailableOptionService;
 
 namespace XtramileBackend.Controllers.AvailableOptionControllers
 {
+
+
+    [EnableCors("AllowAngularDev")]
     [Route("api/availableoptions")]
     [ApiController]
     public class AvailableOptionController : ControllerBase

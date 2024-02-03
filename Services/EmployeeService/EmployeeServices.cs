@@ -356,5 +356,25 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
+
+        /// <summary>
+        /// Adds a selected option from the listed available options for a specific request.
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns>The TBL_REQ_MAPPING object representing the selected option to be added.</returns>
+        public async Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option)
+        {
+            try
+            {
+                await _unitOfWork.RequestMappingRepository.AddAsync(option);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while adding options : {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }
