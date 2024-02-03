@@ -49,6 +49,8 @@ using XtramileBackend.Services.FinanceDepartment;
 using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using XtramileBackend.Services.TravelAdminService;
+using XtramileBackend.Repositories.FileMetaDataRepository;
+using XtramileBackend.Services.FileMetaDataService;
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
@@ -147,6 +149,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAvailableOptionRepository, AvailableOptionRepository>();
 builder.Services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
 builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
+builder.Services.AddScoped<IFileMetaDataRepository, FileMetaDataRepository>();
+
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
 builder.Services.AddScoped<IProjectServices, ProjectServices>();
@@ -171,6 +175,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 //builder.Services.AddScoped<IEmployeeViewPenReqService, EmployeeViewPenReqService>();
 builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>();
 builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
+builder.Services.AddScoped<IFileMetaDataService, FileMetaDataService>();
 
 builder.Services.AddCors(options =>
 {

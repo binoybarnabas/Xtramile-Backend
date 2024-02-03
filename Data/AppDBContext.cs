@@ -55,6 +55,10 @@ namespace XtramileBackend.Data
 
 
         public DbSet<TBL_USER> TBL_USER { get; set; }
+
+        public DbSet<TBL_FILE_METADATA> TBL_FILE_METADATA { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //migrations if needed.

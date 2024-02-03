@@ -8,6 +8,10 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.RequestService;
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.StatusService;
+using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Repositories.FileMetaDataRepository;
+using XtramileBackend.Services.FileMetaDataService;
 
 namespace XtramileBackend.Controllers.RequestControllers
 {
@@ -19,12 +23,25 @@ namespace XtramileBackend.Controllers.RequestControllers
         private readonly IRequestServices _requestServices;
 
         private readonly IRequestStatusServices _requestStatusServices;
+        
+        private readonly IStatusServices _statusServices;
 
-        public RequestController(IRequestServices requestServices, IRequestStatusServices requestStatusServices)
+        private readonly IFileTypeServices _fileTypeServices;
+
+        private readonly IFileMetaDataService _fileMetaDataServices;
+
+        public RequestController(IRequestServices requestServices, IRequestStatusServices requestStatusServices, 
+            
+            IStatusServices statusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices)
         {
             _requestServices = requestServices;
             _requestStatusServices = requestStatusServices;
+            _statusServices = statusServices;
+            _fileTypeServices = fileTypeServices;
+            _fileMetaDataServices = fileMetaDataServices;
         }
+
+
 
         [HttpGet("requests")]
         public async Task<IActionResult> GetAllRequestAsync()
@@ -42,61 +59,23 @@ namespace XtramileBackend.Controllers.RequestControllers
         }
 
 
-        /*        //New Travel Requests
-                [HttpPost("add")]
-                public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
-                {
-
-                    Console.WriteLine("==============================================================================================");
-                    Console.WriteLine(request);
-
-                    Console.WriteLine("==============================================================================================");
-
-                        // Your logic to handle form data (model) here
-
-                        // Check if files are attached and handle them
-                        if (HttpContext.Request.Form.Files != null && HttpContext.Request.Form.Files.Count > 0)
-                        {
-                            foreach (var file in HttpContext.Request.Form.Files)
-                            {
-                                // Handle each file, for example, save it to the server
-                                // Note: You may need to adjust the file handling logic based on your requirements
-                                // For simplicity, the file is saved to wwwroot/uploads folder with a unique filename
-                                var fileName = $"{System.Guid.NewGuid()}_{file.FileName}";
-                                var filePath = System.IO.Path.Combine("Uploads/EmployeeUploads/IDCards", fileName);
-
-                                using (var stream = System.IO.File.Create(filePath))
-                                {
-                                    await file.CopyToAsync(stream);
-                                }
-
-                                // Add logic to save the file path or other details in your database
-                            }
-                        }
-
-                        // Your remaining logic for handling the request
-
-                        return Ok("Request submitted successfully");
-
-
-
-
-                }
-
-        */
-
+        /// <summary>
+        /// Controller to handle new travel request
+        /// Form input contains mutiple input types including files
+        /// </summary>
         [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
         {
 
             try
             {
-                //Handling the request data
-
+                   
                 int empId = int.Parse(request.CreatedBy);
 
+                //Request Code Generation
                 string RequestCode ="REQ"+_requestServices.GenerateRandomCode(empId);
 
+                //Handling text data
                 var tblRequest = new TBL_REQUEST
                 {
                     RequestCode = RequestCode,
@@ -125,47 +104,106 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 };
 
+                //Adding text data to the Entity
                 await _requestServices.AddRequestAsync(tblRequest);
 
+
+                //Getting the requestID after insertion
+                int requestId = await _requestServices.GetRequestIdByEmpId(empId);
+
+
+                //Getting the statusID from status table
+                int primaryStatusId = await _statusServices.GetStatusIdByStatusCodeAsync("OP");
+                int secondaryStatusId = await _statusServices.GetStatusIdByStatusCodeAsync("PE");
+
+
+                //Object for updating status of request
                 var requestStatus = new TBL_REQ_APPROVE
                 {
-
                     //update with req id
-                    RequestId = 1,
+                    RequestId = requestId,
                     EmpId = int.Parse(request.CreatedBy),
-                    PrimaryStatusId = 1,
+                    PrimaryStatusId = primaryStatusId,
                     date = DateTime.Now,
-                    SecondaryStatusId = 2
+                    SecondaryStatusId = secondaryStatusId
 
                 };
 
 
-                //Update mapping tables
+                //Updating Requesting Status
                 await _requestStatusServices.AddRequestStatusAsync(requestStatus);
-                
+
+                Console.WriteLine("------------------------------------");
+                Console.WriteLine(Request.Form.Files);
+                Console.WriteLine(HttpContext.Request.Form.Files.Count);
+                Console.WriteLine("------------------------------------");
+
 
                 // Check if files are attached and handle them
                 if (HttpContext.Request.Form.Files != null && HttpContext.Request.Form.Files.Count > 0)
                 {
-                    foreach (var file in HttpContext.Request.Form.Files)
-                    {
-                        
-                        //var fileName = $"{System.Guid.NewGuid()}_{file.FileName}";
+                     foreach (var file in HttpContext.Request.Form.Files)
+                      {
+                                //Renaming the file using REQCODE
+                                var fileName = $"{RequestCode}{file.FileName}";
 
-                        var fileName = $"{RequestCode}{file.FileName}";
+                                // Get the form field name (key name)
+                                var keyName = file.Name;
 
-                        var filePath = System.IO.Path.Combine("Uploads/EmployeeUploads/IDCards", fileName);
+                                // Define a mapping between form field names and target folders
+                                var folderMapping = new Dictionary<string, string>
+                                {
+                                      { "idCardAttachment", "Uploads/ProfileFiles/IdCards" },
+                                      { "travelAuthorizationEmailCapture", "Uploads/RequestFiles/TravelAuthorizationEmails" },
+                                      { "passportAttachment", "Uploads/ProfileFiles/Passports" }
+                                   
+                                };
 
-                        using (var stream = System.IO.File.Create(filePath))
-                        {
-                            await file.CopyToAsync(stream);
+
+                                // Determine the target folder based on the form field name
+                                if (folderMapping.TryGetValue(keyName, out var targetFolder))
+                                {
+                                      var filePath = Path.Combine(targetFolder, fileName);
+
+                                      using (var stream = System.IO.File.Create(filePath))
+                                      {
+                                         await file.CopyToAsync(stream);
+                                      }
+
+
+                            //Get file type id based on the file extension of received file
+                            int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync("png");
+
+
+                            // Add logic to save the file path or other details in your database
+                            var fileMetaData = new TBL_FILE_METADATA
+                            {
+                               
+                                RequestId = requestId,
+                                FileName = fileName,
+                                FilePath = filePath,
+                                Description = keyName,
+                                FileTypeId = fileTypeId,
+                                CreatedOn = DateTime.Now,
+                                CreatedBy = int.Parse(request.CreatedBy),
+                 
+                            };
+
+                            //Adding files meta data
+                            await _fileMetaDataServices.AddFileMetaDataAsync(fileMetaData);
+
                         }
+                        else
+                                {
+                                     // Handle the case where there is no specific folder mapping for the form field name
+                                    // You can choose to skip the file, move it to a default folder, or handle it in another way
+                                }
+                       
+                     //for ends
+                     }
 
-                        // Add logic to save the file path or other details in your database
-                    }
                 }
-           
-
+                
                 return Ok("Request submitted successfully:-");
             }
             catch (Exception ex)
@@ -175,6 +213,11 @@ namespace XtramileBackend.Controllers.RequestControllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
+
+
+
+
 
 
 

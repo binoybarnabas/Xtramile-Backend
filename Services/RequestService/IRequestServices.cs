@@ -11,6 +11,9 @@ namespace XtramileBackend.Services.RequestService
         public string GenerateRandomCode(int suffix);
 
 
+        public Task<int> GetRequestIdByEmpId(int empId);
+
+
 
     }
 }

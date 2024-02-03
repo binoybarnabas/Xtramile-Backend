@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace XtramileBackend.Models.EntityModels
+namespace XtramileBackend.Models.APIModels
 {
-    public class TBL_REQUEST
+    public class RequestInfo
     {
-        [Key]
+        
         public int RequestId { get; set; }
 
         public string? RequestCode { get; set; }
@@ -46,21 +46,13 @@ namespace XtramileBackend.Models.EntityModels
 
         public string PrefDepartureTime { get; set; }
 
-        public string? AdditionalComments { get; set; }
+        public string AdditionalComments { get; set; }
 
         public int? PriorityId { get; set; }
 
         public int? PerdiemId { get; set; }
 
         public int CreatedBy { get; set; }
-
-        public DateTime CreatedOn { get; set; }
-
-        public int? ModifiedBy { get; set; }
-
-        public DateTime? ModifiedOn { get; set; }
-
-
 
     }
 }
