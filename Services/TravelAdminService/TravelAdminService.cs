@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using Azure.Core;
+using System.Linq.Expressions;
+using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
@@ -115,7 +117,6 @@ namespace XtramileBackend.Services.TravelAdminService
             }
 
         }
-
         /// <summary>
         /// Retrieves the selected option details for a specific request ID.
         /// </summary>
@@ -172,6 +173,45 @@ namespace XtramileBackend.Services.TravelAdminService
                 Console.WriteLine($"An error occurred while getting option : {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Retrieves a list of travel requests based on a specified status code.
+        /// </summary>
+        /// <param name="statusCode">The status code to filter the requests.</param>
+        /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID.</returns>
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetTravelRequests(string statusCode)
+        {
+            IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+            IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+            IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
+            IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+            IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+            IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+
+            var result = (from requestApproval in approvalData
+                          join requests in requestData on requestApproval.RequestId equals requests.RequestId
+                          join priority in priorityData on requests.PriorityId equals priority.PriorityId
+                          join status in statusData on requestApproval.PrimaryStatusId equals status.StatusId
+                          join travelType in travelTypeData on requests.TravelTypeId equals travelType.TravelTypeID
+                          join employee in employeeData on requests.CreatedBy equals employee.EmpId
+                          join employeeProjectMap in projectMappingData on employee.EmpId equals employeeProjectMap.EmpId
+                          join project in projectData on employeeProjectMap.ProjectId equals project.ProjectId
+                          where status.StatusCode == statusCode
+                          group new RequestTableViewTravelAdmin
+                          {
+                              RequestId = requests.RequestId,
+                              EmployeeName = employee.FirstName + " " + employee.LastName,
+                              ProjectCode = project.ProjectCode,
+                              CreatedOn = requests.CreatedOn,
+                              TravelTypeName = travelType.TypeName,
+                              PriorityName = priority.PriorityName,
+                          } by requests.RequestId into grouped
+                          select grouped.LastOrDefault()).ToList();
+
+            return result;
         }
 
     }
