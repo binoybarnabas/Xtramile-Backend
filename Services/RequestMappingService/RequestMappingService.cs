@@ -7,7 +7,7 @@ namespace XtramileBackend.Services.RequestMappingService
     public class RequestMappingService : IRequestMappingService
     {
         private readonly IUnitOfWork _unitOfWork;
-        
+
         public RequestMappingService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

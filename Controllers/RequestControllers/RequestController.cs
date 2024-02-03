@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using XtramileBackend.Models.EntityModels;
@@ -6,6 +7,7 @@ using XtramileBackend.Services.RequestService;
 
 namespace XtramileBackend.Controllers.RequestControllers
 {
+    [EnableCors("AllowAngularDev")]
     [Route("api/request")]
     [ApiController]
     public class RequestController : ControllerBase
