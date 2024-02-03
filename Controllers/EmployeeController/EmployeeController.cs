@@ -148,5 +148,19 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
             }
         }
+
+        [HttpPost("add/option")]
+        public async Task<IActionResult> AddSelectedOptionForRequest([FromBody] TBL_REQ_MAPPING option)
+        {
+            try
+            {
+                await _employeeService.AddSelectedOptionForRequest(option);
+                return Ok(option);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an option: {ex.Message}");
+            }
+        }
     }
 }
