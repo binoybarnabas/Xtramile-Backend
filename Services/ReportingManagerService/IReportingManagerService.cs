@@ -5,24 +5,23 @@ namespace XtramileBackend.Services.ManagerService
 {
     public interface IReportingManagerService
     {
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync([FromQuery] int managerId);
+        //get all employees
+        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync(int managerId);
 
+        //sorting 
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId);
-
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmployeeNameAsync( int managerId);
-
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmailAsync(int managerId);
-
-
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync(int managerId);
+
+        //Get list by date
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date);
 
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmailAsync(int managerId, string email);
-
-
+        //searching by name
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId,string employeeName);
 
-        public Task<List<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
+        //ongoing requests
+        public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
+        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsClosedAsync(int managerId);
 
     }
 }

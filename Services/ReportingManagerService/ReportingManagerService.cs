@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace XtramileBackend.Services.ManagerService
@@ -18,7 +20,6 @@ namespace XtramileBackend.Services.ManagerService
         // Constructor that initializes the service with the database context
         public ReportingManagerService( IUnitOfWork unitOfWork)
         {
-            
             _unitOfWork = unitOfWork;
         }
 
@@ -27,7 +28,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync( int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync(int managerId)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
-                var EmpRequest =  (
+                var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
                   join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
@@ -64,6 +65,49 @@ namespace XtramileBackend.Services.ManagerService
                 Console.WriteLine("Error fetching the Travel Requests");
                 return new List<EmployeeRequestDto>();
             }
+        }
+
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var EmpRequest = (
+                  from employee in employeeData
+                  join request in requestData on employee.EmpId equals request.CreatedBy
+                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
+                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
+                
+                select new EmployeeRequestDto
+                  {
+                      RequestId = request.RequestId,
+                      EmployeeName = employee.FirstName + " " + employee.LastName,
+                      Email = employee.Email,
+                      ProjectCode = project.ProjectCode,
+                      Date = request.CreatedOn,
+                      Mode = null,
+                      Status = status.StatusName
+                  }).ToList();
+
+                return EmpRequest;
+
+                return EmpRequest;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error fetching the Travel Requests");
+                return new List<EmployeeRequestDto>();
+            }
+
         }
 
         /// <summary>
@@ -112,12 +156,12 @@ namespace XtramileBackend.Services.ManagerService
                 return new List<EmployeeRequestDto>();
             }
         }
+
         /// <summary>
         /// Get employee requests asynchronously based on managerId and sorted by email
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-
         public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmployeeNameAsync(int managerId)
         {
             try
@@ -157,13 +201,13 @@ namespace XtramileBackend.Services.ManagerService
                 return new List<EmployeeRequestDto>();
             }
         }
+
         /// <summary>
         /// Get employee requests asynchronously based on managerId and sorted by date
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync( int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync(int managerId)
         {
             try
             {
@@ -205,107 +249,16 @@ namespace XtramileBackend.Services.ManagerService
                 return new List<EmployeeRequestDto>();
             }
         }
-        /// <summary>
-        /// Get employee requests for a specific date
-        /// </summary>
-        /// <param name="managerId"></param>
-        /// <param name="date">Date for filtering the requests</param>  
-        /// <returns>List of EmployeeRequestDto</returns>
-
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync( int managerId, string date)
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmailAsync([FromQuery] int managerId)
-        {
-            try
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-
-                var EmpRequest = (
-                  from employee in employeeData
-                  join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                  join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
-
-                  select new EmployeeRequestDto
-                  {
-                      RequestId = request.RequestId,
-                      EmployeeName = employee.FirstName + " " + employee.LastName,
-                      Email = employee.Email,
-                      ProjectCode = project.ProjectCode,
-                      Date = request.CreatedOn,
-                      Mode = null,
-                      Status = status.StatusName
-                  }).ToList();
-                }).ToListAsync();
-
-                return EmpRequest;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
-            }
-        }
-        /// <summary>
-        /// Get employee requests for a specific email
-        /// </summary>
-        /// <param name="managerId">Manager ID for getting the requests</param>
-        /// <param name="email">Email for filtering the requests</param>
-        /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmailAsync( int managerId, string email)
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync([FromQuery] int managerId)
-        {
-            try
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-
-                var EmpRequest = (
-                  from employee in employeeData
-                  join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                  join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && employee.Email== email
-                  select new EmployeeRequestDto
-                  {
-                      RequestId = request.RequestId,
-                      EmployeeName = employee.FirstName + " " + employee.LastName,
-                      Email = employee.Email,
-                      ProjectCode = project.ProjectCode,
-                      Date = request.CreatedOn,
-                      Mode = null,
-                      Status = status.StatusName
-                  }).ToList();
-                }).ToListAsync();
-
-                return EmpRequest;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
-            }
-        }
 
         /// <summary>
         /// to retreives the forwarded requests to a manager
         /// </summary>
         /// <param name="managerId">to retreiev the travel requests to a manager</param>
         /// <returns></returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId, DateTime date)
         {
             try
+            {
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -313,35 +266,36 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
-                var EmpRequest =  (
-                from employee in employeeData
-                join request in requestData on employee.EmpId equals request.CreatedBy
-                join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                where employee.ReportsTo == managerId && status.StatusCode=="FD" || status1.StatusCode=="FD"
-                where TBL_EMPLOYEE.ReportsTo == managerId && TBL_REQUEST.CreatedOn.Date == date.Date
-                select new EmployeeRequestDto
-                {
-                    RequestId = request.RequestId,
-                    EmployeeName = employee.FirstName + " " + employee.LastName,
-                    Email = employee.Email,
-                    ProjectCode = project.ProjectCode,
-                    Date = request.CreatedOn,
-                    Mode = null,
-                    Status = "Forwarded"
-                }).ToList();
+                var EmpRequest = (
+                    from employee in employeeData
+                    join request in requestData on employee.EmpId equals request.CreatedBy
+                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
+                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                    join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                    join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
+                    where employee.ReportsTo == managerId && (status.StatusCode == "FD" || status1.StatusCode == "FD")
+                          && request.CreatedOn.Date == date.Date
+                    select new EmployeeRequestDto
+                    {
+                        RequestId = request.RequestId,
+                        EmployeeName = employee.FirstName + " " + employee.LastName,
+                        Email = employee.Email,
+                        ProjectCode = project.ProjectCode,
+                        Date = request.CreatedOn,
+                        Mode = null,
+                        Status = status.StatusName  // Assuming you want to assign the status name here
+                    }).ToList();
 
                 return EmpRequest;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests: " + ex.Message);
                 return new List<EmployeeRequestDto>();
             }
         }
+
 
         /// <summary>
         /// Get employee requests that are closed asynchronously based on managerId.
