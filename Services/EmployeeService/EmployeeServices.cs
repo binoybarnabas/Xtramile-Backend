@@ -295,6 +295,7 @@ namespace XtramileBackend.Services.EmployeeService
                                    requestId = request.RequestId,
                                    projectName = project.ProjectName,
                                    reasonOfTravel = request.TripPurpose,
+                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
                                    dateOfTravel = request.DepartureDate
                                }).ToList();
                 return results;
