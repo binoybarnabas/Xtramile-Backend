@@ -8,6 +8,12 @@ namespace XtramileBackend.Services.RequestService
         public Task<IEnumerable<TBL_REQUEST>> GetAllRequestAsync();
         public Task AddRequestAsync(TBL_REQUEST request);
 
+        public string GenerateRandomCode(int suffix);
+
+
+        public Task<int> GetRequestIdByRequestCode(string requestCode);
+
+
     }
 }
 

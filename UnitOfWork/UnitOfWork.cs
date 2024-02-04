@@ -19,6 +19,7 @@ using XtramileBackend.Repositories.CategoryRepository;
 using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Repositories.RequestMappingRepository;
+using XtramileBackend.Repositories.FileMetaDataRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -45,6 +46,7 @@ namespace XtramileBackend.UnitOfWork
         public IRequestStatusRepository RequestStatusRepository { get; }
         public IProjectMappingRepository ProjectMappingRepository { get; }
         public IRequestMappingRepsitory RequestMappingRepository { get; }
+        public IFileMetaDataRepository FileMetaDataRepository { get; }
 
 
         public readonly AppDBContext _dbContext;
@@ -71,7 +73,9 @@ namespace XtramileBackend.UnitOfWork
             RequestStatusRepository = new RequestStatusRepository(_dbContext);
             ProjectMappingRepository = new ProjectMappingRepository(_dbContext);
             RequestMappingRepository = new RequestMappingRepository(_dbContext);
-        } 
+            FileMetaDataRepository = new FileMetaDataRepository(_dbContext);
+
+        }
 
         public int Complete()
         {

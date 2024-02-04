@@ -19,6 +19,7 @@ using XtramileBackend.Repositories.CategoryRepository;
 using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.RequestMappingRepository;
+using XtramileBackend.Repositories.FileMetaDataRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -44,6 +45,7 @@ namespace XtramileBackend.UnitOfWork
         public IProjectMappingRepository ProjectMappingRepository { get; }
         public IRequestStatusRepository RequestStatusRepository { get; }
         public IRequestMappingRepsitory RequestMappingRepository { get; }
+        public IFileMetaDataRepository FileMetaDataRepository { get; }
 
         public int Complete();
         Task SaveChangesAsyn();

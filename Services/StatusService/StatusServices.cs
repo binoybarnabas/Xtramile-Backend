@@ -59,5 +59,31 @@ namespace XtramileBackend.Services.StatusService
             return statusId;
         }
 
+
+        //Get Status ID by the given status code
+        public async Task<int> GetStatusIdByStatusCodeAsync(string statusCode)
+        {
+            try
+            {
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                var statusId = (from item in statusData
+                                where item.StatusCode == statusCode
+                                select item.StatusId).FirstOrDefault();
+                return statusId;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting status id: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+            //EOF
+        }
+
+
+
+
+
     }
 }
