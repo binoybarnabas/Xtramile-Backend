@@ -42,5 +42,38 @@ namespace XtramileBackend.Services.FileTypeService
                 throw; // Re-throw the exception to propagate it
             }
         }
+
+
+
+
+
+        //Get file type id by given file extension
+        public async Task<int> GetFileTypeIdByExtensionAsync(string fileExtension)
+        {
+
+            try
+            {
+                IEnumerable<TBL_FILE_TYPE> fileTypeData = await _unitOfWork.FileTypeRepository.GetAllAsync();
+
+                var fileTypeId = (from item in fileTypeData
+                                  where item.FileExtension == fileExtension
+                                  select item.FileTypeId).FirstOrDefault();
+
+                return fileTypeId;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting File Type: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+
+
+        }
+
+
+
+
+
     }
 }

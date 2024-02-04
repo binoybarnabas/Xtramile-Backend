@@ -52,6 +52,8 @@ namespace XtramileBackend.Data
         public DbSet<TBL_PROJECT_MAPPING> TBL_PROJECT_MAPPING { get; set; }
 
         public DbSet<TBL_REQ_MAPPING> TBL_REQ_MAPPING { get; set; }
+       
+        public DbSet<TBL_FILE_METADATA> TBL_FILE_METADATA { get; set; }
 
 
         public DbSet<TBL_USER> TBL_USER { get; set; }
