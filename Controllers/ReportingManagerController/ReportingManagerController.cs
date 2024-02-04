@@ -111,5 +111,22 @@ namespace XtramileBackend.Controllers.ReportingManagerController
             }
         }
 
+        [HttpGet("travel/request/{requestID}")]
+        public async Task<IActionResult> GetTravelRequest(int requestID)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                TravelRequestEmployeeViewModel requestData = await _reportingManagerService.GetEmployeeRequestDetail(requestID);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
     }
 }

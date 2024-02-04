@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using System;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -461,6 +463,70 @@ namespace XtramileBackend.Services.ManagerService
             {
                 // Logging and rethrowing the exception
                 Console.WriteLine($"An error occurred while getting employee details for Manager ID {managerId}: {ex.Message}");
+                throw;
+            }
+        }
+
+
+        public async Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId)
+        {
+            try
+            {
+
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                var employeeRequestDetail =  (from employee in employees
+                                             join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
+                                             join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
+                                             join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
+                                             join project in projects on projectMapping.ProjectId equals project.ProjectId
+                                             join department in departments on project.DepartmentId equals department.DepartmentId
+                                             join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
+                                             where travelRequest.RequestId == requestId
+                                             select new TravelRequestEmployeeViewModel
+                                             {
+                                                 FirstName = employee.FirstName,
+                                                 LastName = employee.LastName,
+                                                 ContactNumber = employee.ContactNumber,
+                                                 Email = employee.Email,
+                                                 ReportsTo = reportsToEmployee.FirstName + " " + reportsToEmployee.LastName,
+                                                 DepartmentName = department.DepartmentName,
+                                                 ProjectCode = project.ProjectCode,
+                                                 ProjectName = project.ProjectName,
+                                                 TravelType = travelType.TypeName,
+                                                 TripPurpose = travelRequest.TripPurpose,
+                                                 DepartureDate = travelRequest.DepartureDate,
+                                                 ReturnDate = travelRequest.ReturnDate,
+                                                 SourceCityZipCode = travelRequest.SourceCityZipCode,
+                                                 DestinationCityZipCode = travelRequest.DestinationCityZipCode,
+                                                 SourceCity = travelRequest.SourceCity,
+                                                 DestinationCity = travelRequest.DestinationCity,
+                                                 SourceState = travelRequest.SourceState,
+                                                 DestinationState = travelRequest.DestinationState,
+                                                 SourceCountry = travelRequest.SourceCountry,
+                                                 DestinationCountry = travelRequest.DestinationCountry,
+                                                 CabRequired = travelRequest.CabRequired,
+                                                 AccommodationRequired = travelRequest.AccommodationRequired,
+                                                 PrefDepartureTime = travelRequest.PrefDepartureTime,
+                                                 /*TravelAuthorizationEmailCapture =
+                                                 PassportAttachment =
+                                                 IdCardAttachment = */
+                                                 AdditionalComments = travelRequest.AdditionalComments
+                                             }
+                                             );
+
+                return employeeRequestDetail.FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while getting employee request details for request {requestId}: {ex.Message}");
                 throw;
             }
         }
