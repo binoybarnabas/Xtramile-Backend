@@ -27,7 +27,7 @@
         public string CabRequired { get; set; }
         public string AccommodationRequired { get; set; }
         public string PrefDepartureTime { get; set; }
-        public IFormFile? MailAttachment { get; set; }
+        public IFormFile? TravelAuthorizationEmailCapture { get; set; }
         public IFormFile? PassportAttachment { get; set; }
         public IFormFile? IdCardAttachment { get; set; }
         public string? AdditionalComments { get; set; }
