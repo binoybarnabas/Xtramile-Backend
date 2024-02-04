@@ -8,9 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\NewFolder\**" />
     <Compile Remove="Services\TravelAdminServices\**" />
+    <Content Remove="Services\NewFolder\**" />
     <Content Remove="Services\TravelAdminServices\**" />
+    <EmbeddedResource Remove="Services\NewFolder\**" />
     <EmbeddedResource Remove="Services\TravelAdminServices\**" />
+    <None Remove="Services\NewFolder\**" />
     <None Remove="Services\TravelAdminServices\**" />
   </ItemGroup>
 
@@ -28,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\NewFolder\" />
     <Folder Include="Tests\" />
     <Folder Include="Utils\" />
   </ItemGroup>

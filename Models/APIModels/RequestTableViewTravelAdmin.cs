@@ -1,4 +1,4 @@
-﻿namespace XtramileBackend.Models.APIModels
+﻿    namespace XtramileBackend.Models.APIModels
 {
     public class RequestTableViewTravelAdmin
     {
