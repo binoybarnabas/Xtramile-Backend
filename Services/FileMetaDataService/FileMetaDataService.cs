@@ -23,7 +23,7 @@ namespace XtramileBackend.Services.FileMetaDataService
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while adding an expense: {ex.Message}");
+                Console.WriteLine($"An error occurred while adding file meta data: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }
@@ -39,7 +39,7 @@ namespace XtramileBackend.Services.FileMetaDataService
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while getting expenses: {ex.Message}");
+                Console.WriteLine($"An error occurred while getting file metadata: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }

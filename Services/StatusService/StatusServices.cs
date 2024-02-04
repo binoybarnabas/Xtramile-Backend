@@ -64,7 +64,7 @@ namespace XtramileBackend.Services.StatusService
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while getting Employees: {ex.Message}");
+                Console.WriteLine($"An error occurred while getting status id: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
             //EOF

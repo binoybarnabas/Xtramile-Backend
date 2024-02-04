@@ -58,7 +58,7 @@ namespace XtramileBackend.Services.RequestService
         }
 
 
-       
+
 
         //Generate Random Code
         public string GenerateRandomCode(int suffix)
@@ -70,24 +70,18 @@ namespace XtramileBackend.Services.RequestService
 
 
         // Async Method to get request ID by accepting EmpID as an argument
-        public async Task<int> GetRequestIdByEmpId(int empId)
+        public async Task<int> GetRequestIdByRequestCode(string requestCode)
         {
             try
             {
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
 
-                /*        var requestId = (from item in requestData
-                                         where item.CreatedBy == empId
+                        var requestId = (from item in requestData
+                                         where item.RequestCode == requestCode
                                          select item.RequestId).FirstOrDefault();
-                        return requestId;*/
-                
-
-                var requestId = requestData
-                .Where(item => item.CreatedBy == empId)
-                .Select(item => item.RequestId)
-         .          FirstOrDefault();
-
+                        
                 return requestId;
+                
             }
             catch (Exception ex)
             {

@@ -73,9 +73,12 @@ namespace XtramileBackend.Controllers.RequestControllers
                 int empId = int.Parse(request.CreatedBy);
 
                 //Request Code Generation
-                string RequestCode ="REQ"+_requestServices.GenerateRandomCode(empId);
+                string randomCode =  _requestServices.GenerateRandomCode(empId);
 
-                //Handling text data
+                string RequestCode = "REQ" + randomCode;
+
+
+                //Handling text data of travel request
                 var tblRequest = new TBL_REQUEST
                 {
                     RequestCode = RequestCode,
@@ -104,12 +107,12 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 };
 
-                //Adding text data to the Entity
+                //Adding text data to the TBL_REQUEST Entity
                 await _requestServices.AddRequestAsync(tblRequest);
 
 
                 //Getting the requestID after insertion
-                int requestId = await _requestServices.GetRequestIdByEmpId(empId);
+                int requestId = await _requestServices.GetRequestIdByRequestCode(RequestCode);
 
 
                 //Getting the statusID from status table
@@ -120,7 +123,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                 //Object for updating status of request
                 var requestStatus = new TBL_REQ_APPROVE
                 {
-                    //update with req id
+                    
                     RequestId = requestId,
                     EmpId = int.Parse(request.CreatedBy),
                     PrimaryStatusId = primaryStatusId,
@@ -132,11 +135,6 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 //Updating Requesting Status
                 await _requestStatusServices.AddRequestStatusAsync(requestStatus);
-
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine(Request.Form.Files);
-                Console.WriteLine(HttpContext.Request.Form.Files.Count);
-                Console.WriteLine("------------------------------------");
 
 
                 // Check if files are attached and handle them
@@ -150,7 +148,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                                 // Get the form field name (key name)
                                 var keyName = file.Name;
 
-                                // Define a mapping between form field names and target folders
+                                // Mapping between form field names and target folders
                                 var folderMapping = new Dictionary<string, string>
                                 {
                                       { "idCardAttachment", "Uploads/ProfileFiles/IdCards" },
@@ -170,15 +168,16 @@ namespace XtramileBackend.Controllers.RequestControllers
                                          await file.CopyToAsync(stream);
                                       }
 
+                            //Get Extension of received file
+                            string fileExtension = Path.GetExtension(filePath);
 
                             //Get file type id based on the file extension of received file
-                            int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync("png");
+                            int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
 
 
-                            // Add logic to save the file path or other details in your database
+                            // To save the file meta data in TBL_FILE_METADATA
                             var fileMetaData = new TBL_FILE_METADATA
                             {
-                               
                                 RequestId = requestId,
                                 FileName = fileName,
                                 FilePath = filePath,
@@ -194,10 +193,10 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                         }
                         else
-                                {
-                                     // Handle the case where there is no specific folder mapping for the form field name
-                                    // You can choose to skip the file, move it to a default folder, or handle it in another way
-                                }
+                            {     //FOR REFERENCE!  
+                                  // Handle the case where there is no specific folder mapping for the form field name
+                                  // You can choose to skip the file, move it to a default folder, or handle it in another way
+                             }
                        
                      //for ends
                      }
