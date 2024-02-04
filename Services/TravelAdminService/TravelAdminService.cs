@@ -176,10 +176,11 @@ namespace XtramileBackend.Services.TravelAdminService
         }
 
         /// <summary>
-        /// Retrieves a list of travel requests based on a specified status code.
+        /// Retrieves a collection of travel requests based on a specified status code,
+        /// returning the last row of each unique request ID with the specified status.
         /// </summary>
         /// <param name="statusCode">The status code to filter the requests.</param>
-        /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID.</returns>
+        /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID with the specified status.</returns>
         public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetTravelRequests(string statusCode)
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -191,16 +192,20 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
-            var result = (from requestApproval in approvalData
-                          join requests in requestData on requestApproval.RequestId equals requests.RequestId
+            var latestStatusApprovals = approvalData
+                .GroupBy(approval => approval.RequestId)
+                .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+            var result = (from latestApproval in latestStatusApprovals
+                          join requests in requestData on latestApproval.RequestId equals requests.RequestId
                           join priority in priorityData on requests.PriorityId equals priority.PriorityId
-                          join status in statusData on requestApproval.PrimaryStatusId equals status.StatusId
+                          join status in statusData on latestApproval.PrimaryStatusId equals status.StatusId
                           join travelType in travelTypeData on requests.TravelTypeId equals travelType.TravelTypeID
                           join employee in employeeData on requests.CreatedBy equals employee.EmpId
                           join employeeProjectMap in projectMappingData on employee.EmpId equals employeeProjectMap.EmpId
                           join project in projectData on employeeProjectMap.ProjectId equals project.ProjectId
                           where status.StatusCode == statusCode
-                          group new RequestTableViewTravelAdmin
+                          select new RequestTableViewTravelAdmin
                           {
                               RequestId = requests.RequestId,
                               EmployeeName = employee.FirstName + " " + employee.LastName,
@@ -208,11 +213,9 @@ namespace XtramileBackend.Services.TravelAdminService
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = travelType.TypeName,
                               PriorityName = priority.PriorityName,
-                          } by requests.RequestId into grouped
-                          select grouped.LastOrDefault()).ToList();
+                          }).ToList();
 
             return result;
         }
-
     }
 }
