@@ -23,7 +23,10 @@ namespace XtramileBackend.Services.ManagerService
         public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
         public Task<List<EmployeeRequestDto>> GetEmployeeRequestsClosedAsync(int managerId);
 
+        //request detail of an employee 
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
+
+        public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
     }
 }

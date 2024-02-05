@@ -111,6 +111,11 @@ namespace XtramileBackend.Controllers.ReportingManagerController
             }
         }
 
+        /// <summary>
+        /// Get a travel and employee information based on particular request
+        /// </summary>
+        /// <param name="requestID"></param>
+        /// <returns></returns>
         [HttpGet("travel/request/{requestID}")]
         public async Task<IActionResult> GetTravelRequest(int requestID)
         {
@@ -118,6 +123,23 @@ namespace XtramileBackend.Controllers.ReportingManagerController
             {
                 // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
                 TravelRequestEmployeeViewModel requestData = await _reportingManagerService.GetEmployeeRequestDetail(requestID);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("travel/request/approve/")]
+        public async Task<IActionResult> TravelPriorityStatusAndRequestApproval([FromBody] UpdatePriorityAndStatusModel updatePriorityAndStatus)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                bool requestData = await _reportingManagerService.UpdateRequestPriorityAndStatus(updatePriorityAndStatus);
                 // Return a 200 OK response with the retrieved ongoing travel request details
                 return Ok(requestData);
             }
