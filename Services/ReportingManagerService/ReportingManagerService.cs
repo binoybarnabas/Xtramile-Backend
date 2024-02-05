@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
@@ -150,7 +151,6 @@ namespace XtramileBackend.Services.ManagerService
 
                 return EmpRequest;
 
-                return EmpRequest;
             }
             catch (Exception ex)
             {
@@ -468,6 +468,18 @@ namespace XtramileBackend.Services.ManagerService
         }
 
 
+        /// <summary>
+        /// Get the travel information and employee information from a particular request raised by an employee
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns>
+        /// a list that contains
+        /// RequestId, FirstName, LastName, ContactNumber, Email, ReportsTo, DepartmentName, ProjectCode,
+        /// ProjectName, TravelType, TripPurpose, DepartureDate, ReturnDate, SourceCityZipCode, DestinationCityZipCode,
+        /// SourceCity, DestinationCity, SourceState, DestinationState, SourceCountry, DestinationCountry, CabRequired,
+        /// AccommodationRequired, PrefDepartureTime, 
+        /// TravelAuthorizationEmailCapture, PassportAttachment, IdCardAttachment, AdditionalComments
+        /// </returns>
         public async Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId)
         {
             try
@@ -490,6 +502,7 @@ namespace XtramileBackend.Services.ManagerService
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
+                                                 RequestId = travelRequest.RequestId,
                                                  FirstName = employee.FirstName,
                                                  LastName = employee.LastName,
                                                  ContactNumber = employee.ContactNumber,
@@ -527,6 +540,72 @@ namespace XtramileBackend.Services.ManagerService
             {
                 // Logging and rethrowing the exception
                 Console.WriteLine($"An error occurred while getting employee request details for request {requestId}: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+        /// <summary>
+        /// /// Update the request status and priority for a request that comes under a manager
+        /// </summary>
+        /// <param name="updatePriorityAndStatus"></param>
+        /// <returns> return true if the update is successful</returns>
+        public async Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus)
+        {
+            try { 
+
+                TBL_REQUEST existingRequest = await _unitOfWork.RequestRepository.GetByIdAsync(updatePriorityAndStatus.RequestId);
+
+                var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
+                
+                var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "FD");
+
+                var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
+
+                if (existingRequest != null)
+                {
+                    existingRequest.PriorityId = updatePriorityAndStatus.PriorityId;
+                }
+
+                TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+                   
+                approve.RequestId = updatePriorityAndStatus.RequestId;  
+
+                approve.EmpId = updatePriorityAndStatus.ManagerId;
+
+                approve.PrimaryStatusId = primaryStatus.StatusId;
+
+                approve.SecondaryStatusId = secondaryStatus.StatusId;
+
+                approve.date = DateTime.Now;
+
+                await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+
+                existingRequest.PriorityId = updatePriorityAndStatus.PriorityId;
+
+
+                //once the status is updated the new priority and status needs to be set is request status mapping
+                // and delete the older priority and status. here it is OP for open requests
+                _unitOfWork.RequestRepository.Update(existingRequest);
+
+                var rowToDelete = (await _unitOfWork.RequestStatusRepository.GetAllAsync()).FirstOrDefault((approve) => approve.RequestId == updatePriorityAndStatus.RequestId && approve.PrimaryStatusId == previousPrimaryStatus.StatusId);
+
+                if (rowToDelete != null)
+                {
+                    _unitOfWork.RequestStatusRepository.Delete(rowToDelete);
+                    _unitOfWork.Complete();
+                }
+
+                _unitOfWork.Complete();
+
+                return true;
+            }
+            catch(Exception ex) {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while updating the request {updatePriorityAndStatus.RequestId}: {ex.Message}");
                 throw;
             }
         }
