@@ -16,12 +16,12 @@ namespace XtramileBackend.Services.ManagerService
     // Service for managing reporting-related functionality
     public class ReportingManagerService : IReportingManagerService
     {
-        
+
         private readonly IUnitOfWork _unitOfWork;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService( IUnitOfWork unitOfWork)
+        public ReportingManagerService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -49,16 +49,16 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on projectMapping.ProjectId equals project.ProjectId
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" 
+                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   select new EmployeeRequestDto
-                {
-                    RequestId = request.RequestId,
-                    EmployeeName = employee.FirstName + " " + employee.LastName,
-                    Email = employee.Email,
-                    ProjectCode = project.ProjectCode,
-                    Date = request.CreatedOn,
-                    Mode = null,
-                    Status = status.StatusName
+                  {
+                      RequestId = request.RequestId,
+                      EmployeeName = employee.FirstName + " " + employee.LastName,
+                      Email = employee.Email,
+                      ProjectCode = project.ProjectCode,
+                      Date = request.CreatedOn,
+                      Mode = null,
+                      Status = status.StatusName
                   }).ToList();
 
                 return EmpRequest;
@@ -89,8 +89,8 @@ namespace XtramileBackend.Services.ManagerService
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
-                
-                select new EmployeeRequestDto
+
+                  select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
                       EmployeeName = employee.FirstName + " " + employee.LastName,
@@ -100,8 +100,6 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
-
-                return EmpRequest;
 
                 return EmpRequest;
             }
@@ -118,7 +116,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync( int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId)
         {
             try
             {
@@ -354,7 +352,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns>
         /// A list of Request data of a particular employee which contains information like Request Id, Employee name, Email, project code, date and status
         /// </returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName) 
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName)
         {
             try
             {
@@ -492,7 +490,7 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
-                var employeeRequestDetail =  (from employee in employees
+                var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
                                              join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
                                              join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
@@ -553,14 +551,15 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns> return true if the update is successful</returns>
         public async Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus)
         {
-            try { 
+            try
+            {
 
                 TBL_REQUEST existingRequest = await _unitOfWork.RequestRepository.GetByIdAsync(updatePriorityAndStatus.RequestId);
 
                 var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
 
                 var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
-                
+
                 var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "FD");
 
                 var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
@@ -571,8 +570,8 @@ namespace XtramileBackend.Services.ManagerService
                 }
 
                 TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
-                   
-                approve.RequestId = updatePriorityAndStatus.RequestId;  
+
+                approve.RequestId = updatePriorityAndStatus.RequestId;
 
                 approve.EmpId = updatePriorityAndStatus.ManagerId;
 
@@ -596,19 +595,77 @@ namespace XtramileBackend.Services.ManagerService
                 if (rowToDelete != null)
                 {
                     _unitOfWork.RequestStatusRepository.Delete(rowToDelete);
-                    _unitOfWork.Complete();
                 }
 
                 _unitOfWork.Complete();
 
                 return true;
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 // Logging and rethrowing the exception
                 Console.WriteLine($"An error occurred while updating the request {updatePriorityAndStatus.RequestId}: {ex.Message}");
                 throw;
             }
+
         }
+
+        /// <summary>
+        /// Cancellation of request by a manager based on a particular request that comes under the status open by the employee
+        /// </summary>
+        /// <param name="managerCancelRequest"></param>
+        /// <returns>
+        /// returns true if the request is cancelled.
+        /// </returns>
+        public async Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest)
+        {
+            try
+            {
+                TBL_REQUEST existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(managerCancelRequest.RequestId);
+
+                if (existingRequestData != null) {
+
+                    var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                    var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
+
+                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
+
+                    TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+
+                    approve.RequestId = managerCancelRequest.RequestId;
+
+                    approve.EmpId = managerCancelRequest.ManagerId;
+
+                    approve.PrimaryStatusId = primaryStatus.StatusId;
+
+                    approve.SecondaryStatusId = primaryStatus.StatusId;
+
+                    approve.date = DateTime.Now;
+
+                    await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+
+                    // to delete the previous request status mapping from the status table
+                    var rowToDelete = (await _unitOfWork.RequestStatusRepository.GetAllAsync()).FirstOrDefault((approve) => approve.RequestId == managerCancelRequest.RequestId && approve.PrimaryStatusId == previousPrimaryStatus.StatusId);
+
+                    if (rowToDelete != null)
+                    {
+                        _unitOfWork.RequestStatusRepository.Delete(rowToDelete);
+                    }
+                    _unitOfWork.Complete();
+                }
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while updating the request {managerCancelRequest.RequestId}: {ex.Message}");
+                throw;
+            }
+        }
+
+
 
 
     }
