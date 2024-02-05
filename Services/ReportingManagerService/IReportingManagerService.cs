@@ -25,5 +25,8 @@ namespace XtramileBackend.Services.ManagerService
 
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
 
+        public Task<IEnumerable<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId);
+
+
     }
 }

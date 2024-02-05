@@ -253,11 +253,11 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-        /// to retreives the forwarded requests to a manager
+        /// to retreives the forwarded travel requests for a manager
         /// </summary>
         /// <param name="managerId">to retreiev the travel requests to a manager</param>
         /// <returns></returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId, DateTime date)
+        public async Task<IEnumerable<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId)
         {
             try
             {
@@ -276,8 +276,8 @@ namespace XtramileBackend.Services.ManagerService
                     join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                    where employee.ReportsTo == managerId && (status.StatusCode == "FD" || status1.StatusCode == "FD")
-                          && request.CreatedOn.Date == date.Date
+                    where employee.ReportsTo == managerId
+                    && status.StatusCode == "FD" || status1.StatusCode == "FD"
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
@@ -286,7 +286,7 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         Date = request.CreatedOn,
                         Mode = null,
-                        Status = status.StatusName  // Assuming you want to assign the status name here
+                        Status = status.StatusName  
                     }).ToList();
 
                 return EmpRequest;
