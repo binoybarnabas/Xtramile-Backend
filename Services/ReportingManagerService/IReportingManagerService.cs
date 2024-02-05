@@ -28,5 +28,7 @@ namespace XtramileBackend.Services.ManagerService
 
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
+        public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
+
     }
 }
