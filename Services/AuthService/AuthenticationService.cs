@@ -41,6 +41,7 @@ namespace XtramileBackend.Services.AuthService
                                       select new UserDataModel
                                       {
                                           EmpId = employee.EmpId,
+                                          EmployeeName = employee.FirstName + " " + employee.LastName,
                                           Department = department.DepartmentCode,
                                           Role = role.RoleName,
                                           Token = token
