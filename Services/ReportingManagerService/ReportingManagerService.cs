@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -15,12 +17,12 @@ namespace XtramileBackend.Services.ManagerService
     // Service for managing reporting-related functionality
     public class ReportingManagerService : IReportingManagerService
     {
-        
+
         private readonly IUnitOfWork _unitOfWork;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService( IUnitOfWork unitOfWork)
+        public ReportingManagerService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -48,16 +50,16 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on projectMapping.ProjectId equals project.ProjectId
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" 
+                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   select new EmployeeRequestDto
-                {
-                    RequestId = request.RequestId,
-                    EmployeeName = employee.FirstName + " " + employee.LastName,
-                    Email = employee.Email,
-                    ProjectCode = project.ProjectCode,
-                    Date = request.CreatedOn,
-                    Mode = null,
-                    Status = status.StatusName
+                  {
+                      RequestId = request.RequestId,
+                      EmployeeName = employee.FirstName + " " + employee.LastName,
+                      Email = employee.Email,
+                      ProjectCode = project.ProjectCode,
+                      Date = request.CreatedOn,
+                      Mode = null,
+                      Status = status.StatusName
                   }).ToList();
 
                 return EmpRequest;
@@ -88,8 +90,8 @@ namespace XtramileBackend.Services.ManagerService
                   join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
-                
-                select new EmployeeRequestDto
+
+                  select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
                       EmployeeName = employee.FirstName + " " + employee.LastName,
@@ -99,8 +101,6 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
-
-                return EmpRequest;
 
                 return EmpRequest;
             }
@@ -117,7 +117,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync( int managerId)
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId)
         {
             try
             {
@@ -150,7 +150,6 @@ namespace XtramileBackend.Services.ManagerService
 
                 return EmpRequest;
 
-                return EmpRequest;
             }
             catch (Exception ex)
             {
@@ -253,11 +252,13 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-        /// to retreives the forwarded travel requests for a manager
+       /// to retreives the forwarded travel requests for a manager
         /// </summary>
-        /// <param name="managerId">to retreiev the travel requests to a manager</param>
+        /// <param name="managerId">to retrieve the travel requests for a particular manager</param>
+        /// <param name="offset">to set the  page index of the table</param>
+        /// <param name="pageSize">to set the number of rows of paginated table </param>
         /// <returns></returns>
-        public async Task<IEnumerable<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -289,26 +290,36 @@ namespace XtramileBackend.Services.ManagerService
                         Status = status.StatusName  
                     }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();    
+                var totalPages= (int)Math.Ceiling((double   )totalCount / pageSize);
+                var pagedEmployeeRequests= EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests: " + ex.Message);
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
 
         /// <summary>
-        /// Get employee requests that are closed asynchronously based on managerId.
+        ///  Get employee requests that are closed asynchronously based on managerId.
         /// </summary>
-        /// <param name="managerId">Manager ID for retrieving closed travel requests</param>
-        /// <returns>List of closed EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsClosedAsync(int managerId)
+        /// <param name="managerId"> to retrieve the travel requests</param>
+        /// <param name="offset">to set the page index for paginated table</param>
+        /// <param name="pageSize">to set the number of rows in paginated table</param>
+        /// <returns>an object of PagedEmployeeRequestDto </returns>
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsClosedAsync(int managerId, int offset, int pageSize)
         {
             try
             {
-                // Query to retrieve closed travel requests
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -317,33 +328,44 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var EmpRequest = (
-                from employee in employeeData
-                join request in requestData on employee.EmpId equals request.CreatedBy
-                join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                where employee.ReportsTo == managerId && status.StatusCode == "CL" || status1.StatusCode == "CL"
-                select new EmployeeRequestDto
-                {
-                    RequestId = request.RequestId,
-                    EmployeeName = employee.FirstName + " " + employee.LastName,
-                    Email = employee.Email,
-                    ProjectCode = project.ProjectCode,
-                    Date = request.CreatedOn,
-                    Mode = null,
-                    Status = "Closed"
-                }).ToList();
+                    from employee in employeeData
+                    join request in requestData on employee.EmpId equals request.CreatedBy
+                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
+                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                    join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                    join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
+                    where employee.ReportsTo == managerId
+                    && status.StatusCode == "CL"
+                    select new EmployeeRequestDto
+                    {
+                        RequestId = request.RequestId,
+                        EmployeeName = employee.FirstName + " " + employee.LastName,
+                        Email = employee.Email,
+                        ProjectCode = project.ProjectCode,
+                        Date = request.CreatedOn,
+                        Mode = null,
+                        Status = status.StatusName
+                    }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                Console.WriteLine("Error fetching the Closed Travel Requests: " + ex.Message);
+                return new PagedEmployeeRequestDto();
             }
         }
+
 
         /// <summary>
 
@@ -354,7 +376,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns>
         /// A list of Request data of a particular employee which contains information like Request Id, Employee name, Email, project code, date and status
         /// </returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName) 
+        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName)
         {
             try
             {
@@ -468,6 +490,18 @@ namespace XtramileBackend.Services.ManagerService
         }
 
 
+        /// <summary>
+        /// Get the travel information and employee information from a particular request raised by an employee
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns>
+        /// a list that contains
+        /// RequestId, FirstName, LastName, ContactNumber, Email, ReportsTo, DepartmentName, ProjectCode,
+        /// ProjectName, TravelType, TripPurpose, DepartureDate, ReturnDate, SourceCityZipCode, DestinationCityZipCode,
+        /// SourceCity, DestinationCity, SourceState, DestinationState, SourceCountry, DestinationCountry, CabRequired,
+        /// AccommodationRequired, PrefDepartureTime, 
+        /// TravelAuthorizationEmailCapture, PassportAttachment, IdCardAttachment, AdditionalComments
+        /// </returns>
         public async Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId)
         {
             try
@@ -480,7 +514,7 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
-                var employeeRequestDetail =  (from employee in employees
+                var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
                                              join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
                                              join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
@@ -490,6 +524,7 @@ namespace XtramileBackend.Services.ManagerService
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
+                                                 RequestId = travelRequest.RequestId,
                                                  FirstName = employee.FirstName,
                                                  LastName = employee.LastName,
                                                  ContactNumber = employee.ContactNumber,
@@ -531,6 +566,128 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
+
+
+        /// <summary>
+        /// /// Update the request status and priority for a request that comes under a manager
+        /// </summary>
+        /// <param name="updatePriorityAndStatus"></param>
+        /// <returns> return true if the update is successful</returns>
+        public async Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus)
+        {
+            try
+            {
+
+                TBL_REQUEST existingRequest = await _unitOfWork.RequestRepository.GetByIdAsync(updatePriorityAndStatus.RequestId);
+
+                var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
+
+                var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "FD");
+
+                var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
+
+                if (existingRequest != null)
+                {
+                    existingRequest.PriorityId = updatePriorityAndStatus.PriorityId;
+                }
+
+                TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+
+                approve.RequestId = updatePriorityAndStatus.RequestId;
+
+                approve.EmpId = updatePriorityAndStatus.ManagerId;
+
+                approve.PrimaryStatusId = primaryStatus.StatusId;
+
+                approve.SecondaryStatusId = secondaryStatus.StatusId;
+
+                approve.date = DateTime.Now;
+
+                await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+
+                existingRequest.PriorityId = updatePriorityAndStatus.PriorityId;
+
+
+                //once the status is updated the new priority and status needs to be set is request status mapping
+                // and delete the older priority and status. here it is OP for open requests
+                _unitOfWork.RequestRepository.Update(existingRequest);
+
+                var rowToDelete = (await _unitOfWork.RequestStatusRepository.GetAllAsync()).FirstOrDefault((approve) => approve.RequestId == updatePriorityAndStatus.RequestId && approve.PrimaryStatusId == previousPrimaryStatus.StatusId);
+
+                if (rowToDelete != null)
+                {
+                    _unitOfWork.RequestStatusRepository.Delete(rowToDelete);
+                }
+
+                _unitOfWork.Complete();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while updating the request {updatePriorityAndStatus.RequestId}: {ex.Message}");
+                throw;
+            }
+
+        }
+
+        /// <summary>
+        /// Cancellation of request by a manager based on a particular request that comes under the status open by the employee
+        /// </summary>
+        /// <param name="managerCancelRequest"></param>
+        /// <returns>
+        /// returns true if the request is cancelled.
+        /// </returns>
+        public async Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest)
+        {
+            try
+            {
+                TBL_REQUEST existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(managerCancelRequest.RequestId);
+
+                if (existingRequestData != null) {
+
+                    var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                    var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
+
+                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
+
+                    TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+
+                    approve.RequestId = managerCancelRequest.RequestId;
+
+                    approve.EmpId = managerCancelRequest.ManagerId;
+
+                    approve.PrimaryStatusId = primaryStatus.StatusId;
+
+                    approve.SecondaryStatusId = primaryStatus.StatusId;
+
+                    approve.date = DateTime.Now;
+
+                    await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+
+                    // to delete the previous request status mapping from the status table
+                    var rowToDelete = (await _unitOfWork.RequestStatusRepository.GetAllAsync()).FirstOrDefault((approve) => approve.RequestId == managerCancelRequest.RequestId && approve.PrimaryStatusId == previousPrimaryStatus.StatusId);
+
+                    if (rowToDelete != null)
+                    {
+                        _unitOfWork.RequestStatusRepository.Delete(rowToDelete);
+                    }
+                    _unitOfWork.Complete();
+                }
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while updating the request {managerCancelRequest.RequestId}: {ex.Message}");
+                throw;
+            }
+        }
 
     }
 }

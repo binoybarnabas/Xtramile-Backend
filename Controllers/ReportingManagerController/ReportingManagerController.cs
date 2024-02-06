@@ -94,56 +94,103 @@
             /// 200 OK response with a collection of ongoing travel request details for employees reporting to the specified manager,
             /// or 500 Internal Server Error response in case of an exception.
             /// </returns>
-            [HttpGet("travel/request/closed/{managerId}")]
-            public async Task<IActionResult> GetEmployeeRequestsClosedAsync(int managerId)
+            [HttpGet("travel/request/closed")]
+        public async Task<IActionResult> GetTravelRequestClosedAsync(int managerId, int offset = 1, int pageSize = 10)
+        {
+            try
             {
-                try
-                {
-                    // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
-                    IEnumerable<EmployeeRequestDto> ongoingTravelRequestData = await _reportingManagerService.GetEmployeeRequestsClosedAsync(managerId);
-                    // Return a 200 OK response with the retrieved ongoing travel request details
-                    return Ok(ongoingTravelRequestData);
-                }
-                catch (Exception ex)
-                {
-                    // Handle or log the exception
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
-                }
-            }
-
-            [HttpGet("travel/request/{requestID}")]
-            public async Task<IActionResult> GetTravelRequest(int requestID)
-            {
-                try
-                {
-                    // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
-                    TravelRequestEmployeeViewModel requestData = await _reportingManagerService.GetEmployeeRequestDetail(requestID);
-                    // Return a 200 OK response with the retrieved ongoing travel request details
-                    return Ok(requestData);
-                }
-                catch (Exception ex)
-                {
-                    // Handle or log the exception
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
-                }
-            }
-
-
-            [HttpGet("travel/request/forwarded/{managerId}")]
-            public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId)
-            {
-                try
-                {
                 // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
-                    var employeeReq = await _reportingManagerService.GetEmployeeRequestsForwardedAsync(managerId);
-                    return Ok(employeeReq);
-                }
-                catch (Exception ex)
-                {
-                    // Handle or log the exception
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting forwarded travel request details: {ex.Message}");
-                }
+                var employeeReq = await _reportingManagerService.GetEmployeeRequestsClosedAsync(managerId, offset, pageSize);
+                return Ok(employeeReq);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting closed travel request details: {ex.Message}");
+            }
 
+        }
+
+        /// <summary>
+        /// Get a travel and employee information based on particular request
+        /// </summary>
+        /// <param name="requestID"></param>
+        /// <returns></returns>
+        [HttpGet("travel/request/{requestID}")]
+        public async Task<IActionResult> GetTravelRequest(int requestID)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                TravelRequestEmployeeViewModel requestData = await _reportingManagerService.GetEmployeeRequestDetail(requestID);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
             }
         }
+            
+
+        [HttpPatch("travel/request/approve/")]
+        public async Task<IActionResult> TravelPriorityStatusAndRequestApproval([FromBody] UpdatePriorityAndStatusModel updatePriorityAndStatus)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                bool requestData = await _reportingManagerService.UpdateRequestPriorityAndStatus(updatePriorityAndStatus);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("travel/request/cancel/")]
+        public async Task<IActionResult> CancelRequest([FromBody] ManagerCancelRequest managerCancelRequest)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                bool requestData = await _reportingManagerService.CancelRequest(managerCancelRequest);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
+
+
+        [HttpGet("travel/request/forwarded")]
+        public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId,int offset =1, int pageSize=10)
+        {
+            try
+            {
+                // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
+                var employeeReq = await _reportingManagerService.GetEmployeeRequestsForwardedAsync(managerId,offset,pageSize);
+                return Ok(employeeReq);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting forwarded travel request details: {ex.Message}");
+            }
+
+        }
+
+
+        
+
     }
+}
+
+     
