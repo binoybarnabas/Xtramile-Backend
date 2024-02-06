@@ -4,7 +4,7 @@ namespace XtramileBackend.Services.AuthService
 {
     public interface IAuthenticationService
     {
-        public string checkCredentials(Credentials credential);
+        public UserDataModel checkCredentials(Credentials credential);
 
     }
 }

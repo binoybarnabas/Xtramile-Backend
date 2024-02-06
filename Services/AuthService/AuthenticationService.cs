@@ -18,7 +18,7 @@ namespace XtramileBackend.Services.AuthService
 
         }
 
-        public string checkCredentials(Credentials credential) {
+        public UserDataModel checkCredentials(Credentials credential) {
             //check whether the user exists
             //get the userid and create token if userid exists
             //return to controller
@@ -28,11 +28,29 @@ namespace XtramileBackend.Services.AuthService
 
             if (userId == null)
                 return null;
+
             var token = GenerateToken((int)userId);
-            return token;   
+
+            UserDataModel? userDataAndToken = (
+                                      from user in _dbContext.TBL_USER
+                                      join employee in _dbContext.TBL_EMPLOYEE on user.EmpId equals employee.EmpId
+                                      join projectMapping in _dbContext.TBL_PROJECT_MAPPING on employee.EmpId equals projectMapping.EmpId
+                                      join project in _dbContext.TBL_PROJECT on projectMapping.ProjectId equals project.ProjectId
+                                      join department in _dbContext.TBL_DEPARTMENT on project.DepartmentId equals department.DepartmentId
+                                      join role in _dbContext.TBL_ROLES on employee.RoleId equals role.RoleId
+                                      select new UserDataModel
+                                      {
+                                          EmpId = employee.EmpId,
+                                          Department = department.DepartmentCode,
+                                          Role = role.RoleName,
+                                          Token = token
+                                      }).FirstOrDefault();
+
+            return userDataAndToken;   
         }
 
         private string GenerateToken(int userId) {
+
             //get all the data from users
             //get the individual user data
             //set the roles for the users
