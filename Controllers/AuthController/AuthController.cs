@@ -23,8 +23,8 @@ namespace XtramileBackend.Controllers.AuthController
         [HttpPost("login")]
         [AllowAnonymous]
         public IActionResult Login([FromBody] Credentials credential) {
-            var token = _authenticationService.checkCredentials(credential);
-            return Ok(new { token = token });
+            UserDataModel data = _authenticationService.checkCredentials(credential);
+            return Ok(data);
         }
 
         [HttpGet("logininfo")]
