@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
 
 namespace XtramileBackend.Services.ManagerService
@@ -21,7 +22,9 @@ namespace XtramileBackend.Services.ManagerService
 
         //ongoing requests
         public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsClosedAsync(int managerId);
+
+        //closed travel requets
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsClosedAsync(int managerId, int offset, int pageSize);
 
         //request detail of an employee 
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
@@ -29,6 +32,10 @@ namespace XtramileBackend.Services.ManagerService
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
         public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
+         
+        // forwarded travel requests
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize);
 
+        
     }
 }

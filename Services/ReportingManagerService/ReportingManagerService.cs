@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -251,11 +252,13 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-        /// to retreives the forwarded requests to a manager
+       /// to retreives the forwarded travel requests for a manager
         /// </summary>
-        /// <param name="managerId">to retreiev the travel requests to a manager</param>
+        /// <param name="managerId">to retrieve the travel requests for a particular manager</param>
+        /// <param name="offset">to set the  page index of the table</param>
+        /// <param name="pageSize">to set the number of rows of paginated table </param>
         /// <returns></returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsForwardedAsync(int managerId, DateTime date)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -274,8 +277,8 @@ namespace XtramileBackend.Services.ManagerService
                     join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                    where employee.ReportsTo == managerId && (status.StatusCode == "FD" || status1.StatusCode == "FD")
-                          && request.CreatedOn.Date == date.Date
+                    where employee.ReportsTo == managerId
+                    && status.StatusCode == "FD" || status1.StatusCode == "FD"
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
@@ -284,29 +287,39 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         Date = request.CreatedOn,
                         Mode = null,
-                        Status = status.StatusName  // Assuming you want to assign the status name here
+                        Status = status.StatusName  
                     }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();    
+                var totalPages= (int)Math.Ceiling((double   )totalCount / pageSize);
+                var pagedEmployeeRequests= EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests: " + ex.Message);
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
 
         /// <summary>
-        /// Get employee requests that are closed asynchronously based on managerId.
+        ///  Get employee requests that are closed asynchronously based on managerId.
         /// </summary>
-        /// <param name="managerId">Manager ID for retrieving closed travel requests</param>
-        /// <returns>List of closed EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsClosedAsync(int managerId)
+        /// <param name="managerId"> to retrieve the travel requests</param>
+        /// <param name="offset">to set the page index for paginated table</param>
+        /// <param name="pageSize">to set the number of rows in paginated table</param>
+        /// <returns>an object of PagedEmployeeRequestDto </returns>
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsClosedAsync(int managerId, int offset, int pageSize)
         {
             try
             {
-                // Query to retrieve closed travel requests
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -315,33 +328,44 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var EmpRequest = (
-                from employee in employeeData
-                join request in requestData on employee.EmpId equals request.CreatedBy
-                join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
-                join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
-                where employee.ReportsTo == managerId && status.StatusCode == "CL" || status1.StatusCode == "CL"
-                select new EmployeeRequestDto
-                {
-                    RequestId = request.RequestId,
-                    EmployeeName = employee.FirstName + " " + employee.LastName,
-                    Email = employee.Email,
-                    ProjectCode = project.ProjectCode,
-                    Date = request.CreatedOn,
-                    Mode = null,
-                    Status = "Closed"
-                }).ToList();
+                    from employee in employeeData
+                    join request in requestData on employee.EmpId equals request.CreatedBy
+                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
+                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                    join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                    join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
+                    where employee.ReportsTo == managerId
+                    && status.StatusCode == "CL"
+                    select new EmployeeRequestDto
+                    {
+                        RequestId = request.RequestId,
+                        EmployeeName = employee.FirstName + " " + employee.LastName,
+                        Email = employee.Email,
+                        ProjectCode = project.ProjectCode,
+                        Date = request.CreatedOn,
+                        Mode = null,
+                        Status = status.StatusName
+                    }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                Console.WriteLine("Error fetching the Closed Travel Requests: " + ex.Message);
+                return new PagedEmployeeRequestDto();
             }
         }
+
 
         /// <summary>
 
@@ -664,9 +688,6 @@ namespace XtramileBackend.Services.ManagerService
                 throw;
             }
         }
-
-
-
 
     }
 }

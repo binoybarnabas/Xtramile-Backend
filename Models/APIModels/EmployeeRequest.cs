@@ -1,4 +1,5 @@
 
+
 namespace XtramileBackend.Models.APIModels
 {
 	public class EmployeeRequestDto
@@ -14,6 +15,6 @@ namespace XtramileBackend.Models.APIModels
 		public string? Mode {  get; set; }
 
 		public string? Status { get; set; }
-	}
+    }
 
 }
