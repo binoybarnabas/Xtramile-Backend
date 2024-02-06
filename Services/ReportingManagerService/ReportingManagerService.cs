@@ -685,6 +685,41 @@ namespace XtramileBackend.Services.ManagerService
                 throw;
             }
         }
+        /// <summary>
+        /// To post the reason data to TBL_REASON and patch the reasonid to \
+        /// corresponding request using requestid.
+        /// </summary>
+        /// <param name="reason"></param>
+        /// <param name="reqId"></param>
+        /// <returns></returns>
+        public async Task PostReasonAndPatchRequest(TBL_REASON reason, int reqId)
+        {
+            try
+            {
+                reason.ReasonCode = GenerateReasonCode(reqId);
+                await _unitOfWork.ReasonRepository.AddAsync(reason);
+                _unitOfWork.Complete();
+                var request = await _unitOfWork.RequestRepository.GetByIdAsync(reqId);//to get the corresponding request
+                request.ReasonId = reason.ReasonId;
+                _unitOfWork.RequestRepository.Update(request);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"An error occurred while adding reason to the request {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// to generate a random reasoncode using reqid
+        /// </summary>
+        /// <param name="reqId"></param>
+        /// <returns></returns>
+        private string GenerateReasonCode(int reqId)
+        {
+            // For example, you can concatenate "RE" with the ReasonId
+            return "RE" + reqId.ToString("D6"); // Example: RE000001
+        }
 
     }
 }

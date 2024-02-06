@@ -45,8 +45,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                       requestId = request.RequestId,
                                       ProjectCode = project.ProjectCode,
                                       ProjectName = project.ProjectName,
-                                      FirstName = employee.FirstName,
-                                      LastName = employee.LastName,
+                                      Name = employee.FirstName+ " "+employee.LastName,
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity
                                   };
@@ -232,6 +231,7 @@ namespace XtramileBackend.Services.TravelAdminService
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = travelType.TypeName,
                               PriorityName = priority.PriorityName,
+                              ApprovalDate = latestApproval.date
                           }).ToList();
 
             return result;

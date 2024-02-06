@@ -1,4 +1,10 @@
-﻿    using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.ManagerService;
+    using Microsoft.AspNetCore.Cors;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using XtramileBackend.Models.APIModels;
@@ -168,6 +174,24 @@
             }
         }
 
+       //To post to reason table and patch reason id to request table 
+        [HttpPost("travel/request/deny")]
+        public async Task<IActionResult> PostReasonAndPatchRequest([FromBody] TBL_REASON reason,int reqId)
+        {
+            try
+            {
+                await _reportingManagerService.PostReasonAndPatchRequest(reason,reqId);
+                return Ok(reason);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding reason for request: {ex.Message}");
+            }
+
+        }
+
+    }
+}
 
 
         [HttpGet("travel/request/forwarded")]
