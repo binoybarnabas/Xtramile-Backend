@@ -33,7 +33,7 @@ namespace XtramileBackend.Services.ManagerService
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
         public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
-        public Task PostReasonAndPatchRequest(TBL_REASON reason, int reqId);
+        public Task PostReasonForCancellation(TBL_REASON reason, int reqId);
 
          
         // forwarded travel requests

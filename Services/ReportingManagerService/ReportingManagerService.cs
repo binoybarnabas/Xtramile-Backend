@@ -692,7 +692,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <param name="reason"></param>
         /// <param name="reqId"></param>
         /// <returns></returns>
-        public async Task PostReasonAndPatchRequest(TBL_REASON reason, int reqId)
+        public async Task PostReasonForCancellation(TBL_REASON reason, int reqId)
         {
             try
             {
