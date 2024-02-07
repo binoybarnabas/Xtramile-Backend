@@ -34,6 +34,7 @@ namespace XtramileBackend.Services.ProjectService
         {
             try
             {
+                project.CreatedOn = DateTime.Now;
                 await _unitOfWork.ProjectRepository.AddAsync(project);
                 _unitOfWork.Complete();
             }
