@@ -69,8 +69,11 @@ namespace XtramileBackend.Services.TravelAdminService
         // travel type name, priority name, and status name.This returning object is used to display all incoming requests for a travel admin. 
         /// </summary>
         /// <returns>List of objects containing the requested data.</returns>
-        
-        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequests()
+
+
+
+        public async Task<RequestTableViewTravelAdminPaged> GetIncomingRequests(int pageIndex, int pageSize)
+
         {
             try
             {
@@ -111,7 +114,19 @@ namespace XtramileBackend.Services.TravelAdminService
 
 
                 // Execute the query and retrieve the results
-                return incomingRequests;
+
+                // Pagination
+                var totalCount = incomingRequests.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedIncomingRequests = incomingRequests.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+
+                // Return paged result
+                return new RequestTableViewTravelAdminPaged
+                {
+                    TravelRequest = pagedIncomingRequests,
+                    TotalPages = totalPages,
+                    PageCount = totalCount,
+                };
             }
             catch (Exception ex)
             {
@@ -284,15 +299,15 @@ namespace XtramileBackend.Services.TravelAdminService
             }
         }
 
-
+        
 
         public async Task<RequestTableViewTravelAdminPaged> GetIncomingRequestsSorted(int pageIndex, int pageSize, bool priority, bool status, bool travelType)
         {
             try
             {
-                List<RequestTableViewTravelAdmin> incomingRequests = new List<RequestTableViewTravelAdmin>();
+                List<RequestTableViewTravelAdmin> incomingRequests =new List<RequestTableViewTravelAdmin> ();
 
-                if (priority)
+               if(priority)
                 {
                     incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByPriority();
                 }
@@ -300,13 +315,13 @@ namespace XtramileBackend.Services.TravelAdminService
                 {
                     incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSortByStatus();
                 }
-                else if (travelType)
+                else if(travelType)
                 {
                     incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByTravelType();
                 }
                 else
                 {
-                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequests();
+                    GetIncomingRequests(pageIndex, pageSize);
                 }
 
                 // Pagination

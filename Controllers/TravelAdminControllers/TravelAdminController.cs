@@ -30,11 +30,11 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         [HttpGet("incomingrequests")]
-        public async Task<IActionResult> GetIncomingRequests()
+        public async Task<IActionResult> GetIncomingRequests(int pageIndex=1, int pageSize = 10)
         {
             try
             {
-                var incomingRequestData = await _travelAdminService.GetIncomingRequests();
+                var incomingRequestData = await _travelAdminService.GetIncomingRequests(pageIndex,pageSize);
                 return Ok(incomingRequestData);
             }
             catch (Exception ex)
