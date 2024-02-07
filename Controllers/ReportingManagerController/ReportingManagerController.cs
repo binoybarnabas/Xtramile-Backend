@@ -1,8 +1,14 @@
-﻿    using Microsoft.AspNetCore.Cors;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using XtramileBackend.Models.APIModels;
-    using XtramileBackend.Services.ManagerService;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.ManagerService;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
+using XtramileBackend.Services.ManagerService;
 
     // Controller for handling reporting manager related actions
     namespace XtramileBackend.Controllers.ReportingManagerController
@@ -168,15 +174,29 @@
             }
         }
 
+       //To post to reason table and patch reason id to request table 
+        [HttpPost("travel/request/deny")]
+        public async Task<IActionResult> PostReasonAndPatchRequest([FromBody] TBL_REASON reason,int reqId)
+        {
+            try
+            {
+                await _reportingManagerService.PostReasonForCancellation(reason,reqId);
+                return Ok(reason);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding reason for request: {ex.Message}");
+            }
 
+        }
 
         [HttpGet("travel/request/forwarded")]
-        public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId,int offset = 1, int pageSize=10)
+        public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId, int offset = 1, int pageSize = 10)
         {
             try
             {
                 // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
-                var employeeReq = await _reportingManagerService.GetEmployeeRequestsForwardedAsync(managerId,offset,pageSize);
+                var employeeReq = await _reportingManagerService.GetEmployeeRequestsForwardedAsync(managerId, offset, pageSize);
                 return Ok(employeeReq);
             }
             catch (Exception ex)
@@ -187,10 +207,13 @@
 
         }
 
-
-        
-
     }
 }
+
+
+       
+
+
+       
 
      
