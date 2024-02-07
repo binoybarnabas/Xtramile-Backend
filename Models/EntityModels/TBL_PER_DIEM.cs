@@ -6,7 +6,7 @@ namespace XtramileBackend.Models.EntityModels
     {
         [Key]
         public int PerdiemId { get; set; }
-        public string? PerdiemName { get; set; }
+        public float? PerdiemAmount { get; set; }
         public int CountryId { get; set; }
         public string? Description { get; set; }
         public int CreatedBy { get; set; }

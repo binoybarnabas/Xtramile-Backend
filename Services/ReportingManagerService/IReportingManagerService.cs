@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Services.ManagerService
 {
@@ -32,6 +33,8 @@ namespace XtramileBackend.Services.ManagerService
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
         public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
+        public Task PostReasonForCancellation(TBL_REASON reason, int reqId);
+
          
         // forwarded travel requests
         public Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize);

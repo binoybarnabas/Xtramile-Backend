@@ -60,7 +60,7 @@ namespace XtramileBackend.Models.EntityModels
 
         public DateTime? ModifiedOn { get; set; }
 
-
+        public int? ReasonId { get; set; }
 
     }
 }
