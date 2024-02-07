@@ -10,5 +10,8 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<IEnumerable<RequestTableViewTravelAdmin>> GetTravelRequests(string statusCode);
 
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
+
+        public Task<RequestTableViewTravelAdminPaged> GetIncomingRequestsSorted(int pageIndex, int pageSize, bool priority, bool status, bool travelType);
+
     }
 }

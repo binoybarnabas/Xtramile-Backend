@@ -91,5 +91,23 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             }
         }
 
+        [HttpGet("incomingrequest/sort")]
+        public async Task<IActionResult> GetIncomingRequestsSorted(int pageIndex = 1, int pageSize = 10, bool priority = false, bool status = false, bool travelType = false)
+        {
+            try
+            {
+                var travelRequests = await _travelAdminService.GetIncomingRequestsSorted(pageIndex, pageSize, priority, status, travelType);
+                return Ok(travelRequests);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while getting incoming requests sorted: {ex.Message}");
+                throw;
+            }
+
+        }
+
+
     }
 }
