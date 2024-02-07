@@ -24,7 +24,7 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
         public Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId);
 
-        public Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId);
+        public Task<PagedEmployeeViewReqDto> GeRequestHistoryByEmpId(int empId, int pageIndex, int pageSize);
 
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
 
