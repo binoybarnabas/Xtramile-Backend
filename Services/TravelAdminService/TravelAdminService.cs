@@ -83,31 +83,35 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
-                var incomingRequests = from request in requestData
-                                      join reqApprove in approvalData on request.RequestId equals reqApprove.RequestId
-                                      join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
-                                      from priorityItem in priorityGroup.DefaultIfEmpty()
-                                      join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
-                                      join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                                      join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
-                                      join employee in employeeData on request.CreatedBy equals employee.EmpId
-                                      join approver in employeeData on reqApprove.EmpId equals approver.EmpId
-                                      join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
-                                      where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                      select new RequestTableViewTravelAdmin
-                                      {
-                                          RequestId = request.RequestId,
-                                          EmployeeName = $"{employee.FirstName} {employee.LastName}",
-                                          ProjectCode = project.ProjectCode,
-                                          CreatedOn = request.CreatedOn,
-                                          TravelTypeName = travelType.TypeName,
-                                          PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                          StatusName = status.StatusName
-                                      };
+                var latestApprovals = approvalData.GroupBy(approval => approval.RequestId)
+                                   .Select(group => group.OrderByDescending(approval => approval.date).FirstOrDefault());
+
+
+                var incomingRequests = ( from request in requestData
+                                       join reqApprove in latestApprovals on request.RequestId equals reqApprove.RequestId
+                                       join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
+                                       from priorityItem in priorityGroup.DefaultIfEmpty()
+                                       join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
+                                       join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                                       join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                                       join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                       join approver in employeeData on reqApprove.EmpId equals approver.EmpId
+                                       join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
+                                       where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
+                                       select new RequestTableViewTravelAdmin
+                                       {
+                                           RequestId = request.RequestId,
+                                           EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                                           ProjectCode = project.ProjectCode,
+                                           CreatedOn = request.CreatedOn,
+                                           TravelTypeName = travelType.TypeName,
+                                           PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
+                                           StatusName = status.StatusName
+                                       } ).ToList();
 
 
                 // Execute the query and retrieve the results
-                return incomingRequests.ToList();
+                return incomingRequests;
             }
             catch (Exception ex)
             {
