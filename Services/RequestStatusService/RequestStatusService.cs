@@ -35,6 +35,7 @@ namespace XtramileBackend.Services.RequestStatusService
         {
             try
             {
+                requestStatus.date = DateTime.Now;
                 await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
                 _unitOfWork.Complete();
             }

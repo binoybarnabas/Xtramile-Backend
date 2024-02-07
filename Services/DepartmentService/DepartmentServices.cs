@@ -35,6 +35,7 @@ namespace XtramileBackend.Services.DepartmentService
         {
             try
             {
+                department.CreatedOn = DateTime.Now;
                 await _unitOfWork.DepartmentRepository.AddAsync(department);
                 _unitOfWork.Complete();
             }

@@ -79,6 +79,7 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
+                employee.CreatedOn = DateTime.Now;
                 await _unitOfWork.EmployeeRepository.AddAsync(employee);
                 _unitOfWork.Complete();
             }
