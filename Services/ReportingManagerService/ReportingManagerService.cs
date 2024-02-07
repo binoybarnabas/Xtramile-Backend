@@ -560,6 +560,7 @@ namespace XtramileBackend.Services.ManagerService
                                                  CabRequired = travelRequest.CabRequired,
                                                  AccommodationRequired = travelRequest.AccommodationRequired,
                                                  PrefDepartureTime = travelRequest.PrefDepartureTime,
+                                                 CreatedBy = travelRequest.CreatedBy,
                                                  /*TravelAuthorizationEmailCapture =
                                                  PassportAttachment =
                                                  IdCardAttachment = */

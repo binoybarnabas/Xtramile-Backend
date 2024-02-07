@@ -171,7 +171,7 @@
 
 
         [HttpGet("travel/request/forwarded")]
-        public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId,int offset =1, int pageSize=10)
+        public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId,int offset = 1, int pageSize=10)
         {
             try
             {

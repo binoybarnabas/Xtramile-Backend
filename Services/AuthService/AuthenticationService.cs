@@ -38,6 +38,7 @@ namespace XtramileBackend.Services.AuthService
                                       join project in _dbContext.TBL_PROJECT on projectMapping.ProjectId equals project.ProjectId
                                       join department in _dbContext.TBL_DEPARTMENT on project.DepartmentId equals department.DepartmentId
                                       join role in _dbContext.TBL_ROLES on employee.RoleId equals role.RoleId
+                                      where user.EmpId == userId
                                       select new UserDataModel
                                       {
                                           EmpId = employee.EmpId,
