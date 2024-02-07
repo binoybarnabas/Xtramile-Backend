@@ -152,11 +152,11 @@ namespace XtramileBackend.Controllers.EmployeeController
 
 
         [HttpGet("request/history")]
-        public async Task<IActionResult> GetRequestHistory(int empId)
+        public async Task<IActionResult> GetRequestHistory(int empId, int pageIndex = 1, int pageSize = 10)
         {
             try
             {
-                IEnumerable<EmployeeViewReq>requestData = await _employeeService.GeRequestHistoryByEmpId(empId);
+                PagedEmployeeViewReqDto requestData = await _employeeService.GeRequestHistoryByEmpId(empId, pageIndex, pageSize);
                 return Ok(requestData);
             }
             catch (Exception ex)
@@ -166,7 +166,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
 
         }
-
 
 
         [HttpPost("add/option")]

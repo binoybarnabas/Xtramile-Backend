@@ -30,11 +30,11 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         [HttpGet("incomingrequests")]
-        public async Task<IActionResult> GetIncomingRequests()
+        public async Task<IActionResult> GetIncomingRequests(int pageIndex=1, int pageSize = 10)
         {
             try
             {
-                var incomingRequestData = await _travelAdminService.GetIncomingRequests();
+                var incomingRequestData = await _travelAdminService.GetIncomingRequests(pageIndex,pageSize);
                 return Ok(incomingRequestData);
             }
             catch (Exception ex)
@@ -90,6 +90,24 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
             }
         }
+
+        [HttpGet("incomingrequest/sort")]
+        public async Task<IActionResult> GetIncomingRequestsSorted(int pageIndex = 1, int pageSize = 10, bool priority = false, bool status = false, bool travelType = false)
+        {
+            try
+            {
+                var travelRequests = await _travelAdminService.GetIncomingRequestsSorted(pageIndex, pageSize, priority, status, travelType);
+                return Ok(travelRequests);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while getting incoming requests sorted: {ex.Message}");
+                throw;
+            }
+
+        }
+
 
     }
 }

@@ -317,7 +317,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <param name="empId"> Employee id for retrieving requests</param>
         /// <returns>An asynchronous task return a collection of type EmpViewRequest</returns>
 
-        public async Task<IEnumerable<EmployeeViewReq>> GeRequestHistoryByEmpId(int empId)
+        public async Task<PagedEmployeeViewReqDto> GeRequestHistoryByEmpId(int empId, int pageIndex, int pageSize)
         {
             try
             {
@@ -328,17 +328,20 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
+                var latestStatusApprovals = statusApprovalData
+                .GroupBy(approval => approval.RequestId)
+                .Select(group => group.OrderByDescending(approval => approval.date).First());
 
-                var result =  (from request in requestData
-                              join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                var result = (from request in requestData
+                              join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                               join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where request.CreatedBy == empId
-                              && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
-                               select new EmployeeViewReq
+                               && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
+                              select new EmployeeViewReq
                               {
                                   RequestId = request.RequestId,
                                   ProjectCode = project.ProjectCode,
@@ -348,7 +351,17 @@ namespace XtramileBackend.Services.EmployeeService
                                   Status = "Closed"
 
                               }).ToList();
-                return result;
+
+                int totalCount = result.Count();
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedRequest = result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+
+                return new PagedEmployeeViewReqDto
+                {
+                    EmployeeRequest = pagedRequest,
+                    TotatlCount = totalCount,
+                    TotalPages = totalPages,
+                };
             }
             catch (Exception ex)
             {
