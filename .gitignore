@@ -7,8 +7,7 @@
 obj/
 bin/Debug/net8.0/
 .vs/
-
-
+Uploads/
 
 # dotenv files
 .env
