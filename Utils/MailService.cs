@@ -7,6 +7,12 @@ namespace XtramileBackend.Utils
 {
     public class MailService
     {
+
+        /// <summary>
+        /// To send mail based on activities like request submission from employees, request approval, request rejection, when the travel admin send ticket options to 
+        /// the employee.
+        /// </summary>
+        /// <param name="mailInfo"></param>
         public static void SendMail(Mail mailInfo)
         {
             DotNetEnv.Env.Load();
