@@ -293,12 +293,21 @@ namespace XtramileBackend.Services.EmployeeService
                                where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
                                select new PendingRequetsViewEmployee
                                {
-                                   requestId = request.RequestId,
-                                   projectName = project.ProjectName,
-                                   reasonOfTravel = request.TripPurpose,
-                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
-                                   dateOfTravel = request.DepartureDate
-                               }).ToList();
+                                   requestCode = request.RequestCode,
+                                   projectCode = project.ProjectCode,
+                                   tripPurpose = request.TripPurpose,
+                                   sourceCity = request.SourceCity,
+                                   sourceCountry = request.SourceCountry,
+                                   destinationCity = request.DestinationCity,
+                                   destinationCountry = request.DestinationCountry,
+                                   departureDate = request.DepartureDate,
+                                   returnDate = request.ReturnDate,
+                                   
+
+
+/*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
+*//*                                   dateOfTravel = request.DepartureDate
+*/                               }).ToList();
                 return results;
             }
             catch (Exception ex)
