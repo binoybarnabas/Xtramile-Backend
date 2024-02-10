@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Azure.Core;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -42,6 +44,38 @@ namespace XtramileBackend.Services.ProjectService
             {
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while adding a project: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        public async Task<List<ProjectCodesViewModel>?> GetProjectCodesByEmployeeId(int empId)
+        {
+            try
+            {
+
+            var projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+            var projectData =   await _unitOfWork.ProjectRepository.GetAllAsync();
+
+
+             var result = (from projectMapping in projectMappingData
+                              join project in projectData on projectMapping.ProjectId equals project.ProjectId 
+                              where projectMapping.EmpId == empId
+                              select new ProjectCodesViewModel
+                              {
+                                  ProjectCode = project.ProjectCode
+
+                              }).ToList();
+
+                /*                return new List<ProjectCodesViewModel> { result };
+                */
+                return result;
+
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting project codes: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }
