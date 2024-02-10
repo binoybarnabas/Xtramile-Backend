@@ -1,5 +1,9 @@
-﻿using XtramileBackend.Models.EntityModels;
+﻿using Microsoft.Extensions.Primitives;
+using System.Dynamic;
+using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Utils;
 
 namespace XtramileBackend.Services.RequestService
 {
@@ -40,7 +44,24 @@ namespace XtramileBackend.Services.RequestService
             try
             {
                 await _unitOfWork.RequestRepository.AddAsync(request);
+
+                int empId = request.CreatedBy;
+                
+                Mail mailInfo = new Mail();
+
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(empId);
+
+                if (employeeData != null)
+                {
+                    mailInfo.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                    mailInfo.recipientEmail = employeeData.Email;
+                }
+
+                mailInfo.mailContext = "submit";
+                
                 _unitOfWork.Complete();
+                //sending the mail once the request is submitted
+                MailService.SendMail(mailInfo);
             }
             catch (Exception ex)
             {
