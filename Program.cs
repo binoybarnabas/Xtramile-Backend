@@ -74,8 +74,7 @@ string connectionString = DotNetEnv.Env.GetString("DB_STRING");
 
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
-string senderEmail = DotNetEnv.Env.GetString("senderEmail");
-string senderPassword = DotNetEnv.Env.GetString("senderPassword");
+
 builder.Configuration["Jwt:SecretKey"] = secretkey;
 builder.Configuration["Jwt:Issuer"] = issuer;
 

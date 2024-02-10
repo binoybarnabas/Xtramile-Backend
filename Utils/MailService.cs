@@ -1,20 +1,20 @@
 ﻿using System.Net.Mail;
 using System.Net;
 using Azure.Core;
+using XtramileBackend.Models.APIModels;
 
 namespace XtramileBackend.Utils
 {
     public class MailService
     {
-       
-        public static void SendMail(string recipientEmail,string recipientName,string mailContext,string managerName = "",string reasonForRejection)
+        public static void SendMail(Mail mailInfo)
         {
             DotNetEnv.Env.Load();
             //sender email and password
             string senderEmail = DotNetEnv.Env.GetString("senderEmail");
             string senderPassword = DotNetEnv.Env.GetString("senderPassword");
             //receipient email 
-            string recipient = recipientEmail;
+            string recipientEmail = mailInfo.recipientEmail;
 
             if (!string.IsNullOrEmpty(senderEmail) && !string.IsNullOrEmpty(recipientEmail))
             {
@@ -23,12 +23,12 @@ namespace XtramileBackend.Utils
                 mail.Subject = "Travel Request Status";
                 string salutation, body, emailContent;
 
-                switch (mailContext) {
+                switch (mailInfo.mailContext) {
 
                     case "submit":
 
                         // Salutation
-                        salutation = $"Dear {recipientName}, \n\n"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
                         body = "Your request has been submitted.\n" +
@@ -41,10 +41,10 @@ namespace XtramileBackend.Utils
                     case "approve":
 
                         // Salutation
-                        salutation = $"Dear {recipientName}, \n\n"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request has been Approved by {managerName}\n" +
+                        body = $"Your request has been Approved by {mailInfo.managerName}\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
@@ -55,11 +55,11 @@ namespace XtramileBackend.Utils
                     case "reject":
 
                         // Salutation
-                        salutation = $"Dear {recipientName}, \n\n"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request has been Rejected by {managerName}\n" + 
-                                $"The reason for your rejection is {reasonForRejection} \n" +
+                        body = $"Your request has been Rejected by {mailInfo.managerName}\n" + 
+                                $"The reason for your rejection is {mailInfo.reasonForRejection} \n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
@@ -70,10 +70,10 @@ namespace XtramileBackend.Utils
                     case "options":
 
                         // Salutation
-                        salutation = $"Dear {recipientName}, \n\n"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},";
 
                         // Body of the email
-                        body = $"Your request has been Approved by travel admin {managerName}\n" +
+                        body = $"Your request has been Approved by travel admin {mailInfo.managerName}\n" +
                                 "Pick the tickets for the trip based on your interest.\n" +
                                       "Thank you \n\n";
 
@@ -81,8 +81,6 @@ namespace XtramileBackend.Utils
                         emailContent = salutation + "\n\n" + body;
                         mail.Body = emailContent;
                         break;
-
-
 
 
                 }
