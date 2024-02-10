@@ -9,6 +9,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Utils;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -675,7 +676,10 @@ namespace XtramileBackend.Services.ManagerService
                     await _unitOfWork.RequestStatusRepository.AddAsync(approve);
 
                     _unitOfWork.Complete();
+
+                    
                 }
+                
                 return true;
 
             }
@@ -704,6 +708,20 @@ namespace XtramileBackend.Services.ManagerService
                 request.ReasonId = reason.ReasonId;
                 _unitOfWork.RequestRepository.Update(request);
                 _unitOfWork.Complete();
+
+                //cancellation or rejection mail when the manager rejects a travel request raised by an employee
+                Mail mailData = new Mail();
+                TBL_REQUEST requestData = await _unitOfWork.RequestRepository.GetByIdAsync(reqId);
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(requestData.CreatedBy);
+                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeData.ReportsTo ?? -1);
+                TBL_REASON reasonData = await _unitOfWork.ReasonRepository.GetByIdAsync(requestData.ReasonId ?? -1);
+
+                mailData.mailContext = "reject";
+                mailData.managerName = managerData.FirstName + " " + managerData.LastName;
+                mailData.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                mailData.recipientEmail = employeeData.Email;
+                mailData.reasonForRejection = reasonData.Description;
+                MailService.SendMail(mailData);
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred while adding reason to the request {ex.Message}");

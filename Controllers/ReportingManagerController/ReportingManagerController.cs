@@ -13,6 +13,7 @@ using XtramileBackend.Services.ManagerService;
     // Controller for handling reporting manager related actions
     namespace XtramileBackend.Controllers.ReportingManagerController
     {
+
         [EnableCors("AllowAngularDev")]
         [Route("api/reportingmanager")]
         [ApiController]
