@@ -62,7 +62,9 @@ namespace XtramileBackend.Services.ProjectService
                               where projectMapping.EmpId == empId
                               select new ProjectCodesViewModel
                               {
-                                  ProjectCode = project.ProjectCode
+                                  ProjectId = project.ProjectId,
+                                  ProjectCode = project.ProjectCode,
+                                  ProjectName = project.ProjectName,
 
                               }).ToList();
 

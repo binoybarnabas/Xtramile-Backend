@@ -64,6 +64,7 @@ namespace XtramileBackend.Controllers.RequestControllers
         [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
         {
+            Console.WriteLine(request.TravelTypeId);
 
             try
             {
@@ -79,23 +80,41 @@ namespace XtramileBackend.Controllers.RequestControllers
                 //Handling text data of travel request
                 var tblRequest = new TBL_REQUEST
                 {
+
                     RequestCode = RequestCode,
-                    TravelTypeId = 1,
+
+                    ProjectId = Int32.Parse(request.ProjectId),
+
+                    TripType = request.TripType,
+                    
+                    TravelModeId = Int32.Parse(request.TravelModeId),
+                    
+                    TravelTypeId = Int32.Parse(request.TravelTypeId),
+                    
                     TripPurpose = request.TripPurpose,
+                    
                     DepartureDate = DateTime.Parse(request.DepartureDate),
+                    
                     ReturnDate = DateTime.Parse(request.ReturnDate),
-                    SourceCityZipCode = request.SourceCityZipCode,
-                    DestinationCityZipCode = request.DestinationCityZipCode,
+                    
                     SourceCity = request.SourceCity,
+                    
                     DestinationCity = request.DestinationCity,
-                    SourceState = request.SourceState,
-                    DestinationState = request.DestinationState,
+                    
                     SourceCountry = request.SourceCountry,
+                    
                     DestinationCountry = request.DestinationCountry,
+                    
                     CabRequired = request.CabRequired,
+                    
+                    PrefPickUpTime = request.PrefPickUpTime,
+                    
                     AccommodationRequired = request.AccommodationRequired,
+                    
                     PrefDepartureTime = request.PrefDepartureTime,
+                    
                     AdditionalComments = request.AdditionalComments,
+
                     PriorityId = null,
                     PerdiemId = null,
                     CreatedOn = DateTime.Now,
