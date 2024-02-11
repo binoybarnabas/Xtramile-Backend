@@ -4,6 +4,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Utils.TestMailService;
 
 namespace XtramileBackend.Services.EmployeeService
 {
@@ -22,6 +23,7 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 var employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                await TestMailService.SendEmailAsyncTest();
                 return employeeData;
             }
             catch (Exception ex)
