@@ -628,6 +628,25 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.RequestRepository.Update(existingRequest);
 
                 _unitOfWork.Complete();
+                
+                //Data for sending email notification when request approved by manager
+                Mail mailInfo = new Mail();
+
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(existingRequest.CreatedBy);
+                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(approve.EmpId);
+
+
+                if (employeeData != null)
+                {
+                    mailInfo.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                    mailInfo.recipientEmail = employeeData.Email;
+                    mailInfo.managerName = managerData.FirstName + " " + managerData.LastName;
+                }
+
+                mailInfo.mailContext = "approve";
+
+                //sending the mail
+                MailService.SendMail(mailInfo);
 
                 return true;
             }

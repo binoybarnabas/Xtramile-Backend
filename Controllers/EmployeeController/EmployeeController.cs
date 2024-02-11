@@ -31,7 +31,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
-
                 return Ok(employeeData);
             }
             catch (Exception ex)
