@@ -218,5 +218,30 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [HttpPatch("update/password")]
+        public async Task<IActionResult> updatePassword([FromBody] UpdatePassword updatePassword)
+        {
+            try
+            {
+                var user = await _employeeService.updatePassword(updatePassword.Email, updatePassword.Password);
+
+                if (user != null)
+                {
+                    // Password updated successfully
+                    return Ok("Password updated successfully.");
+                }
+                else
+                {
+                    // User not found with the given email
+                    return NotFound("User not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while updating password: {ex.Message}");
+            }
+
+        }
+
     }
 }
