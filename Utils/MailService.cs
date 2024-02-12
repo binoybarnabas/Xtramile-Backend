@@ -37,7 +37,7 @@ namespace XtramileBackend.Utils
                         salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = "Your request has been submitted.\n" +
+                        body = $"Your request with code {mailInfo.requestCode} has been submitted.\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
@@ -50,7 +50,7 @@ namespace XtramileBackend.Utils
                         salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request has been Approved by {mailInfo.managerName}\n" +
+                        body = $"Your request with code {mailInfo.requestCode}  has been Approved by {mailInfo.managerName}\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
@@ -64,7 +64,7 @@ namespace XtramileBackend.Utils
                         salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request has been Rejected by {mailInfo.managerName}\n" + 
+                        body = $"Your request with code {mailInfo.requestCode} has been Rejected by {mailInfo.managerName}\n" + 
                                 $"The reason for your rejection is {mailInfo.reasonForRejection} \n" +
                                       "Thank you \n\n";
 
@@ -79,7 +79,7 @@ namespace XtramileBackend.Utils
                         salutation = $"Dear {mailInfo.recipientName},";
 
                         // Body of the email
-                        body = $"Your request has been Approved by travel admin {mailInfo.managerName}\n" +
+                        body = $"Your request with {mailInfo.requestCode} has been Approved by travel admin {mailInfo.managerName}\n" +
                                 "Pick the tickets for the trip based on your interest.\n" +
                                       "Thank you \n\n";
 
