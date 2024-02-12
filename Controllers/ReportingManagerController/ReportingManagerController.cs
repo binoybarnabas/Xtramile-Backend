@@ -9,13 +9,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.ManagerService;
+using Microsoft.AspNetCore.Authorization;
 
-    // Controller for handling reporting manager related actions
+// Controller for handling reporting manager related actions
     namespace XtramileBackend.Controllers.ReportingManagerController
     {
 
         [EnableCors("AllowAngularDev")]
         [Route("api/reportingmanager")]
+        [Authorize("Manager")]
         [ApiController]
         public class ReportingManagerController : ControllerBase
         {
