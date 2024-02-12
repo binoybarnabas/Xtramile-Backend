@@ -1,4 +1,6 @@
-﻿namespace XtramileBackend.Models.APIModels
+﻿using System.Globalization;
+
+namespace XtramileBackend.Models.APIModels
 {
     public class TravelRequestEmployeeViewModel
     {
@@ -34,5 +36,16 @@
         public IFormFile? PassportAttachment { get; set; }
         public IFormFile? IdCardAttachment { get; set; }
         public string? AdditionalComments { get; set; }
+
+
+
+        public string RequestCode { get; set; }
+
+        public string TripType { get; set; }
+
+        public string TravelMode { get; set; }
+
+        public string PrefPickUpTime { get; set; }
+
     }
 }

@@ -14,6 +14,7 @@
     public class PendingRequetsViewEmployee
     {
 
+        public int requestId { get; set; } 
 
         public string? requestCode { get; set; }
 
@@ -33,6 +34,8 @@
         public DateTime returnDate { get; set; }  
 
         public string statusName { get; set; }
+
+        public string travelMode { get; set; }
 
 
     }

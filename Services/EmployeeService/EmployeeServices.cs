@@ -283,16 +283,18 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
 
                 var results = (from request in requestData
                                join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
                                join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                                join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                                join employeeProject in employeeProjectMap on statusApproval.EmpId equals employeeProject.EmpId
-                               join project in projectData on employeeProject.ProjectId equals project.ProjectId
+                               join project in projectData on employeeProject.ProjectId equals project.ProjectId join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
                                select new PendingRequetsViewEmployee
                                {
+                                   requestId = request.RequestId,
                                    requestCode = request.RequestCode,
                                    projectCode = project.ProjectCode,
                                    tripPurpose = request.TripPurpose,
@@ -302,6 +304,8 @@ namespace XtramileBackend.Services.EmployeeService
                                    destinationCountry = request.DestinationCountry,
                                    departureDate = request.DepartureDate,
                                    returnDate = request.ReturnDate,
+                                   travelMode = travelMode.ModeName
+
                                    
 
 

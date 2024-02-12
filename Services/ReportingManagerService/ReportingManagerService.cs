@@ -526,17 +526,23 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+
+
+
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
                                              join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
-                                             join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-                                             join project in projects on projectMapping.ProjectId equals project.ProjectId
+/*                                             join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
+*/                                             join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
+                                             join travelMode in travelModeData on travelRequest.TravelModeId equals travelMode.ModeId
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
                                                  RequestId = travelRequest.RequestId,
+                                                 RequestCode = travelRequest.RequestCode,
                                                  FirstName = employee.FirstName,
                                                  LastName = employee.LastName,
                                                  ContactNumber = employee.ContactNumber,
@@ -564,7 +570,15 @@ namespace XtramileBackend.Services.ManagerService
                                                  /*TravelAuthorizationEmailCapture =
                                                  PassportAttachment =
                                                  IdCardAttachment = */
-                                                 AdditionalComments = travelRequest.AdditionalComments
+                                                 AdditionalComments = travelRequest.AdditionalComments,
+
+                                                 TripType = travelRequest.TripType,
+
+                                                 PrefPickUpTime = travelRequest.PrefPickUpTime,
+
+                                                 TravelMode = travelMode.ModeName
+
+                                                 
                                              }
                                              );
 
