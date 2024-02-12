@@ -696,7 +696,7 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.RequestRepository.Update(existingRequest);
 
                 _unitOfWork.Complete();
-                
+
                 //Data for sending email notification when request approved by manager
                 Mail mailInfo = new Mail();
 
