@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.ProjectService;
 
@@ -48,5 +49,24 @@ namespace XtramileBackend.Controllers.ProductControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a project: {ex.Message}");
             }
         }
+
+
+
+        [HttpGet("getprojectcodes/{empId}")]
+        public async Task<IActionResult> GetProjectCodesByEmpId(int empId)
+        {
+            try
+            {
+                IEnumerable<ProjectCodesViewModel> projectCodeData = await _projectServices.GetProjectCodesByEmployeeId(empId);
+                return Ok(projectCodeData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
+            }
+        }
+
+
     }
 }
