@@ -31,7 +31,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
-
                 return Ok(employeeData);
             }
             catch (Exception ex)
@@ -204,5 +203,20 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing request details: {ex.Message}");
             }
         }
+
+        [HttpGet("current/request")]
+        public async Task<IActionResult> getEmployeeCurrentTravel(int empId)
+        {
+            try
+            {
+                EmployeeCurrentRequest request=await _employeeService.getEmployeeCurrentTravel(empId);
+                return Ok(request); 
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error while getting currently travelling request: {ex.Message}");
+            }
+        }
+
     }
 }

@@ -28,6 +28,8 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
 
+        public Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId);
+
 
     }
 }
