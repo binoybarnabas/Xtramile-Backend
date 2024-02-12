@@ -68,5 +68,22 @@ namespace XtramileBackend.Controllers.ProductControllers
         }
 
 
+
+
+        //To get project codes and corresponding project id.
+        [HttpGet("projectcodes")]
+
+        public async Task<IActionResult> GetProjectCodeandId()
+        {
+            try
+            {
+                IEnumerable<object> projectData = await _projectServices.GetProjectIdAndCode();
+                return Ok(projectData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting projects: {ex.Message}");
+            }
+        }
     }
 }
