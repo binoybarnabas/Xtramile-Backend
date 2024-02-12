@@ -61,6 +61,14 @@ namespace XtramileBackend.Models.EntityModels
         public DateTime? ModifiedOn { get; set; }
 
         public int? ReasonId { get; set; }
+        
+        public int ProjectId { get; set; }
+
+        public string TripType { get; set; }
+
+        public int TravelModeId { get; set; }
+
+        public string PrefPickUpTime { get; set; }
 
 
         //remove on code optimizations
