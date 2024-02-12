@@ -4,6 +4,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XtramileBackend.Services.EmployeeService
 {
@@ -461,6 +462,37 @@ namespace XtramileBackend.Services.EmployeeService
                 Console.WriteLine($"An error occurred while getting employee details for Manager ID {employeeId}: {ex.Message}");
                 throw;
             }
+        }
+
+        public async Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId)
+        {
+            try
+            {
+                var date = DateTime.Now;
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                var request = requestData.FirstOrDefault(r => r.CreatedBy == empId && date >= r.DepartureDate && date <= r.ReturnDate);
+
+                if (request != null)
+                {
+                    return new EmployeeCurrentRequest
+                    {
+                        DepartureDate = request.DepartureDate,
+                        ReturnDate = request.ReturnDate
+                    };
+                }
+                else
+                {
+                    return null; // Or throw an exception, or return a default EmployeeCurrentRequest
+                }
+                
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
+
+            
         }
 
     }

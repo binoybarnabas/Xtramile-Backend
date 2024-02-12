@@ -8,18 +8,18 @@ namespace XtramileBackend.Services.ManagerService
     public interface IReportingManagerService
     {
         //get all employees
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync(int managerId);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, int offset, int pageSize);
 
         //sorting 
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId);
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmployeeNameAsync( int managerId);
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync(int managerId);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByRequestCodeAsync(int managerId, int offset, int pageSize);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByEmployeeNameAsync( int managerId, int offset, int pageSize);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId, int offset, int pageSize);
 
         //Get list by date
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId, string date, int offset, int pageSize);
 
         //searching by name
-        public Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId,string employeeName);
+        public Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId,string employeeName, int offset, int pageSize);
 
         //ongoing requests
         public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
