@@ -31,7 +31,7 @@
 
         public DateTime departureDate { get; set; }
 
-        public DateTime returnDate { get; set; }  
+        public DateTime? returnDate { get; set; }  
 
         public string statusName { get; set; }
 

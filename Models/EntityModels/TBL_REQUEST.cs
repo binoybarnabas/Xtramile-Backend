@@ -23,7 +23,7 @@ namespace XtramileBackend.Models.EntityModels
 
         public DateTime DepartureDate { get; set; }
 
-        public DateTime ReturnDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
 
 
         public string SourceCity { get; set; }
