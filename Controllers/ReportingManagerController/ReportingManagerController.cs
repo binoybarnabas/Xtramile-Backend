@@ -208,6 +208,23 @@ using XtramileBackend.Services.ManagerService;
 
         }
 
+        [HttpGet("request/notification")]
+        public async Task<IActionResult> GetManagerRequestNotification(int empId)
+        {
+            try
+            {
+                // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
+                var reqNotification = await _reportingManagerService.getManagerRequestNotification(empId);
+                return Ok(reqNotification);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting manager notification: {ex.Message}");
+            }
+
+        }
+
     }
 }
 

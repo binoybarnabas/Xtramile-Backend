@@ -30,6 +30,7 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId);
 
+        public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
 
     }
 }

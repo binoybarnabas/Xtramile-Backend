@@ -218,5 +218,20 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [HttpGet("request/notification")]
+
+        public async Task<IActionResult> getEmployeeRequestNotification(int empId)
+        {
+            try
+            {
+                var notification= await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
+                return Ok(notification);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error while fetching employee notification: {ex.Message}");
+            }
+        }
+
     }
 }
