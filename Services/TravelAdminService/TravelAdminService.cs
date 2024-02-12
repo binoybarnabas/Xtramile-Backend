@@ -68,9 +68,6 @@ namespace XtramileBackend.Services.TravelAdminService
         // travel type name, priority name, and status name.This returning object is used to display all incoming requests for a travel admin. 
         /// </summary>
         /// <returns>List of objects containing the requested data.</returns>
-
-
-
         public async Task<RequestTableViewTravelAdminPaged> GetIncomingRequests(int pageIndex, int pageSize)
 
         {
@@ -135,6 +132,7 @@ namespace XtramileBackend.Services.TravelAdminService
             }
 
         }
+
         /// <summary>
         /// Retrieves the selected option details for a specific request ID.
         /// </summary>
@@ -236,6 +234,13 @@ namespace XtramileBackend.Services.TravelAdminService
 
             return result;
         }
+
+        /// <summary>
+        /// Get the detail of the request based on a request id 
+        /// This shows the request related information for a particular request raised by an employee
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
         public async Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId)
         {
             try
@@ -299,25 +304,28 @@ namespace XtramileBackend.Services.TravelAdminService
             }
         }
 
-        
 
-        public async Task<RequestTableViewTravelAdminPaged> GetIncomingRequestsSorted(int pageIndex, int pageSize, bool priority, bool status, bool travelType)
+        /// <summary>
+        /// Sort incoming request 
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="employeeName"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public async Task<RequestTableViewTravelAdminPaged> GetIncomingRequestsSorted(int pageIndex, int pageSize, bool employeeName, bool date)
         {
             try
             {
                 List<RequestTableViewTravelAdmin> incomingRequests =new List<RequestTableViewTravelAdmin> ();
 
-               if(priority)
+                if (employeeName)
                 {
-                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByPriority();
+                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByDate();
                 }
-                else if (status)
+                else if (date)
                 {
-                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSortByStatus();
-                }
-                else if(travelType)
-                {
-                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByTravelType();
+                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSortByEmployeeName();
                 }
                 else
                 {
@@ -346,7 +354,11 @@ namespace XtramileBackend.Services.TravelAdminService
             }
         }
 
-        private async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSoryByPriority()
+        /// <summary>
+        /// Sort the request based on the request date
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSoryByDate()
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -368,7 +380,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
                                     where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                    orderby priorityItem?.PriorityName
+                                    orderby request.CreatedOn
                                     select new RequestTableViewTravelAdmin
                                     {
                                         RequestId = request.RequestId,
@@ -382,7 +394,13 @@ namespace XtramileBackend.Services.TravelAdminService
             return incomingRequests;
         }
 
-        private async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSortByStatus()
+
+
+        /// <summary>
+        /// Sort the incoming request based on employeeName
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSortByEmployeeName()
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -404,7 +422,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
                                     where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                    orderby status.StatusName
+                                    orderby employee.FirstName, employee.LastName
                                     select new RequestTableViewTravelAdmin
                                     {
                                         RequestId = request.RequestId,
@@ -418,7 +436,13 @@ namespace XtramileBackend.Services.TravelAdminService
             return incomingRequests;
         }
 
-        private async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSoryByTravelType()
+
+        /// <summary>
+        /// get all the requests based on a given date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetEmployeeRequestsByDateAsync(string date)
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -439,8 +463,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join employee in employeeData on request.CreatedBy equals employee.EmpId
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
-                                    where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                    orderby travelType.TypeName
+                                    where ((reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)) && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
+                                    
                                     select new RequestTableViewTravelAdmin
                                     {
                                         RequestId = request.RequestId,
@@ -448,10 +472,53 @@ namespace XtramileBackend.Services.TravelAdminService
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = travelType.TypeName,
-                                        PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
+                                        PriorityName = priorityItem?.PriorityName ?? "High",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
             return incomingRequests;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="employeeName"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetEmployeeRequestsByEmployeeNameAsync(string employeeName)
+        {
+            IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+            IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+            IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
+            IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+            IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
+            IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+            // Fetch required data from repositories
+            var incomingRequests = (from request in requestData
+                                    join reqApprove in approvalData on request.RequestId equals reqApprove.RequestId
+                                    join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
+                                    from priorityItem in priorityGroup.DefaultIfEmpty()
+                                    join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
+                                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                                    join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                                    join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                    join approver in employeeData on reqApprove.EmpId equals approver.EmpId
+                                    join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
+                                    where ((reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2))
+                                     && (employee.FirstName + " " + employee.LastName).Contains(employeeName)
+                                    select new RequestTableViewTravelAdmin
+                                    {
+                                        RequestId = request.RequestId,
+                                        EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                                        ProjectCode = project.ProjectCode,
+                                        CreatedOn = request.CreatedOn,
+                                        TravelTypeName = travelType.TypeName,
+                                        PriorityName = priorityItem?.PriorityName ?? "High",// Using ?. to handle null in case of no priority
+                                        StatusName = status.StatusName
+                                    }).ToList();
+            return incomingRequests;
+        }
+
+
+
     }
 }
