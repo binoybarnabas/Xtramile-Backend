@@ -463,6 +463,7 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
+
                 var totalCount = EmpRequest.Count();
                 var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
                 var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();

@@ -74,6 +74,7 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             }
 
         }
+
         [HttpGet("travel/request/{requestID}")]
         public async Task<IActionResult> GetTravelRequest(int requestID)
         {
@@ -91,14 +92,21 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             }
         }
 
+        /// <summary>
+        /// to sort incoming request based on the employeename and date of request
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="employeeName"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
         [HttpGet("incomingrequest/sort")]
-        public async Task<IActionResult> GetIncomingRequestsSorted(int pageIndex = 1, int pageSize = 10, bool priority = false, bool status = false, bool travelType = false)
+        public async Task<IActionResult> GetIncomingRequestsSorted([FromQuery] int pageIndex, int pageSize, bool employeeName, bool date)
         {
             try
             {
-                var travelRequests = await _travelAdminService.GetIncomingRequestsSorted(pageIndex, pageSize, priority, status, travelType);
+                var travelRequests = await _travelAdminService.GetIncomingRequestsSorted(pageIndex, pageSize, employeeName, date);
                 return Ok(travelRequests);
-
             }
             catch (Exception ex)
             {
@@ -109,5 +117,21 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
 
+        //api for appbar
+        // Get employee requests for a specific date based on managerId and date
+        [HttpGet("date")]
+        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery]string date)
+        {
+            var empRequests = await _travelAdminService.GetEmployeeRequestsByDateAsync(date);
+            return Ok(empRequests);
+        }
+
+        // Get employee requests sorted by employee name 
+        [HttpGet("search/employeename")]
+        public async Task<IActionResult> GetEmployeeRequestSortEmployeeNameAsync([FromQuery] string employeeName)
+        {
+            var empRequests = await _travelAdminService.GetEmployeeRequestsByEmployeeNameAsync(employeeName);
+            return Ok(empRequests);
+        }
     }
 }
