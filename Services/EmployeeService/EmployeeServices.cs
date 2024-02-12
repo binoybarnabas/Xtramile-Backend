@@ -12,9 +12,11 @@ namespace XtramileBackend.Services.EmployeeService
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public EmployeeServices(IUnitOfWork unitOfWork)
+        private readonly AppDBContext _dbContext;
+        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext)
         {
             _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
         }
 
 
@@ -499,5 +501,33 @@ namespace XtramileBackend.Services.EmployeeService
             
         }
 
+/// <summary>
+/// Updates the password for a user with the specified email.
+/// </summary>
+/// <param name="email">The email of the user whose password is to be updated.</param>
+/// <param name="newPassword">The new password to set for the user.</param>
+/// <returns>The updated user entity if the password was updated successfully, or null if no user was found.</returns>
+        public async Task<TBL_USER> updatePassword(string email, string newPassword)
+        {
+            try
+            {
+                var user = await _dbContext.TBL_USER.FirstOrDefaultAsync(u => u.Email == email);
+                if (user != null)
+                {
+                    // Update the user's password
+                    user.Password = newPassword;
+
+                    // Save the changes to the database
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
+        }
     }
 }

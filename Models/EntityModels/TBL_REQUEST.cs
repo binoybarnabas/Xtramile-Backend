@@ -61,8 +61,7 @@ namespace XtramileBackend.Models.EntityModels
         public DateTime? ModifiedOn { get; set; }
 
         public int? ReasonId { get; set; }
-
-
+        
         //remove on code optimizations
 
         public string? DestinationCityZipCode { get; set; }
