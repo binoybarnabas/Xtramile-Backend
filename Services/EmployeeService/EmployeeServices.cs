@@ -470,6 +470,12 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+        /// <summary>
+        /// Gets details of dashboard upcoming details for a specific employee based on the provided employee ID.
+        /// Perform join operation on the tables TBL_EMPLOYEE, TBL_STATUS, TBL_REQ_APPROVE and TBL_REQUEST.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>A collection of dashboard upcoming details for the employee.</returns>
         public async Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId)
         {
             try
@@ -524,6 +530,13 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
+        /// <summary>
+        /// Gets details of dashboard progress details for a specific employee based on the provided employee ID.
+        /// Perform join operation on the tables TBL_EMPLOYEE, TBL_STATUS, TBL_REQ_APPROVE, TBL_ROLES and TBL_REQUEST.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee.</param>
+        /// <returns>A collection of dashboard progress details for the employee.</returns>
         public async Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId)
         {
             try
@@ -535,7 +548,7 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_ROLES> employeeRoles = await _unitOfWork.RoleRepository.GetAllAsync();
 
-                // Querying for ongoing request details
+                // Querying for dashboard details
                 var result = (
                     from reqApproval in reqApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
@@ -572,13 +585,13 @@ namespace XtramileBackend.Services.EmployeeService
                 else
                 {
                     // Throwing exception if no matching requests
-                    throw new FileNotFoundException($"No ongoing request found for employee ID {employeeId} with the specified criteria.");
+                    throw new FileNotFoundException($"No dashboard details found for employee ID {employeeId} with the specified criteria.");
                 }
             }
             catch (Exception ex)
             {
                 // Logging and rethrowing the exception
-                Console.WriteLine($"An error occurred while getting ongoing request details for employee ID {employeeId}: {ex.Message}");
+                Console.WriteLine($"An error occurred while getting dashboard details for employee ID {employeeId}: {ex.Message}");
                 throw;
             }
         }
