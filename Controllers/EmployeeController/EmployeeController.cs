@@ -40,7 +40,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _employeeService.GetEmployeeAsync();
-
                 return Ok(employeeData);
             }
             catch (Exception ex)
@@ -213,41 +212,82 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing request details: {ex.Message}");
             }
         }
-        [HttpGet("dashboard/upcoming/trip/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeDashboardUpcomingTrip(int employeeId)
+
+        [HttpGet("current/request")]
+        public async Task<IActionResult> getEmployeeCurrentTravel(int empId)
         {
             try
             {
-                // Call the service method to retrieve upcoming trip details for the specified employee
-                IEnumerable<DashboardUpcomingTrip> employeeDashboardUpcomingTripData = await _employeeService.GetEmployeeDashboardUpcomingTripByIdAsync(employeeId);
-
-                // Return a 200 OK response with the retrieved upcoming trip details
-                return Ok(employeeDashboardUpcomingTripData);
+                EmployeeCurrentRequest request = await _employeeService.getEmployeeCurrentTravel(empId);
+                return Ok(request);
             }
             catch (Exception ex)
             {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting upcoming trip details: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error while getting currently travelling request: {ex.Message}");
             }
         }
-        [HttpGet("dashboard/employee/progress/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeDashboardProgress(int employeeId)
+
+        [HttpPatch("update/password")]
+        public async Task<IActionResult> updatePassword([FromBody] UpdatePassword updatePassword)
         {
             try
             {
-                // Call the service method to retrieve progress details for the specified employee
-                DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+                var user = await _employeeService.updatePassword(updatePassword.Email, updatePassword.Password);
 
-                // Return a 200 OK response with the retrieved progress details
-                return Ok(employeeDashboardProgress);
+                if (user != null)
+                {
+                    // Password updated successfully
+                    return Ok("Password updated successfully.");
+                }
+                else
+                {
+                    // User not found with the given email
+                    return NotFound("User not found.");
+                }
             }
             catch (Exception ex)
             {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting progress details: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while updating password: {ex.Message}");
             }
-        }
 
+        }
 
     }
+    [HttpGet("dashboard/upcoming/trip/{employeeId}")]
+    public async Task<IActionResult> GetEmployeeDashboardUpcomingTrip(int employeeId)
+    {
+        try
+        {
+            // Call the service method to retrieve upcoming trip details for the specified employee
+            IEnumerable<DashboardUpcomingTrip> employeeDashboardUpcomingTripData = await _employeeService.GetEmployeeDashboardUpcomingTripByIdAsync(employeeId);
+
+            // Return a 200 OK response with the retrieved upcoming trip details
+            return Ok(employeeDashboardUpcomingTripData);
+        }
+        catch (Exception ex)
+        {
+            // Handle or log the exception
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting upcoming trip details: {ex.Message}");
+        }
+    }
+    [HttpGet("dashboard/employee/progress/{employeeId}")]
+    public async Task<IActionResult> GetEmployeeDashboardProgress(int employeeId)
+    {
+        try
+        {
+            // Call the service method to retrieve progress details for the specified employee
+            DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+
+            // Return a 200 OK response with the retrieved progress details
+            return Ok(employeeDashboardProgress);
+        }
+        catch (Exception ex)
+        {
+            // Handle or log the exception
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting progress details: {ex.Message}");
+        }
+    }
+
+
 }
+

@@ -4,7 +4,7 @@
     {
         public string TripPurpose { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string SourceCity { get; set; }
         public string? SourceState { get; set; }
         public string SourceCountry { get; set; }

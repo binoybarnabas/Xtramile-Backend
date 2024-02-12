@@ -9,6 +9,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Utils;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -32,7 +33,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsAsync(int managerId)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -40,7 +41,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -50,8 +50,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                  join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
@@ -66,16 +65,25 @@ namespace XtramileBackend.Services.ManagerService
                       Status = status.StatusName
                   }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByDateAsync(int managerId, string date)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId, string date,int offset, int pageSize)
         {
             try
             {
@@ -83,15 +91,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
 
@@ -106,12 +116,21 @@ namespace XtramileBackend.Services.ManagerService
                       Status = status.StatusName
                   }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
 
         }
@@ -121,7 +140,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByRequestCodeAsync(int managerId)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByRequestCodeAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -129,15 +148,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby request.RequestId
@@ -152,13 +173,22 @@ namespace XtramileBackend.Services.ManagerService
                       Status = status.StatusName
                   }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
@@ -167,7 +197,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByEmployeeNameAsync(int managerId)
+        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -175,15 +205,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby employee.FirstName, employee.LastName
@@ -198,12 +230,21 @@ namespace XtramileBackend.Services.ManagerService
                       Status = status.StatusName
                   }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
@@ -212,7 +253,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsSortByDateAsync(int managerId)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId, int offset, int pageSize)
         {
             try
             {
@@ -220,15 +261,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby request.CreatedOn
@@ -244,14 +287,22 @@ namespace XtramileBackend.Services.ManagerService
                       Status = status.StatusName
                   }).ToList();
 
-                return EmpRequest;
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
 
-                return EmpRequest;
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Travel Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
@@ -270,7 +321,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -280,8 +330,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                     from employee in employeeData
                     join request in requestData on employee.EmpId equals request.CreatedBy
-                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
@@ -332,7 +381,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -342,8 +390,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                     from employee in employeeData
                     join request in requestData on employee.EmpId equals request.CreatedBy
-                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
@@ -388,7 +435,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns>
         /// A list of Request data of a particular employee which contains information like Request Id, Employee name, Email, project code, date and status
         /// </returns>
-        public async Task<List<EmployeeRequestDto>> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName, int offset, int pageSize)
         {
             try
             {
@@ -396,15 +443,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                    && (employee.FirstName + " " + employee.LastName).Contains(employeeName)
@@ -418,12 +467,22 @@ namespace XtramileBackend.Services.ManagerService
                       Mode = null,
                       Status = status.StatusName
                   }).ToList();
-                return EmpRequest;
+
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                return new PagedEmployeeRequestDto
+                {
+                    EmployeeRequest = pagedEmployeeRequests,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                };
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error fetching the Employee requests Requests");
-                return new List<EmployeeRequestDto>();
+                return new PagedEmployeeRequestDto();
             }
         }
 
@@ -444,24 +503,26 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_REQ_MAPPING> reqMappings = await _unitOfWork.RequestMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorities = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var latestStatusApprovals = reqApprovals
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
+
                 // LINQ query to retrieve ongoing travel request details
                 var result = (
                     from request in travelRequests
                     join mapping in reqMappings on request.RequestId equals mapping.RequestId
                     join employee in employees on mapping.EmpId equals employee.EmpId
-                    join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-                    join project in projects on projectMapping.ProjectId equals project.ProjectId
+                    join project in projects on request.ProjectId equals project.ProjectId
                     join department in departments on project.DepartmentId equals department.DepartmentId
                     join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                     join priority in priorities on request.PriorityId equals priority.PriorityId
-                    join reqApproval in reqApprovals on request.RequestId equals reqApproval.RequestId
+                    join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where employee.ReportsTo == managerId
@@ -523,20 +584,24 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+
+
+
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
                                              join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
-                                             join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-                                             join project in projects on projectMapping.ProjectId equals project.ProjectId
+                                             join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
+                                             join travelMode in travelModeData on travelRequest.TravelModeId equals travelMode.ModeId
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
                                                  RequestId = travelRequest.RequestId,
+                                                 RequestCode = travelRequest.RequestCode,
                                                  FirstName = employee.FirstName,
                                                  LastName = employee.LastName,
                                                  ContactNumber = employee.ContactNumber,
@@ -564,7 +629,15 @@ namespace XtramileBackend.Services.ManagerService
                                                  /*TravelAuthorizationEmailCapture =
                                                  PassportAttachment =
                                                  IdCardAttachment = */
-                                                 AdditionalComments = travelRequest.AdditionalComments
+                                                 AdditionalComments = travelRequest.AdditionalComments,
+
+                                                 TripType = travelRequest.TripType,
+
+                                                 PrefPickUpTime = travelRequest.PrefPickUpTime,
+
+                                                 TravelMode = travelMode.ModeName
+
+                                                 
                                              }
                                              );
 
@@ -628,6 +701,25 @@ namespace XtramileBackend.Services.ManagerService
 
                 _unitOfWork.Complete();
 
+                //Data for sending email notification when request approved by manager
+                Mail mailInfo = new Mail();
+
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(existingRequest.CreatedBy);
+                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(approve.EmpId);
+
+
+                if (employeeData != null)
+                {
+                    mailInfo.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                    mailInfo.recipientEmail = employeeData.Email;
+                    mailInfo.managerName = managerData.FirstName + " " + managerData.LastName;
+                }
+
+                mailInfo.mailContext = "approve";
+
+                //sending the mail
+                MailService.SendMail(mailInfo);
+
                 return true;
             }
             catch (Exception ex)
@@ -675,7 +767,10 @@ namespace XtramileBackend.Services.ManagerService
                     await _unitOfWork.RequestStatusRepository.AddAsync(approve);
 
                     _unitOfWork.Complete();
+
+                    
                 }
+                
                 return true;
 
             }
@@ -704,6 +799,20 @@ namespace XtramileBackend.Services.ManagerService
                 request.ReasonId = reason.ReasonId;
                 _unitOfWork.RequestRepository.Update(request);
                 _unitOfWork.Complete();
+
+                //cancellation or rejection mail when the manager rejects a travel request raised by an employee
+                Mail mailData = new Mail();
+                TBL_REQUEST requestData = await _unitOfWork.RequestRepository.GetByIdAsync(reqId);
+                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(requestData.CreatedBy);
+                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeData.ReportsTo ?? -1);
+                TBL_REASON reasonData = await _unitOfWork.ReasonRepository.GetByIdAsync(requestData.ReasonId ?? -1);
+
+                mailData.mailContext = "reject";
+                mailData.managerName = managerData.FirstName + " " + managerData.LastName;
+                mailData.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                mailData.recipientEmail = employeeData.Email;
+                mailData.reasonForRejection = reasonData.Description;
+                MailService.SendMail(mailData);
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred while adding reason to the request {ex.Message}");

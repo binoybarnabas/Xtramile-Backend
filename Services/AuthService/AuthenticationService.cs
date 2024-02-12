@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
@@ -22,7 +23,9 @@ namespace XtramileBackend.Services.AuthService
             //check whether the user exists
             //get the userid and create token if userid exists
             //return to controller
-            
+
+            /*string password = HashPassword(credential.Password);
+            Console.WriteLine("~"+password+'~');*/
             var userData = from user in _dbContext.TBL_USER where credential.Email == user.Email && credential.Password == user.Password select new { UserId = user.EmpId };
             var userId = userData?.FirstOrDefault()?.UserId;
 
@@ -95,6 +98,18 @@ namespace XtramileBackend.Services.AuthService
             return token;
 
         }
+
+
+        /*private string HashPassword(string password)
+        {
+            // In a production environment, use a secure password hashing library (e.g., BCrypt)
+            // For simplicity, we'll use a basic hashing method here for demonstration purposes
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }*/
 
     }
 }

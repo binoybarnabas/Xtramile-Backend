@@ -4,6 +4,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XtramileBackend.Services.EmployeeService
 {
@@ -11,9 +12,11 @@ namespace XtramileBackend.Services.EmployeeService
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public EmployeeServices(IUnitOfWork unitOfWork)
+        private readonly AppDBContext _dbContext;
+        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext)
         {
             _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
         }
 
 
@@ -243,11 +246,13 @@ namespace XtramileBackend.Services.EmployeeService
                                   Class = option.Class,
                                   RequestId = option.RequestId,
                                   SourceCity = request.SourceCity,
-                                  SourceState = request.SourceState,
+                                  /*                                  SourceState = request.SourceState,
+                                  */
                                   SourceCountry = request.SourceCountry,
                                   SourceCountryCode = sourceCountry.CountryCode,
                                   DestinationCity = request.DestinationCity,
-                                  DestinationState = request.DestinationState,
+                                  /*                                  DestinationState = request.DestinationState,
+                                  */
                                   DestinationCountry = request.DestinationCountry,
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
@@ -283,6 +288,7 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
 
                 var results = (from request in requestData
                                join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
@@ -290,14 +296,25 @@ namespace XtramileBackend.Services.EmployeeService
                                join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                                join employeeProject in employeeProjectMap on statusApproval.EmpId equals employeeProject.EmpId
                                join project in projectData on employeeProject.ProjectId equals project.ProjectId
+                               join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
                                select new PendingRequetsViewEmployee
                                {
                                    requestId = request.RequestId,
-                                   projectName = project.ProjectName,
-                                   reasonOfTravel = request.TripPurpose,
-                                   destination = request.DestinationCity + ", " + request.DestinationCountry,
-                                   dateOfTravel = request.DepartureDate
+                                   requestCode = request.RequestCode,
+                                   projectCode = project.ProjectCode,
+                                   tripPurpose = request.TripPurpose,
+                                   sourceCity = request.SourceCity,
+                                   sourceCountry = request.SourceCountry,
+                                   destinationCity = request.DestinationCity,
+                                   destinationCountry = request.DestinationCountry,
+                                   departureDate = request.DepartureDate,
+                                   returnDate = request.ReturnDate,
+                                   travelMode = travelMode.ModeName,
+
+                                   /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
+                                   *//*                                   dateOfTravel = request.DepartureDate
+                                   */
                                }).ToList();
                 return results;
             }
@@ -566,6 +583,65 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
+        public async Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId)
+        {
+            try
+            {
+                var date = DateTime.Now;
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                var request = requestData.FirstOrDefault(r => r.CreatedBy == empId && date >= r.DepartureDate && date <= r.ReturnDate);
+
+                if (request != null)
+                {
+                    return new EmployeeCurrentRequest
+                    {
+                        DepartureDate = request.DepartureDate,
+                        ReturnDate = request.ReturnDate
+                    };
+                }
+                else
+                {
+                    return null; // Or throw an exception, or return a default EmployeeCurrentRequest
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
+
+
+        }
+
+        /// <summary>
+        /// Updates the password for a user with the specified email.
+        /// </summary>
+        /// <param name="email">The email of the user whose password is to be updated.</param>
+        /// <param name="newPassword">The new password to set for the user.</param>
+        /// <returns>The updated user entity if the password was updated successfully, or null if no user was found.</returns>
+        public async Task<TBL_USER> updatePassword(string email, string newPassword)
+        {
+            try
+            {
+                var user = await _dbContext.TBL_USER.FirstOrDefaultAsync(u => u.Email == email);
+                if (user != null)
+                {
+                    // Update the user's password
+                    user.Password = newPassword;
+
+                    // Save the changes to the database
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
+        }
 
     }
 }

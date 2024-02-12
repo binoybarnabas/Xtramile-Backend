@@ -27,6 +27,11 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<PagedEmployeeViewReqDto> GeRequestHistoryByEmpId(int empId, int pageIndex, int pageSize);
 
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
+
+        public Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId);
+
+        public Task<TBL_USER> updatePassword(string email, string newPassword);
+
         public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
         public Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId);
     }
