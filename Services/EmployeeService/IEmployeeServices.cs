@@ -1,4 +1,4 @@
-﻿        
+﻿
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 
@@ -20,14 +20,14 @@ namespace XtramileBackend.Services.EmployeeService
         public Task UpdateEmployeeDetailsAsync(int employeeId, ProfileEdit profileEdit);
 
         public Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId);
-        
+
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
         public Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId);
 
         public Task<PagedEmployeeViewReqDto> GeRequestHistoryByEmpId(int empId, int pageIndex, int pageSize);
 
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
-
-
+        public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
+        public Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId);
     }
 }

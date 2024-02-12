@@ -171,7 +171,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="employeeId">The ID of the employee to update.</param>
         /// <param name="profileEdit">A ProfileEdit object containing the updated details.</param>
-        public async Task UpdateEmployeeDetailsAsync(int employeeId, [FromBody] ProfileEdit profileEdit)
+        public async Task UpdateEmployeeDetailsAsync(int employeeId, ProfileEdit profileEdit)
         {
             // Retrieving the employee from the repository
             TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
@@ -296,7 +296,7 @@ namespace XtramileBackend.Services.EmployeeService
                                    requestId = request.RequestId,
                                    projectName = project.ProjectName,
                                    reasonOfTravel = request.TripPurpose,
-                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
+                                   destination = request.DestinationCity + ", " + request.DestinationCountry,
                                    dateOfTravel = request.DepartureDate
                                }).ToList();
                 return results;
@@ -413,12 +413,12 @@ namespace XtramileBackend.Services.EmployeeService
                 var result = (
                     from reqApproval in reqApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
-                    join employee in employees on reqApproval.EmpId equals employee.EmpId
+                    join employee in employees on request.CreatedBy equals employee.EmpId
                     join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
                     join project in projects on projectMapping.ProjectId equals project.ProjectId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    where employee.EmpId == employeeId
+                    where request.CreatedBy == employeeId
                         && request.PerdiemId != null
                         && reqApproval.PrimaryStatusId == 5
                         && primaryStatus.StatusCode == "OG"
@@ -443,16 +443,129 @@ namespace XtramileBackend.Services.EmployeeService
                 else
                 {
                     // Throwing exception if no employees are found or no matching requests
-                    throw new FileNotFoundException($"No employees found who report to Manager ID {employeeId} with the specified criteria.");
+                    throw new FileNotFoundException($"No employees found with Employee ID {employeeId} with the specified criteria.");
                 }
             }
             catch (Exception ex)
             {
                 // Logging and rethrowing the exception
-                Console.WriteLine($"An error occurred while getting employee details for Manager ID {employeeId}: {ex.Message}");
+                Console.WriteLine($"An error occurred while getting employee details with Employee ID {employeeId}: {ex.Message}");
                 throw;
             }
         }
+        public async Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId)
+        {
+            try
+            {
+                // Fetching data from repositories
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+
+                // Querying for ongoing request details
+                var result = (
+                    from reqApproval in reqApprovals
+                    join request in travelRequests on reqApproval.RequestId equals request.RequestId
+                    join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
+                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                    where request.CreatedBy == employeeId
+                        && request.PerdiemId != null
+                        && reqApproval.PrimaryStatusId == 5
+                        && primaryStatus.StatusCode == "OG"
+                        && secondaryStatus.StatusCode == "OG"
+                    select new DashboardUpcomingTrip
+                    {
+                        StartDate = request.DepartureDate,
+                        EndDate = request.ReturnDate,
+                        TripPurpose = request.TripPurpose,
+                        SourceCity = request.SourceCity,
+                        SourceState = request.SourceState,
+                        SourceCountry = request.SourceCountry,
+                        DestinationCity = request.DestinationCity,
+                        DestinationState = request.DestinationState,
+                        DestinationCountry = request.DestinationCountry
+                    }
+                );
+
+                // Checking if the result is not null and returning
+                if (result != null && result.Any()) // Check if there are any results
+                {
+                    return result.ToList(); // If there are results, return the list
+                }
+                else
+                {
+                    return result = null;
+                    // Throwing exception if no employees are found or no matching requests
+                    throw new FileNotFoundException($"No employees found with Employee ID {employeeId} with the specified criteria.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while getting employee details for Employee ID {employeeId}: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId)
+        {
+            try
+            {
+                // Fetching data from repositories
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_ROLES> employeeRoles = await _unitOfWork.RoleRepository.GetAllAsync();
+
+                // Querying for ongoing request details
+                var result = (
+                    from reqApproval in reqApprovals
+                    join request in travelRequests on reqApproval.RequestId equals request.RequestId
+                    join employee in employees on request.CreatedBy equals employee.EmpId
+                    join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
+                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                    join employeeRole in employeeRoles on reqApproval.EmpId equals employeeRole.RoleId into er
+                    from empRole in er.DefaultIfEmpty()
+                    where request.CreatedBy == employeeId
+                    select (
+                        (primaryStatus.StatusCode == "OP" && secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
+                        (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Manager") ? "Manager Forwarded" :
+                        (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
+                        (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Approved" :
+                        (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
+                        (primaryStatus.StatusCode == "CD" && secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
+                        (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Manager") ? "Manager Denied" :
+                        (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Denied" :
+                        (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Denied" :
+                        "Unknown"
+                    )
+                ).FirstOrDefault();
+
+                // Checking if the result is not null and returning
+                if (!string.IsNullOrEmpty(result)) // Check if there is a result
+                {
+                    var dashboardProgress = new DashboardEmployeeprogress
+                    {
+                        Progress = result
+                    };
+
+                    return dashboardProgress; // If there is a result, return the status
+                }
+                else
+                {
+                    // Throwing exception if no matching requests
+                    throw new FileNotFoundException($"No ongoing request found for employee ID {employeeId} with the specified criteria.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while getting ongoing request details for employee ID {employeeId}: {ex.Message}");
+                throw;
+            }
+        }
+
 
     }
 }

@@ -8,6 +8,8 @@ using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ProjectService;
 using Microsoft.AspNetCore.Cors;
+using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.FileMetaDataService;
 
 
 namespace XtramileBackend.Controllers.EmployeeController
@@ -19,10 +21,17 @@ namespace XtramileBackend.Controllers.EmployeeController
     {
         private readonly IEmployeeServices _employeeService;
 
-        public EmployeeController(IEmployeeServices employeeService)
+
+        private readonly IFileTypeServices _fileTypeServices;
+
+        private readonly IFileMetaDataService _fileMetaDataServices;
+
+        public EmployeeController(IEmployeeServices employeeService, IFileTypeServices fileTypeServices,
+            IFileMetaDataService fileMetaDataServices)
 
         {
             _employeeService = employeeService;
+            _fileTypeServices = fileTypeServices;
         }
 
         [HttpGet("employees")]
@@ -204,5 +213,41 @@ namespace XtramileBackend.Controllers.EmployeeController
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing request details: {ex.Message}");
             }
         }
+        [HttpGet("dashboard/upcoming/trip/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeDashboardUpcomingTrip(int employeeId)
+        {
+            try
+            {
+                // Call the service method to retrieve upcoming trip details for the specified employee
+                IEnumerable<DashboardUpcomingTrip> employeeDashboardUpcomingTripData = await _employeeService.GetEmployeeDashboardUpcomingTripByIdAsync(employeeId);
+
+                // Return a 200 OK response with the retrieved upcoming trip details
+                return Ok(employeeDashboardUpcomingTripData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting upcoming trip details: {ex.Message}");
+            }
+        }
+        [HttpGet("dashboard/employee/progress/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeDashboardProgress(int employeeId)
+        {
+            try
+            {
+                // Call the service method to retrieve progress details for the specified employee
+                DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+
+                // Return a 200 OK response with the retrieved progress details
+                return Ok(employeeDashboardProgress);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting progress details: {ex.Message}");
+            }
+        }
+
+
     }
 }
