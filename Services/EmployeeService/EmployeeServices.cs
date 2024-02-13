@@ -658,6 +658,38 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+        public async Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var travelRequest = (
+                    from request in requestData 
+                    join reqApproval in reqApprovalData on request.RequestId equals reqApproval.RequestId
+                    join status in statusData on reqApproval.PrimaryStatusId equals status.StatusId
+                    where request.CreatedBy== empId
+                    orderby reqApproval.date
+                    select new RequestNotification
+                    {
+                        RequestCode= request.RequestCode,
+                        StatusName= status.StatusName,
+                        Date = reqApproval.date,
+                    }
+
+                    ).Take(6).ToList();
+
+                return travelRequest;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while fetching employee request notification {ex.Message}");
+                throw;
+            }
+
+        }
     }
 }

@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 
         [EnableCors("AllowAngularDev")]
         [Route("api/reportingmanager")]
-        [Authorize("Manager")]
+        //[Authorize("Manager")]
         [ApiController]
         public class ReportingManagerController : ControllerBase
         {
@@ -206,6 +206,23 @@ using Microsoft.AspNetCore.Authorization;
             {
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting forwarded travel request details: {ex.Message}");
+            }
+
+        }
+
+        [HttpGet("request/notification")]
+        public async Task<IActionResult> GetManagerRequestNotification(int empId)
+        {
+            try
+            {
+                // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
+                var reqNotification = await _reportingManagerService.getManagerRequestNotification(empId);
+                return Ok(reqNotification);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting manager notification: {ex.Message}");
             }
 
         }

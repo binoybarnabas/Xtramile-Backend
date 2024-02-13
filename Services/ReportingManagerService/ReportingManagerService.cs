@@ -481,7 +481,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Employee requests Requests");
+                Console.WriteLine($"Error fetching the employee request {ex.Message}");
                 return new PagedEmployeeRequestDto();
             }
         }
@@ -877,6 +877,38 @@ namespace XtramileBackend.Services.ManagerService
         {
             // For example, you can concatenate "RE" with the ReasonId
             return "RE" + reqId.ToString("D6"); // Example: RE000001
+        }
+
+        public async Task<IEnumerable<RequestNotification>> getManagerRequestNotification(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var requestNotification = (from employee in employeeData
+                                           join request in requestData on employee.EmpId equals request.CreatedBy
+                                           join reqApproval in reqApprovalData on request.RequestId equals reqApproval.RequestId
+                                           join status in statusData on reqApproval.PrimaryStatusId equals status.StatusId
+                                           where employee.ReportsTo == empId || employee.EmpId == empId
+                                           orderby reqApproval.date
+                                           select new RequestNotification
+                                           {
+                                               RequestCode = request.RequestCode,
+                                               StatusName = status.StatusName,
+                                               Date = reqApproval.date
+                                           }
+                              ).Take(6).ToList();
+                return requestNotification;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while fetching manager notification {ex.Message}");
+                throw;
+            }
         }
 
     }
