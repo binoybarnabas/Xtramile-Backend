@@ -663,6 +663,87 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+        public async Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var travelRequest = (
+                    from request in requestData 
+                    join reqApproval in reqApprovalData on request.RequestId equals reqApproval.RequestId
+                    join status in statusData on reqApproval.PrimaryStatusId equals status.StatusId
+                    where request.CreatedBy== empId
+                    orderby reqApproval.date
+                    select new RequestNotification
+                    {
+                        RequestCode= request.RequestCode,
+                        StatusName= status.StatusName,
+                        Date = reqApproval.date,
+                    }
+
+                    ).Take(6).ToList();
+
+                return travelRequest;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while fetching employee request notification {ex.Message}");
+                throw;
+            }
+
+        }
+        /// <summary>
+        /// To display the completed trips  of an employee by joining multiple tables
+        /// </summary>
+        /// <param name="empId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<TBL_COUNTRY> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var completedTrips = from req in requests
+                                     join employee in employees on req.CreatedBy equals employee.EmpId
+                                     where req.CreatedBy == empId
+                                     join app in approves on req.RequestId equals app.RequestId
+                                     where app.PrimaryStatusId == 3
+                                     join mode in travelModeData on req.TravelModeId equals mode.ModeId
+                                     join project in projectData on req.ProjectId equals project.ProjectId
+                                     join sourceCountry in countryData on req.SourceCountry equals sourceCountry.CountryName
+                                     join destCountry in countryData on req.DestinationCountry equals destCountry.CountryName into destCountryJoin
+                                     from destCountry in destCountryJoin.DefaultIfEmpty()
+                                     select new CompletedTripsCard
+                                     {
+                                         SourceCity = req.SourceCity,
+                                         DestinationCity = req.DestinationCity ?? null,
+                                         SourceCountryCode = sourceCountry.CountryCode,
+                                         DestinationCountryCode = destCountry.CountryCode ?? null,
+                                         DepartureDate = req.DepartureDate,
+                                         ReturnDate = (DateTime)(req.ReturnDate ?? null),
+                                         ModeName = mode.ModeName,
+                                         ProjectCode = project.ProjectCode,
+                                         TripPurpose = req.TripPurpose,
+                                         RequestCode = req.RequestCode,
+                                     };
+
+                return completedTrips;
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine("An error occured");
+                throw;
+            }
+        }
     }
 }

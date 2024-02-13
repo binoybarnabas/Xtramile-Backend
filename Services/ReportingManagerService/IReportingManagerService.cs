@@ -39,6 +39,10 @@ namespace XtramileBackend.Services.ManagerService
         // forwarded travel requests
         public Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize);
 
-        
+        // notification for manager
+        public Task<IEnumerable<RequestNotification>> getManagerRequestNotification(int empId);
+
+        // to get all completed trips in a month
+        public Task<Dictionary<string, int>> GetRequestsByMonth(int empId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using OfficeOpenXml;
 using System.Linq.Expressions;
 using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
@@ -522,8 +523,236 @@ namespace XtramileBackend.Services.TravelAdminService
                                     }).ToList();
             return incomingRequests;
         }
+        /// <summary>
+        /// Generates an Excel report summarizing the count of travel modes used in a specified month.
+        /// </summary>
+        /// <param name="monthName">The name of the month for which the report is generated (e.g., "January").</param>
+        /// <returns>A byte array representing the Excel file containing the mode count report.</returns>
+        /// <remarks>
+        /// This method loads data from the database into memory using asynchronous operations,
+        /// performs LINQ queries to calculate the count of each travel mode used in the specified month,
+        /// and generates an Excel report with the mode names and their respective counts.
+        /// </remarks>
+        public async Task<byte[]> GenerateModeCountFromMonthReport(string monthName)
+        {
+            // Load tables into memory
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> modes = await _unitOfWork.TravelModeRepository.GetAllAsync();
+
+                DateTime monthDate = DateTime.ParseExact(monthName, "MMMM", System.Globalization.CultureInfo.InvariantCulture);
+                int month = monthDate.Month;
+
+                // Filter requests created in the specified month
+                var filteredRequests = requests.Where(r => r.CreatedOn.Month == month);
+
+                // Join with approved requests in TBL_REQ_APPROVE
+                var approvedRequests = from request in filteredRequests
+                                       join approval in approves
+                                       on request.RequestId equals approval.RequestId
+                                       where approval.PrimaryStatusId == 3
+                                       select new
+                                       {
+                                           request.TravelModeId
+                                       };
+
+                // Count how many times each mode id was used in a single month
+                var modeCounts = approvedRequests.GroupBy(r => r.TravelModeId)
+                                                  .Select(g => new
+                                                  {
+                                                      ModeId = g.Key,
+                                                      Count = g.Count()
+                                                  });
+
+                // Get ModeName from TBL_TRAVEL_MODE using mode id in TBL_REQUEST
+                var modeDetails = from modeCount in modeCounts
+                                  join mode in modes
+                                  on modeCount.ModeId equals mode.ModeId
+                                  select new
+                                  {
+                                      ModeName = mode.ModeName,
+                                      Count = modeCount.Count
+                                  };
+
+                // Create Excel package
+                using (var package = new ExcelPackage())
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Monthly Mode Report");
+
+                    // Add headers
+                    worksheet.Cells[1, 1].Value = "Month";
+                    worksheet.Cells[1, 2].Value = monthName;
+                    worksheet.Cells[2, 1].Value = "Mode Name";
+                    worksheet.Cells[2, 2].Value = "Count";
 
 
+                    // Populate data
+                    int row = 3;
+                    foreach (var item in modeDetails)
+                    {
+                        worksheet.Cells[row, 1].Value = item.ModeName;
+                        worksheet.Cells[row, 2].Value = item.Count;
+                        row++;
+                    }
 
+                    // Convert to byte array
+                    return package.GetAsByteArray();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"An error while generating report: {ex.Message}");
+                return null;
+            }
+        }
+        /// <summary>
+        /// Generates an Excel report summarizing the count of travel modes used in requests associated with a specified project.
+        /// </summary>
+        /// <param name="projectId">The ID of the project for which the report is generated.</param>
+        /// <returns>A byte array representing the Excel file containing the mode count report.</returns>
+        /// <remarks>
+        /// This method loads data from the database into memory using asynchronous operations,
+        /// filters requests based on the provided project ID, retrieves the project name,
+        /// performs LINQ queries to calculate the count of each travel mode used in the project,
+        /// and generates an Excel report with the mode names and their respective counts.
+        /// </remarks>
+        public async Task<byte[]> GenerateModeCountFromProjectIdExcelReport(int projectId)
+        {
+            // Load tables into memory
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> modes = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+
+                // Filter requests based on projectId
+                var filteredRequests = requests.Where(r => r.ProjectId == projectId);
+
+                // To get the project name 
+                var projectName = (from request in filteredRequests
+                                   join project in projects
+                                   on request.ProjectId equals project.ProjectId
+                                   select project.ProjectName).FirstOrDefault();
+
+                // Join with approved requests in TBL_REQ_APPROVE
+                var approvedRequests = from request in filteredRequests
+                                       join approval in approves
+                                       on request.RequestId equals approval.RequestId
+                                       where approval.PrimaryStatusId == 3
+                                       select new
+                                       {
+                                           request.TravelModeId
+                                       };
+
+                // Count how many times each mode id was used in a single project
+                var modeCounts = approvedRequests.GroupBy(r => r.TravelModeId)
+                                                  .Select(g => new
+                                                  {
+                                                      ModeId = g.Key,
+                                                      Count = g.Count()
+                                                  });
+
+                // Get ModeName from TBL_TRAVEL_MODE using mode id in TBL_REQUEST
+                var modeDetails = from modeCount in modeCounts
+                                  join mode in modes
+                                  on modeCount.ModeId equals mode.ModeId
+                                  select new
+                                  {
+                                      ModeName = mode.ModeName,
+                                      Count = modeCount.Count
+                                  };
+
+                // Create Excel package
+                using (var package = new ExcelPackage())
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Project based Travel Mode Report");
+
+                    // Add headers
+                    worksheet.Cells[1, 1].Value = "Project Name";
+                    worksheet.Cells[1, 2].Value = projectName;
+                    worksheet.Cells[2, 1].Value = "Mode Name";
+                    worksheet.Cells[2, 2].Value = "Count";
+
+                    // Populate data
+                    int row = 3;
+                    foreach (var item in modeDetails)
+                    {
+                        worksheet.Cells[row, 1].Value = item.ModeName;
+                        worksheet.Cells[row, 2].Value = item.Count;
+                        row++;
+                    }
+
+                    // Convert to byte array
+                    return package.GetAsByteArray();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"An error while generating report: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the count of approved requests grouped by month based on their departure dates.
+        /// </summary>
+        /// <returns>A dictionary where keys represent the month names and values represent the count of approved requests in each month.</returns>
+        /// <remarks>
+        /// This method loads data from the database into memory using asynchronous operations,
+        /// retrieves approved requests from the repository and joins them with request statuses,
+        /// groups the requests by month based on their departure dates,
+        /// fills in missing months with zero counts,
+        /// and returns a dictionary containing the count of approved requests for each month.
+        /// </remarks>
+        public async Task<Dictionary<string, int>> GetRequestsByMonth()
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+
+                var approvedRequests = from req in requests
+                                       join app in approves
+                                       on req.RequestId equals app.RequestId
+                                       where app.PrimaryStatusId == 3
+                                       select req;
+
+                var requestsByMonth = approvedRequests
+                    .GroupBy(r => r.DepartureDate.ToString("MMMM"))// using DepartureDate to filter requests to corresponding months
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var allMonths = Enumerable.Range(1, 12)
+                    .Select(i => new DateTime(2000, i, 1).ToString("MMMM"))// to generate all months
+                    .ToArray();
+
+                foreach (var month in allMonths)
+                {
+                    if (!requestsByMonth.ContainsKey(month))
+                    {
+                        requestsByMonth.Add(month, 0);
+                    }
+                }
+
+                return requestsByMonth;
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"An error while generating report: {ex.Message}");
+                return null;
+            }
+
+
+        }
     }
 }
+       
+       
+
