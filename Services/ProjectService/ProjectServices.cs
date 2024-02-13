@@ -81,5 +81,24 @@ namespace XtramileBackend.Services.ProjectService
                 throw; // Re-throw the exception to propagate it
             }
         }
+
+        //Get Project Code By Project ID
+        public async Task<string> GetProjectCodeByProjectIdAsync(int projectId)
+        {
+            try
+            {
+                TBL_PROJECT projectData = await _unitOfWork.ProjectRepository.GetByIdAsync(projectId);
+                return projectData.ProjectCode;
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting project codes: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+      
     }
 }

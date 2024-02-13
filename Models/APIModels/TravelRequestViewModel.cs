@@ -1,8 +1,26 @@
-﻿namespace XtramileBackend.Models.APIModels
+﻿using System.Globalization;
+
+namespace XtramileBackend.Models.APIModels
 {
 
     public class TravelRequestViewModel
     {
+
+        //Additional Fields For Returns
+        public string? RequestCode { get; set; }
+
+        public string? ProjectCode {  get; set; }  
+
+        public string? EmployeeName { get; set; }
+
+        public string? PrimaryStatus { get; set; }
+
+        public string? PassportFileUrl { get; set; }
+
+        public string? TravelAuthMailFileUrl { get; set; }
+
+
+
         public string CreatedBy { get; set; }
 
         public string ProjectId { get; set; }

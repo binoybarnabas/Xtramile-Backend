@@ -3,8 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.AvailableOptionService;
+using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.RequestService;
 
 namespace XtramileBackend.Controllers.AvailableOptionControllers
 {
@@ -17,9 +21,20 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
     {
         private readonly IAvailableOptionServices _availableOptionServices;
 
-        public AvailableOptionController(IAvailableOptionServices availableOptionServices)
+        private readonly IFileTypeServices _fileTypeServices;
+
+        private readonly IFileMetaDataService _fileMetaDataServices;
+
+        private readonly IRequestServices _requestServices;
+
+
+        public AvailableOptionController(IRequestServices requestServices, IAvailableOptionServices availableOptionServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices)
         {
             _availableOptionServices = availableOptionServices;
+            _fileTypeServices = fileTypeServices;
+            _fileMetaDataServices = fileMetaDataServices;
+            _requestServices = requestServices;
+
         }
 
         [HttpGet("traveloptions")]
@@ -51,5 +66,112 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an available option: {ex.Message}");
             }
         }
+
+
+        //Add New Travel Option - Files Not Received from front end
+        [HttpPost("addoption")]
+        public async Task<IActionResult> AddTravelOptionAsync([FromForm] TravelOptionViewModel travelOption)
+        {
+           /* Console.WriteLine("FormDatas" + travelOption.RequestId);
+            Console.WriteLine("FormDatas" + travelOption.GetType);
+            Console.WriteLine("FormDatas" + travelOption.OptionFile.Name);*/
+            try
+            {
+                //Handling text data of travel request
+                var tblTravelOption = new TBL_TRAVEL_OPTION
+                {
+                    RequestId = int.Parse( travelOption.RequestId),
+                    Description = travelOption.Description,
+                };
+
+/*                await _availableOptionServices.AddNewTravelOptionAsync(tblTravelOption);
+*/                Console.WriteLine(HttpContext.Request.Form.Files.Count);
+
+                int optionId = await _availableOptionServices.AddNewTravelOptionAsync(tblTravelOption);
+                // Now you can access the optionId
+
+                // Check if files are attached and handle them
+                if (HttpContext.Request.Form.Files != null && HttpContext.Request.Form.Files.Count > 0)
+                {
+                    foreach (var file in HttpContext.Request.Form.Files)
+                    {
+                        string randomCode = _requestServices.GenerateRandomCode(int.Parse(travelOption.RequestId));
+
+                        // Renaming the file using REQCODE
+                        var fileName = $"{randomCode}{file.FileName}";
+
+                        // Define the target folder
+                        var targetFolder = "Uploads/RequestFiles/TravelOptions";
+
+                        var filePath = Path.Combine(targetFolder, fileName);
+
+                        using (var stream = System.IO.File.Create(filePath))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // Get Extension of received file
+                        string fileExtension = Path.GetExtension(filePath);
+
+                        // Get file type id based on the file extension of received file
+                        int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
+
+                        // To save the file meta data in TBL_FILE_METADATA
+                        var fileMetaData = new TBL_FILE_METADATA
+                        {
+                            RequestId = int.Parse(travelOption.RequestId),
+                            FileName = fileName,
+                            FilePath = filePath,
+                            Description = file.Name, // Assuming file.Name is appropriate for description
+                            FileTypeId = fileTypeId,
+                            CreatedOn = DateTime.Now,
+                            CreatedBy = 1,
+                        };
+
+                        // Adding files meta data
+                        await _fileMetaDataServices.AddFileMetaDataAsync(fileMetaData);
+
+                        int fileId = await _fileMetaDataServices.GetFileIdByFileNameAsync(fileName);
+
+                        await _availableOptionServices.UpdateFileIdOfOptionAsync(fileId, optionId);
+
+                    }
+
+                }
+
+                return Ok("Option Added successfully:-");
+            }
+            catch (Exception ex)
+            {
+                // Log and handle any exceptions
+                Console.WriteLine($"Error processing request: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+
+
+
+
+
+        //Get Travel Options By Req ID
+        [HttpGet("get_travel_options_by_request_id/{reqId}")]
+        public async Task<IActionResult> GetTravelOptionsByReqIdAsync(int reqId)
+        {
+            try
+            {
+                IEnumerable<TBL_TRAVEL_OPTION> travelOptionsData = await _availableOptionServices.GetTravelOptionsByRequestIdAsync(reqId);
+                return Ok(travelOptionsData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting available options: {ex.Message}");
+            }
+        }
+
+
+
+
     }
 }

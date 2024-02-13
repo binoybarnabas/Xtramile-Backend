@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.StatusService;
+using XtramileBackend.Services.TravelModeService;
 
 namespace XtramileBackend.Controllers.RequestControllers
 {
@@ -27,15 +30,31 @@ namespace XtramileBackend.Controllers.RequestControllers
 
         private readonly IFileMetaDataService _fileMetaDataServices;
 
+        private readonly IEmployeeServices _employeeService;
+
+
+        private readonly IProjectServices _projectServices;
+
+        private readonly ITravelModeService _travelModeService;
+
+
         public RequestController(IRequestServices requestServices, IRequestStatusServices requestStatusServices,
 
-            IStatusServices statusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices)
+            IStatusServices statusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices,
+            
+            IEmployeeServices employeeServices, IProjectServices projectServices, ITravelModeService travelModeService
+
+            
+            )
         {
             _requestServices = requestServices;
             _requestStatusServices = requestStatusServices;
             _statusServices = statusServices;
             _fileTypeServices = fileTypeServices;
             _fileMetaDataServices = fileMetaDataServices;
+            _employeeService = employeeServices;
+            _projectServices = projectServices;
+            _travelModeService = travelModeService;
         }
 
         [HttpGet("requests")]
@@ -168,9 +187,9 @@ namespace XtramileBackend.Controllers.RequestControllers
                         // Mapping between form field names and target folders
                         var folderMapping = new Dictionary<string, string>
                                 {
-                                      { "idCardAttachment", "Uploads/ProfileFiles/IdCards" },
-                                      { "travelAuthorizationEmailCapture", "Uploads/RequestFiles/TravelAuthorizationEmails" },
-                                      { "passportAttachment", "Uploads/ProfileFiles/Passports" }
+                                      { "idCardAttachment", "Uploads\\ProfileFiles\\IdCards" },
+                                      { "travelAuthorizationEmailCapture", "Uploads\\RequestFiles\\TravelAuthorizationEmails" },
+                                      { "passportAttachment", "Uploads\\ProfileFiles\\Passports" }
 
                                 };
 
@@ -232,7 +251,74 @@ namespace XtramileBackend.Controllers.RequestControllers
 
 
 
+        //Get Request By Id
+        [HttpGet("getbyid/{reqId}")]
+        public async Task<IActionResult> GetRequestByIdAsync(int reqId)
+        {
+            try
+            {
 
+                
+
+                TBL_REQUEST request = await _requestServices.GetRequestById(reqId);
+
+
+                //Get Employee Name
+                EmployeeInfo EmployeeData = await _employeeService.GetEmployeeInfo(request.CreatedBy);
+
+                //Get Project Code
+                string ProjectCode = await _projectServices.GetProjectCodeByProjectIdAsync(request.ProjectId);
+
+                //Get Status
+                string Status = await _statusServices.GetPrimaryStatusByRequestIdAsync(request.RequestId);
+
+                //Get Mode
+                string TravelMode = await _travelModeService.GetTravelModeByIdAsync(request.TravelTypeId);
+
+
+                //Get Files
+                // Fetch file paths from tbl_file_metadata
+                var PassportFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "passportAttachment");
+                var TravelAuthMailFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "travelAuthorizationEmailCapture");
+
+               // Construct file URLs
+                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{PassportFilePath}" : "file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
+
+
+/*                // Construct file URLs
+                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\Uploads\\RequestFiles\\TravelAuthorizationEmails\\REQ36015why2.png" : "file_not_found";
+*//*                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
+*/
+
+                var travelrequestViewData = new TravelRequestViewModel
+                {
+                    EmployeeName = EmployeeData.FirstName,
+                    ProjectCode = ProjectCode,
+                    SourceCity = request.SourceCity,
+                    SourceCountry = request.SourceCountry,
+                    DestinationCity = request.DestinationCity,
+                    DestinationCountry = request.DestinationCountry,
+                    DepartureDate = string.Concat(request.DepartureDate),
+                    ReturnDate = string.Concat(request.ReturnDate),
+                    RequestCode = request.RequestCode,
+                    TravelModeId = TravelMode,
+                    PrimaryStatus = Status,
+                    PassportFileUrl = passportFileUrl,
+                   // TravelAuthMailFileUrl = travelAuthMailFileUrl
+
+                };
+
+               
+                return Ok(travelrequestViewData);
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting request: {ex.Message}");
+            }
+        }
 
 
 

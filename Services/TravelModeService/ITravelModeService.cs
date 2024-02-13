@@ -7,5 +7,8 @@ namespace XtramileBackend.Services.TravelModeService
         public Task<IEnumerable<TBL_TRAVEL_MODE>> GetTravelModeAsync();
 
         public Task SetTravelModeAsync(TBL_TRAVEL_MODE travelMode);
+
+        public Task<string> GetTravelModeByIdAsync(int id);
+
     }
 }

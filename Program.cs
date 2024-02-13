@@ -52,6 +52,7 @@ using XtramileBackend.Services.ManagerService;
 using XtramileBackend.Repositories.RequestMappingRepository;
 using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Repositories.TravelOptionRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -142,6 +143,7 @@ builder.Services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
 builder.Services.AddScoped<IProjectMappingRepository, ProjectMappingRepository>();
 builder.Services.AddScoped<IRequestMappingRepsitory,RequestMappingRepository>();
 builder.Services.AddScoped<IFileMetaDataRepository, FileMetaDataRepository>();
+builder.Services.AddScoped<ITravelOptionRepository, TravelOptionRepository>();
 
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();
@@ -168,6 +170,7 @@ builder.Services.AddScoped<IFinanceDepartmentService, FinanceDepartmentService>(
 builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 builder.Services.AddScoped<IReportingManagerService, ReportingManagerService>();
 builder.Services.AddScoped<IFileMetaDataService, FileMetaDataService>();
+//builder.Services.AddScoped<ITravelOptionService, TravelOptionService>();
 
 builder.Services.AddCors(options =>
 {

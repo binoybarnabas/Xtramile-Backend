@@ -1,4 +1,5 @@
-﻿using XtramileBackend.Models.EntityModels;
+﻿using Microsoft.AspNetCore.Http;
+using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Services.StatusService
@@ -81,6 +82,28 @@ namespace XtramileBackend.Services.StatusService
             //EOF
         }
 
+        public async Task<string> GetPrimaryStatusByRequestIdAsync(int reqId)
+        {
+            try
+            {
+
+                IEnumerable<TBL_REQ_APPROVE> statusMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+
+                var statusId = (from item in statusMappingData
+                                where item.RequestId == reqId
+                                select item.PrimaryStatusId).LastOrDefault();
+
+                TBL_STATUS statusData = await _unitOfWork.StatusRepository.GetByIdAsync(statusId);
+
+                return statusData.StatusName;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting status name: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+
+            }
+        }
 
 
 
