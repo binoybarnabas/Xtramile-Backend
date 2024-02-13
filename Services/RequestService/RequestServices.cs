@@ -46,6 +46,8 @@ namespace XtramileBackend.Services.RequestService
                 await _unitOfWork.RequestRepository.AddAsync(request);
 
                 int empId = request.CreatedBy;
+
+                string requestCode = request.RequestCode;
                 
                 Mail mailInfo = new Mail();
 
@@ -56,6 +58,8 @@ namespace XtramileBackend.Services.RequestService
                     mailInfo.recipientName = employeeData.FirstName + " " + employeeData.LastName;
                     mailInfo.recipientEmail = employeeData.Email;
                 }
+
+                mailInfo.requestCode = requestCode;
 
                 mailInfo.mailContext = "submit";
                 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.FinanceDepartment;
@@ -7,6 +8,7 @@ namespace XtramileBackend.Controllers.FinanceDepartmentControllers
 {
     [Route("api/financedepartment")]
     [ApiController]
+    [Authorize("Manager")]
     public class FinanceDepartmentController : ControllerBase
     {
         private readonly IFinanceDepartmentService _financeDepartmentService;

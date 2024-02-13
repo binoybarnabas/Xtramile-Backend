@@ -30,6 +30,9 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId);
 
+        public Task<TBL_USER> updatePassword(string email, string newPassword);
+
+
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
 
     }

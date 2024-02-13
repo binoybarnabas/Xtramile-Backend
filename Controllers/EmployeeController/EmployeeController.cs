@@ -14,6 +14,7 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
+    [Authorize(Roles="Employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -216,6 +217,31 @@ namespace XtramileBackend.Controllers.EmployeeController
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error while getting currently travelling request: {ex.Message}");
             }
+        }
+
+        [HttpPatch("update/password")]
+        public async Task<IActionResult> updatePassword([FromBody] UpdatePassword updatePassword)
+        {
+            try
+            {
+                var user = await _employeeService.updatePassword(updatePassword.Email, updatePassword.Password);
+
+                if (user != null)
+                {
+                    // Password updated successfully
+                    return Ok("Password updated successfully.");
+                }
+                else
+                {
+                    // User not found with the given email
+                    return NotFound("User not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while updating password: {ex.Message}");
+            }
+
         }
 
         [HttpGet("request/notification")]

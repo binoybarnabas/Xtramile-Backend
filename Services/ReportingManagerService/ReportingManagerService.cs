@@ -41,7 +41,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -51,8 +50,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                  join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
@@ -93,15 +91,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
 
@@ -148,15 +148,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby request.RequestId
@@ -203,15 +205,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby employee.FirstName, employee.LastName
@@ -257,15 +261,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                   orderby request.CreatedOn
@@ -315,7 +321,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -325,8 +330,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                     from employee in employeeData
                     join request in requestData on employee.EmpId equals request.CreatedBy
-                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
@@ -377,7 +381,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -387,8 +390,7 @@ namespace XtramileBackend.Services.ManagerService
                 var EmpRequest = (
                     from employee in employeeData
                     join request in requestData on employee.EmpId equals request.CreatedBy
-                    join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                    join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                    join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
@@ -441,15 +443,17 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalData
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData
                   join request in requestData on employee.EmpId equals request.CreatedBy
-                  join projectMapping in projectMappingData on employee.EmpId equals projectMapping.EmpId
-                  join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                  join statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                  join project in projectData on request.ProjectId equals project.ProjectId
+                  join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
                    && (employee.FirstName + " " + employee.LastName).Contains(employeeName)
@@ -499,24 +503,26 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_REQ_MAPPING> reqMappings = await _unitOfWork.RequestMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorities = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var latestStatusApprovals = reqApprovals
+    .GroupBy(approval => approval.RequestId)
+    .Select(group => group.OrderByDescending(approval => approval.date).First());
+
                 // LINQ query to retrieve ongoing travel request details
                 var result = (
                     from request in travelRequests
                     join mapping in reqMappings on request.RequestId equals mapping.RequestId
                     join employee in employees on mapping.EmpId equals employee.EmpId
-                    join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-                    join project in projects on projectMapping.ProjectId equals project.ProjectId
+                    join project in projects on request.ProjectId equals project.ProjectId
                     join department in departments on project.DepartmentId equals department.DepartmentId
                     join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                     join priority in priorities on request.PriorityId equals priority.PriorityId
-                    join reqApproval in reqApprovals on request.RequestId equals reqApproval.RequestId
+                    join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where employee.ReportsTo == managerId
@@ -578,7 +584,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
@@ -588,8 +593,7 @@ namespace XtramileBackend.Services.ManagerService
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
                                              join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
-/*                                             join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-*/                                             join project in projects on travelRequest.ProjectId equals project.ProjectId
+                                             join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
                                              join travelMode in travelModeData on travelRequest.TravelModeId equals travelMode.ModeId
@@ -696,7 +700,7 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.RequestRepository.Update(existingRequest);
 
                 _unitOfWork.Complete();
-                
+
                 //Data for sending email notification when request approved by manager
                 Mail mailInfo = new Mail();
 
