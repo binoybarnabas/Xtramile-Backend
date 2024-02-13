@@ -29,66 +29,86 @@ namespace XtramileBackend.Utils
                 mail.Subject = "Travel Request Status";
                 string salutation, body, emailContent;
 
-                switch (mailInfo.mailContext) {
+                switch (mailInfo.mailContext)
+                {
 
                     case "submit":
 
                         // Salutation
-                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request with code {mailInfo.requestCode} has been submitted.\n" +
+                        body = $"Your request with code <b>{mailInfo.requestCode}</b> has been submitted.\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
                         emailContent = salutation + "\n\n" + body;
                         mail.Body = emailContent;
+                        mail.IsBodyHtml = true;
                         break;
+
                     case "approve":
 
                         // Salutation
-                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request with code {mailInfo.requestCode}  has been Approved by {mailInfo.managerName}\n" +
+                        body = $"The request with code <b>{mailInfo.requestCode}</b> has been Approved by {mailInfo.managerName}\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
                         emailContent = salutation + "\n\n" + body;
                         mail.Body = emailContent;
+                        mail.IsBodyHtml = true;
                         break;
 
                     case "reject":
 
                         // Salutation
-                        salutation = $"Dear {mailInfo.recipientName},"; // Replace "John" with the recipient's name
+                        salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
 
                         // Body of the email
-                        body = $"Your request with code {mailInfo.requestCode} has been Rejected by {mailInfo.managerName}\n" + 
+                        body = $"The request with code <b>{mailInfo.requestCode}</b> has been Rejected by {mailInfo.managerName}\n" +
                                 $"The reason for your rejection is {mailInfo.reasonForRejection} \n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
                         emailContent = salutation + "\n\n" + body;
                         mail.Body = emailContent;
+                        mail.IsBodyHtml = true;
                         break;
 
                     case "options":
 
                         // Salutation
-                        salutation = $"Dear {mailInfo.recipientName},";
+                        salutation = $"Dear {mailInfo.recipientName},\n";
 
                         // Body of the email
-                        body = $"Your request with {mailInfo.requestCode} has been Approved by travel admin {mailInfo.managerName}\n" +
+                        body = $"Your request with code <b>{mailInfo.requestCode}</b> has been Approved by travel admin {mailInfo.managerName}\n" +
                                 "Pick the tickets for the trip based on your interest.\n" +
                                       "Thank you \n\n";
 
                         // Concatenate the salutation and body
                         emailContent = salutation + "\n\n" + body;
                         mail.Body = emailContent;
+                        mail.IsBodyHtml = true;
                         break;
 
+                    case "sendToHigherPersonnelOnSubmit":
 
+                        // Salutation
+                        salutation = $"Dear {mailInfo.recipientName},\n";
+
+                        // Body of the email
+                        body = $"A request with code <b>{mailInfo.requestCode}</b> has been submitted by {mailInfo.requestSubmittedBy}\n" +
+                                "Please verify the details and do the needful.\n" +
+                                      "Thank you \n\n";
+
+                        // Concatenate the salutation and body
+                        emailContent = salutation + "\n\n" + body;
+                        mail.Body = emailContent;
+                        mail.IsBodyHtml = true;
+                        break;
                 }
 
                 // SMTP client configuration
@@ -111,6 +131,6 @@ namespace XtramileBackend.Utils
             }
         }
 
-        
+
     }
 }
