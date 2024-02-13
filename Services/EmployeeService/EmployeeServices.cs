@@ -284,17 +284,19 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> employeeProjectMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
 
+                var latestStatusApprovals = statusApprovalMap
+.GroupBy(approval => approval.RequestId)
+.Select(group => group.OrderByDescending(approval => approval.date).First());
+
                 var results = (from request in requestData
-                               join statusApproval in statusApprovalMap on request.RequestId equals statusApproval.RequestId
+                               join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                                join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
-                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
-                               join employeeProject in employeeProjectMap on statusApproval.EmpId equals employeeProject.EmpId
-                               join project in projectData on employeeProject.ProjectId equals project.ProjectId join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
-                               where secondarystatus.StatusCode == "PE" && statusApproval.EmpId == empId
+                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId 
+                               join project in projectData on request.ProjectId equals project.ProjectId join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
+                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" ||  primarystatus.StatusCode != "DD" ||  primarystatus.StatusCode != "CD" || primarystatus.StatusCode!= "CL")
                                select new PendingRequetsViewEmployee
                                {
                                    requestId = request.RequestId,
@@ -307,10 +309,8 @@ namespace XtramileBackend.Services.EmployeeService
                                    destinationCountry = request.DestinationCountry,
                                    departureDate = request.DepartureDate,
                                    returnDate = request.ReturnDate,
-                                   travelMode = travelMode.ModeName
-
-                                   
-
+                                   travelMode = travelMode.ModeName,
+                                   statusName = primarystatus.StatusName,
 
 /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
 *//*                                   dateOfTravel = request.DepartureDate
