@@ -123,7 +123,7 @@ namespace XtramileBackend.Utils
                     try
                     {
                         // Send the email
-                        smtpClient.SendMailAsync(mail);
+                        smtpClient.Send(mail);
                         Console.WriteLine("Email sent successfully!");
                     }
                     catch (Exception ex)
