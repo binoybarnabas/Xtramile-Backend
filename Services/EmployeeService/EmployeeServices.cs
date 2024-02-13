@@ -304,7 +304,8 @@ namespace XtramileBackend.Services.EmployeeService
                                join project in projectData on request.ProjectId equals project.ProjectId
                                join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" || primarystatus.StatusCode != "DD" || primarystatus.StatusCode != "CD" || primarystatus.StatusCode != "CL")
+/*                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" || primarystatus.StatusCode != "DD" || primarystatus.StatusCode != "CD" || primarystatus.StatusCode != "CL")
+*/                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" && primarystatus.StatusCode != "DD" && primarystatus.StatusCode != "CD" && primarystatus.StatusCode != "CL")
                                select new PendingRequetsViewEmployee
                                {
                                    requestId = request.RequestId,
