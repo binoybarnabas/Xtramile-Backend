@@ -13,10 +13,8 @@ namespace XtramileBackend.Utils
         /// the employee.
         /// </summary>
         /// <param name="mailInfo"></param>
-        public static async Task SendMail(Mail mailInfo)
+        public static void SendMail(Mail mailInfo)
         {
-            await Task.Run(() =>
-            {
                 DotNetEnv.Env.Load();
                 //sender email and password
                 string senderEmail = DotNetEnv.Env.GetString("senderEmail");
@@ -131,7 +129,6 @@ namespace XtramileBackend.Utils
                         Console.WriteLine($"Failed to send email: {ex.Message}");
                     }
                 }
-            });
         }
 
     }

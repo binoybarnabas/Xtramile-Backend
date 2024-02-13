@@ -130,7 +130,7 @@ namespace XtramileBackend.Services.RequestService
                 // Send mails to all travel admins
                 foreach (var mail in travelAdminMails)
                 {
-                    await MailService.SendMail(mail);
+                    MailService.SendMail(mail);
                 }
 
 
