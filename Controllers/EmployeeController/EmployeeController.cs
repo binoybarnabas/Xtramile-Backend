@@ -64,7 +64,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting an employee: {ex.Message}");
             }
-
         }
 
         [HttpPost("add")]
