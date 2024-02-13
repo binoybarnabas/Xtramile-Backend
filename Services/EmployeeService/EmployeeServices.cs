@@ -745,5 +745,48 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
+
+        public async Task<bool> EmployeeCancelRequest(int requestId,int empId)
+        {
+            try
+            {
+                TBL_REQUEST existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+
+                if (existingRequestData != null)
+                {
+
+                    var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
+
+                    TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+
+                    approve.RequestId = requestId;
+
+                    approve.EmpId = empId;
+
+                    approve.PrimaryStatusId = primaryStatus.StatusId;
+
+                    approve.SecondaryStatusId = primaryStatus.StatusId;
+
+                    approve.date = DateTime.Now;
+
+                    await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+
+                    _unitOfWork.Complete();
+
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                // Logging and rethrowing the exception
+                Console.WriteLine($"An error occurred while updating the request {requestId}: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

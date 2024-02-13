@@ -16,8 +16,8 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
-/*    [Authorize(Roles="Employee")]
-*/    [ApiController]
+    [Authorize(Roles="Employee")]
+    [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
@@ -318,6 +318,23 @@ namespace XtramileBackend.Controllers.EmployeeController
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("request/cancel")]
+        public async Task<IActionResult> CancelRequest([FromBody]CancelRequest cancelRequest)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                bool requestData = await _employeeService.EmployeeCancelRequest(cancelRequest.requestId, cancelRequest.empId);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
             }
         }
 

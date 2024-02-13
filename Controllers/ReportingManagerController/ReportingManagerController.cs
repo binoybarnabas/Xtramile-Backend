@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 
         [EnableCors("AllowAngularDev")]
         [Route("api/reportingmanager")]
-        //[Authorize("Manager")]
+        [Authorize("Manager")]
         [ApiController]
         public class ReportingManagerController : ControllerBase
         {
