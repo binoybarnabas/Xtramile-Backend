@@ -16,5 +16,9 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<IEnumerable<RequestTableViewTravelAdmin>> GetEmployeeRequestsByDateAsync(string date);
 
         public  Task<IEnumerable<RequestTableViewTravelAdmin>> GetEmployeeRequestsByEmployeeNameAsync(string employeeName);
+        public Task<byte[]> GenerateModeCountFromMonthReport(string monthName);
+        public Task<byte[]> GenerateModeCountFromProjectIdExcelReport(int projectId);
+        public Task<Dictionary<string, int>> GetRequestsByMonth();
+       
     }
 }

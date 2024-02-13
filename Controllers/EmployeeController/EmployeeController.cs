@@ -16,8 +16,8 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
-    [Authorize(Roles="Employee")]
-    [ApiController]
+/*    [Authorize(Roles="Employee")]
+*/    [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
@@ -300,6 +300,25 @@ namespace XtramileBackend.Controllers.EmployeeController
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error while fetching employee notification: {ex.Message}");
+            }
+        }
+
+        //to get the compleled trips of a given empId
+        [HttpGet("completedtrips/{empId}")]
+        public async Task<IActionResult> GetCompletedTrips(int empId)
+        {
+            try
+            {
+                var completedTrips = await _employeeService.GetCompletedTrips(empId);
+                if (completedTrips == null)
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+                return Ok(completedTrips);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
 
