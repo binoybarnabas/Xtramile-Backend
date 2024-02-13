@@ -27,6 +27,22 @@ namespace XtramileBackend.Services.TravelModeService
             }
         }
 
+        public async Task<string> GetTravelModeByIdAsync(int id)
+        {
+            try
+            {
+                TBL_TRAVEL_MODE travelModeData = await _unitOfWork.TravelModeRepository.GetByIdAsync(id);
+                return travelModeData.ModeName;
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting travel Modes : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
         public async Task SetTravelModeAsync(TBL_TRAVEL_MODE travelMode)
         {
             try

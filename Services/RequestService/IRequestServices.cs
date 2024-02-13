@@ -1,4 +1,5 @@
-﻿using XtramileBackend.Models.EntityModels;
+﻿using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Services.RequestService
 {
@@ -13,6 +14,8 @@ namespace XtramileBackend.Services.RequestService
 
         public Task<int> GetRequestIdByRequestCode(string requestCode);
 
+
+        public Task<TBL_REQUEST> GetRequestById (int id);
 
     }
 }

@@ -10,6 +10,8 @@ namespace XtramileBackend.Services.StatusService
         public Task<int> GetStatusIdByCode(string statusCode);
         public Task<int> GetStatusIdByStatusCodeAsync(string statusCode);
 
+        public Task<string> GetPrimaryStatusByRequestIdAsync(int reqId);
+
     }
 }
 

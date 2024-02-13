@@ -55,6 +55,10 @@ namespace XtramileBackend.Data
        
         public DbSet<TBL_FILE_METADATA> TBL_FILE_METADATA { get; set; }
 
+        public DbSet<TBL_TRAVEL_OPTION> TBL_TRAVEL_OPTIONS { get; set; }
+
+        public DbSet<TBL_TRAVEL_OPTION_MAPPING> TBL_TRAVEL_OPTION_MAPPING { get; set; } 
+
 
         public DbSet<TBL_USER> TBL_USER { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

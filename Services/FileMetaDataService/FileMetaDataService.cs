@@ -28,8 +28,31 @@ namespace XtramileBackend.Services.FileMetaDataService
             }
         }
 
+        //implement 
+        public async Task<int> GetFileIdByFileNameAsync(string fileName)
+        {
+            try
+            {
+                IEnumerable<TBL_FILE_METADATA> fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
 
-        public async Task<IEnumerable<TBL_FILE_METADATA>> GetFileMetaDataAsync()
+                var fileId = (from item in fileMetaData
+                                 where item.FileName == fileName
+                                 select item.FileId).FirstOrDefault();
+
+                return fileId;
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting file id: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+
+            //EOF
+         }
+
+            public async Task<IEnumerable<TBL_FILE_METADATA>> GetFileMetaDataAsync()
         {
             try
             {
@@ -43,7 +66,28 @@ namespace XtramileBackend.Services.FileMetaDataService
                 throw; // Re-throw the exception to propagate it
             }
         }
-        
+
+        //Get File Path RequestId and description
+        public async Task<string> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
+        {
+            try
+            {
+                var fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+              
+                var filePath = (from item in fileMetaData
+                               where item.RequestId == requestId && item.Description == description
+                               select item.FilePath).FirstOrDefault();
+
+                return filePath;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
+                throw;
+            }
+        }
+
+
 
     }
 }

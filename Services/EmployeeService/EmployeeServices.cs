@@ -789,4 +789,25 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
     }
+
+
+        public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
+        {
+            try
+            {
+                await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
+        }
+
+
+
+
+
+    }
 }

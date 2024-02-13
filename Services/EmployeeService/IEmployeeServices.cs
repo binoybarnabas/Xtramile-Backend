@@ -40,5 +40,9 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<bool> EmployeeCancelRequest(int requestId,int empId);
 
+        public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
+
+
+
     }
 }

@@ -13,6 +13,9 @@ namespace XtramileBackend.Services.ProjectService
 
         public Task<List<ProjectCodesViewModel>> GetProjectCodesByEmployeeId(int empId);
 
+
+        public Task<string> GetProjectCodeByProjectIdAsync(int projectId);
+
     }
 }
 

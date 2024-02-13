@@ -20,6 +20,8 @@ using XtramileBackend.Repositories.ProjectMappingRepository;
 using XtramileBackend.Repositories.RequestStatusRepository;
 using XtramileBackend.Repositories.RequestMappingRepository;
 using XtramileBackend.Repositories.FileMetaDataRepository;
+using XtramileBackend.Repositories.TravelOptionRepository;
+using XtramileBackend.Repositories.TravelOptionMappingRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -46,6 +48,10 @@ namespace XtramileBackend.UnitOfWork
         public IRequestStatusRepository RequestStatusRepository { get; }
         public IRequestMappingRepsitory RequestMappingRepository { get; }
         public IFileMetaDataRepository FileMetaDataRepository { get; }
+
+        public ITravelOptionRepository TravelOptionRepository { get; }
+
+        public ITravelOptionMappingRepository TravelOptionMappingRepository { get; }
 
         public int Complete();
         Task SaveChangesAsyn();

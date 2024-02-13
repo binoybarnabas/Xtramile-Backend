@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using Azure.Core;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using System.Dynamic;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -178,8 +180,20 @@ namespace XtramileBackend.Services.RequestService
         }
 
 
-
-
-
+        public async Task<TBL_REQUEST> GetRequestById(int id)
+        {
+            try
+            {
+                TBL_REQUEST travelRequest = await _unitOfWork.RequestRepository.GetByIdAsync(id);
+                return travelRequest;
+             
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting travel request with id: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
     }
 }
