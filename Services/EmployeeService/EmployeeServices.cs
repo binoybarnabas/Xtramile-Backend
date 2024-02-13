@@ -696,7 +696,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="empId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<object>> GetCompletedTrips(int empId)
+        public async Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId)
         {
             try
             {
@@ -717,14 +717,14 @@ namespace XtramileBackend.Services.EmployeeService
                                      join sourceCountry in countryData on req.SourceCountry equals sourceCountry.CountryName
                                      join destCountry in countryData on req.DestinationCountry equals destCountry.CountryName into destCountryJoin
                                      from destCountry in destCountryJoin.DefaultIfEmpty()
-                                     select new
+                                     select new CompletedTripsCard
                                      {
                                          SourceCity = req.SourceCity,
                                          DestinationCity = req.DestinationCity ?? null,
                                          SourceCountryCode = sourceCountry.CountryCode,
                                          DestinationCountryCode = destCountry.CountryCode ?? null,
                                          DepartureDate = req.DepartureDate,
-                                         ReturnDate = req.ReturnDate ?? null,
+                                         ReturnDate = (DateTime)(req.ReturnDate ?? null),
                                          ModeName = mode.ModeName,
                                          ProjectCode = project.ProjectCode,
                                          TripPurpose = req.TripPurpose,
