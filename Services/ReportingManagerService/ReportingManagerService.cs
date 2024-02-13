@@ -911,5 +911,52 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
+        /// <summary>
+        /// To get all completed trips in the corresponding month
+        /// </summary>
+        /// <param name="empId"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, int>> GetRequestsByMonth(int empId)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var approvedRequests = from req in requests
+                                       join employee in employees on req.CreatedBy equals employee.EmpId
+                                       where employee.ReportsTo == empId
+                                       join app in approves on req.RequestId equals app.RequestId
+                                       where app.PrimaryStatusId == 3
+                                       select req;
+
+                var requestsByMonth = approvedRequests
+                    .GroupBy(r => r.DepartureDate.ToString("MMMM"))// using DepartureDate to filter requests to corresponding months
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var allMonths = Enumerable.Range(1, 12)
+                    .Select(i => new DateTime(2000, i, 1).ToString("MMMM"))// to generate all months
+                    .ToArray();
+
+                foreach (var month in allMonths)
+                {
+                    if (!requestsByMonth.ContainsKey(month))
+                    {
+                        requestsByMonth.Add(month, 0);
+                    }
+                }
+
+                return requestsByMonth;
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"An error while generating report: {ex.Message}");
+                return null;
+            }
+
+        }
     }
+
 }

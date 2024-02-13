@@ -42,5 +42,7 @@ namespace XtramileBackend.Services.ManagerService
         // notification for manager
         public Task<IEnumerable<RequestNotification>> getManagerRequestNotification(int empId);
 
+        // to get all completed trips in a month
+        public Task<Dictionary<string, int>> GetRequestsByMonth(int empId);
     }
 }

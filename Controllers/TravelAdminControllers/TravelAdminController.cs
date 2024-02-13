@@ -133,6 +133,23 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             }
         }
 
+        //api for appbar
+        // Get employee requests for a specific date based on managerId and date
+        [HttpGet("date")]
+        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery]string date)
+        {
+            var empRequests = await _travelAdminService.GetEmployeeRequestsByDateAsync(date);
+            return Ok(empRequests);
+        }
+
+        // Get employee requests sorted by employee name 
+        [HttpGet("search/employeename")]
+        public async Task<IActionResult> GetEmployeeRequestSortEmployeeNameAsync([FromQuery] string employeeName)
+        {
+            var empRequests = await _travelAdminService.GetEmployeeRequestsByEmployeeNameAsync(employeeName);
+            return Ok(empRequests);
+        }
+
         //to return generate an excel sheet based on the input projectId
         [HttpGet("generateprojectmodecount")]
 
@@ -162,24 +179,6 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
-        }
-
-
-        //api for appbar
-        // Get employee requests for a specific date based on managerId and date
-        [HttpGet("date")]
-        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery]string date)
-        {
-            var empRequests = await _travelAdminService.GetEmployeeRequestsByDateAsync(date);
-            return Ok(empRequests);
-        }
-
-        // Get employee requests sorted by employee name 
-        [HttpGet("search/employeename")]
-        public async Task<IActionResult> GetEmployeeRequestSortEmployeeNameAsync([FromQuery] string employeeName)
-        {
-            var empRequests = await _travelAdminService.GetEmployeeRequestsByEmployeeNameAsync(employeeName);
-            return Ok(empRequests);
         }
     }
 }

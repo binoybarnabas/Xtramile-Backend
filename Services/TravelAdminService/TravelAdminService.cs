@@ -523,11 +523,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                     }).ToList();
             return incomingRequests;
         }
-
-
-
-    }
-}
         /// <summary>
         /// Generates an Excel report summarizing the count of travel modes used in a specified month.
         /// </summary>
@@ -560,11 +555,11 @@ namespace XtramileBackend.Services.TravelAdminService
                                        where approval.PrimaryStatusId == 3
                                        select new
                                        {
-                                           request.ModeId
+                                           request.TravelModeId
                                        };
 
                 // Count how many times each mode id was used in a single month
-                var modeCounts = approvedRequests.GroupBy(r => r.ModeId)
+                var modeCounts = approvedRequests.GroupBy(r => r.TravelModeId)
                                                   .Select(g => new
                                                   {
                                                       ModeId = g.Key,
@@ -651,11 +646,11 @@ namespace XtramileBackend.Services.TravelAdminService
                                        where approval.PrimaryStatusId == 3
                                        select new
                                        {
-                                           request.ModeId
+                                           request.TravelModeId
                                        };
 
                 // Count how many times each mode id was used in a single project
-                var modeCounts = approvedRequests.GroupBy(r => r.ModeId)
+                var modeCounts = approvedRequests.GroupBy(r => r.TravelModeId)
                                                   .Select(g => new
                                                   {
                                                       ModeId = g.Key,
@@ -758,4 +753,6 @@ namespace XtramileBackend.Services.TravelAdminService
         }
     }
 }
+       
+       
 

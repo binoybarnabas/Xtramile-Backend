@@ -227,6 +227,19 @@ using Microsoft.AspNetCore.Authorization;
 
         }
 
+        [HttpGet("travel/completedtrips/{empId}")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetCompletedTripsMonthly(int empId)
+        {
+            try
+            {
+                var requestsByMonth = await _reportingManagerService.GetRequestsByMonth(empId);
+                return Ok(requestsByMonth);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 }
 

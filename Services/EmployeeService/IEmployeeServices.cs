@@ -36,6 +36,7 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId);
 
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
+        public Task<IEnumerable<object>> GetCompletedTrips(int empId);
 
     }
 }
