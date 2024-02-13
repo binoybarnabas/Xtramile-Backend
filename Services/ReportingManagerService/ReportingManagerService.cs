@@ -500,10 +500,8 @@ namespace XtramileBackend.Services.ManagerService
             {
                 // Fetching data from repositories
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_MAPPING> reqMappings = await _unitOfWork.RequestMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorities = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
@@ -516,18 +514,14 @@ namespace XtramileBackend.Services.ManagerService
                 // LINQ query to retrieve ongoing travel request details
                 var result = (
                     from request in travelRequests
-                    join mapping in reqMappings on request.RequestId equals mapping.RequestId
-                    join employee in employees on mapping.EmpId equals employee.EmpId
+                    join employee in employees on request.CreatedBy equals employee.EmpId
                     join project in projects on request.ProjectId equals project.ProjectId
-                    join department in departments on project.DepartmentId equals department.DepartmentId
                     join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                     join priority in priorities on request.PriorityId equals priority.PriorityId
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where employee.ReportsTo == managerId
-                        && request.PerdiemId != null
-                        && reqApproval.PrimaryStatusId == 5
                         && primaryStatus.StatusCode == "OG"
                         && secondaryStatus.StatusCode == "OG"
                     select new ManagerOngoingTravelRequest
@@ -543,16 +537,7 @@ namespace XtramileBackend.Services.ManagerService
                     }
                 );
 
-                // Checking if the result is not null and returning
-                if (result != null && result.Any())
-                {
                     return result.ToList();
-                }
-                else
-                {
-                    // Throwing exception if no employees are found or no matching requests
-                    throw new FileNotFoundException($"No employees found who report to Manager ID {managerId} with the specified criteria.");
-                }
             }
             catch (Exception ex)
             {
