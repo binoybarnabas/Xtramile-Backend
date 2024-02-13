@@ -1,4 +1,4 @@
-﻿        
+﻿
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 
@@ -20,7 +20,7 @@ namespace XtramileBackend.Services.EmployeeService
         public Task UpdateEmployeeDetailsAsync(int employeeId, ProfileEdit profileEdit);
 
         public Task<IEnumerable<OptionCard>> GetOptionsByReqId(int reqId);
-        
+
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId);
         public Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId);
 
@@ -32,6 +32,8 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<TBL_USER> updatePassword(string email, string newPassword);
 
+        public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
+        public Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId);
 
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
 

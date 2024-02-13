@@ -481,7 +481,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Employee requests Requests");
+                Console.WriteLine($"Error fetching the employee request {ex.Message}");
                 return new PagedEmployeeRequestDto();
             }
         }
@@ -702,7 +702,7 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.Complete();
 
                 //Data for sending email notification when request approved by manager
-                Mail mailInfo = new Mail();
+                Mail sendToEmployee = new Mail();
 
                 TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(existingRequest.CreatedBy);
                 TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(approve.EmpId);
@@ -710,15 +710,62 @@ namespace XtramileBackend.Services.ManagerService
 
                 if (employeeData != null)
                 {
-                    mailInfo.recipientName = employeeData.FirstName + " " + employeeData.LastName;
-                    mailInfo.recipientEmail = employeeData.Email;
-                    mailInfo.managerName = managerData.FirstName + " " + managerData.LastName;
+                    sendToEmployee.recipientName = employeeData.FirstName + " " + employeeData.LastName;
+                    sendToEmployee.recipientEmail = employeeData.Email;
+                    sendToEmployee.managerName = managerData.FirstName + " " + managerData.LastName;
                 }
 
-                mailInfo.mailContext = "approve";
+                sendToEmployee.requestCode = existingRequest.RequestCode;
+
+                sendToEmployee.mailContext = "approve";
 
                 //sending the mail
-                MailService.SendMail(mailInfo);
+                MailService.SendMail(sendToEmployee);
+
+                //List of mails for each travek admin
+                List<Mail> travelAdminMails = new List<Mail>();
+
+                // Retrieve data from repositories
+                IEnumerable<TBL_EMPLOYEE> travelAdminData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_ROLES> rolesData = await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+
+                // Query to get travel admin details
+                var travelAdminEmails = (from travelAdmin in travelAdminData
+                                         join projectMapping in projectMappingData on travelAdmin.EmpId equals projectMapping.EmpId
+                                         join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                                         join department in departmentData on project.DepartmentId equals department.DepartmentId
+                                         join role in rolesData on travelAdmin.RoleId equals role.RoleId
+                                         where department.DepartmentCode == "TA" && (travelAdmin.RoleId == 2 || travelAdmin.RoleId == 3)
+                                         select new { travelAdmin.FirstName, travelAdmin.LastName, travelAdmin.Email }).ToList();
+
+                // Iterate through each travel admin and create a separate mail for each
+                foreach (var travelAdminAndManager in travelAdminEmails)
+                {
+                    // Create a new mail instance for each travel admin
+                    Mail sendToTravelAdmin = new Mail();
+
+                    // Set recipient details
+                    sendToTravelAdmin.recipientName = travelAdminAndManager.FirstName + " " + travelAdminAndManager.LastName;
+                    sendToTravelAdmin.recipientEmail = travelAdminAndManager.Email;
+
+                    // Set other mail details
+                    sendToTravelAdmin.requestCode = existingRequest.RequestCode;
+                    sendToTravelAdmin.managerName = managerData.FirstName + " " + managerData.LastName;
+
+                    sendToTravelAdmin.mailContext = "approve";
+
+                    // Add the mail to the list
+                    travelAdminMails.Add(sendToTravelAdmin);
+                }
+
+                // Send mails to all travel admins
+                foreach (var mail in travelAdminMails)
+                {
+                    MailService.SendMail(mail);
+                }
 
                 return true;
             }
@@ -811,6 +858,7 @@ namespace XtramileBackend.Services.ManagerService
                 mailData.managerName = managerData.FirstName + " " + managerData.LastName;
                 mailData.recipientName = employeeData.FirstName + " " + employeeData.LastName;
                 mailData.recipientEmail = employeeData.Email;
+                mailData.requestCode = requestData.RequestCode;
                 mailData.reasonForRejection = reasonData.Description;
                 MailService.SendMail(mailData);
             }
@@ -858,7 +906,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occured while fetching employee notification");
+                Console.WriteLine($"An error occurred while fetching manager notification {ex.Message}");
                 throw;
             }
         }
