@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.TravelAdminService;
@@ -7,6 +8,7 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
 {
     [Route("api/traveladmin")]
     [ApiController]
+    [Authorize("Manager")]
     public class TravelAdminController : ControllerBase
     {
         private readonly ITravelAdminService _travelAdminService;

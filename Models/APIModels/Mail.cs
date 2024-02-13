@@ -7,6 +7,7 @@
         public string mailContext { get; set; }
         public string requestCode { get; set; }
         public string? managerName { get; set; }
+        public string? requestSubmittedBy { get; set; }
         public string? reasonForRejection {get; set;}
     }
 }

@@ -12,7 +12,6 @@ namespace XtramileBackend.Controllers.AuthController
  
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Employee")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
