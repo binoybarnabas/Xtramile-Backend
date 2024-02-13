@@ -558,29 +558,29 @@ namespace XtramileBackend.Services.EmployeeService
                     join employeeRole in employeeRoles on reqApproval.EmpId equals employeeRole.RoleId into er
                     from empRole in er.DefaultIfEmpty()
                     where request.CreatedBy == employeeId
-                    select (
-                        (primaryStatus.StatusCode == "OP" && secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
-                        (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Manager") ? "Manager Forwarded" :
-                        (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
-                        (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Approved" :
-                        (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
-                        (primaryStatus.StatusCode == "CD" && secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
-                        (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Manager") ? "Manager Denied" :
-                        (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Denied" :
-                        (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Denied" :
-                        "Unknown"
-                    )
+                    select new DashboardEmployeeprogress
+                    {
+                        RequestCode = request.RequestCode, // Add RequestId property
+                        Status = primaryStatus.StatusName, // Assuming StatusName is the property you want to include
+                        Progress = (
+                            (primaryStatus.StatusCode == "OP" && secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
+                            (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Manager") ? "Manager Forwarded" :
+                            (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
+                            (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Approved" :
+                            (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
+                            (primaryStatus.StatusCode == "CD" && secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
+                            (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Manager") ? "Manager Denied" :
+                            (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Denied" :
+                            (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Denied" :
+                            "Unknown"
+                        )
+                    }
                 ).FirstOrDefault();
 
                 // Checking if the result is not null and returning
-                if (!string.IsNullOrEmpty(result)) // Check if there is a result
+                if (result != null) // Check if there is a result
                 {
-                    var dashboardProgress = new DashboardEmployeeprogress
-                    {
-                        Progress = result
-                    };
-
-                    return dashboardProgress; // If there is a result, return the status
+                    return result; // If there is a result, return the status
                 }
                 else
                 {
