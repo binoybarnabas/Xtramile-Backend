@@ -9,13 +9,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Services.ManagerService;
+using Microsoft.AspNetCore.Authorization;
 
-    // Controller for handling reporting manager related actions
+// Controller for handling reporting manager related actions
     namespace XtramileBackend.Controllers.ReportingManagerController
     {
 
         [EnableCors("AllowAngularDev")]
         [Route("api/reportingmanager")]
+        [Authorize("Manager")]
         [ApiController]
         public class ReportingManagerController : ControllerBase
         {
@@ -208,6 +210,36 @@ using XtramileBackend.Services.ManagerService;
 
         }
 
+        [HttpGet("request/notification")]
+        public async Task<IActionResult> GetManagerRequestNotification(int empId)
+        {
+            try
+            {
+                // Call the service method to retrieve forwarded travel request details for employees reporting to the specified manager
+                var reqNotification = await _reportingManagerService.getManagerRequestNotification(empId);
+                return Ok(reqNotification);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting manager notification: {ex.Message}");
+            }
+
+        }
+
+        [HttpGet("travel/completedtrips/{empId}")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetCompletedTripsMonthly(int empId)
+        {
+            try
+            {
+                var requestsByMonth = await _reportingManagerService.GetRequestsByMonth(empId);
+                return Ok(requestsByMonth);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 }
 

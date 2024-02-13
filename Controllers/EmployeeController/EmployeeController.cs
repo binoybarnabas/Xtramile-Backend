@@ -8,21 +8,31 @@ using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.ProjectService;
 using Microsoft.AspNetCore.Cors;
+using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.FileMetaDataService;
 
 
 namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
+    [Authorize(Roles="Employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
 
-        public EmployeeController(IEmployeeServices employeeService)
+
+        private readonly IFileTypeServices _fileTypeServices;
+
+        private readonly IFileMetaDataService _fileMetaDataServices;
+
+        public EmployeeController(IEmployeeServices employeeService, IFileTypeServices fileTypeServices,
+            IFileMetaDataService fileMetaDataServices)
 
         {
             _employeeService = employeeService;
+            _fileTypeServices = fileTypeServices;
         }
 
         [HttpGet("employees")]
@@ -40,6 +50,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("info/{id}")]
         public async Task<IActionResult> GetEmployeeInfo(int id)
         {
@@ -53,7 +64,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting an employee: {ex.Message}");
             }
-
         }
 
         [HttpPost("add")]
@@ -209,14 +219,127 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                EmployeeCurrentRequest request=await _employeeService.getEmployeeCurrentTravel(empId);
-                return Ok(request); 
+                EmployeeCurrentRequest request = await _employeeService.getEmployeeCurrentTravel(empId);
+                return Ok(request);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error while getting currently travelling request: {ex.Message}");
             }
         }
+
+        [HttpPatch("update/password")]
+        public async Task<IActionResult> updatePassword([FromBody] UpdatePassword updatePassword)
+        {
+            try
+            {
+                var user = await _employeeService.updatePassword(updatePassword.Email, updatePassword.Password);
+
+                if (user != null)
+                {
+                    // Password updated successfully
+                    return Ok("Password updated successfully.");
+                }
+                else
+                {
+                    // User not found with the given email
+                    return NotFound("User not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while updating password: {ex.Message}");
+            }
+
+        }
+        [HttpGet("dashboard/upcoming/trip/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeDashboardUpcomingTrip(int employeeId)
+        {
+            try
+            {
+                // Call the service method to retrieve upcoming trip details for the specified employee
+                IEnumerable<DashboardUpcomingTrip> employeeDashboardUpcomingTripData = await _employeeService.GetEmployeeDashboardUpcomingTripByIdAsync(employeeId);
+
+                // Return a 200 OK response with the retrieved upcoming trip details
+                return Ok(employeeDashboardUpcomingTripData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting upcoming trip details: {ex.Message}");
+            }
+        }
+        [HttpGet("dashboard/employee/progress/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeDashboardProgress(int employeeId)
+        {
+            try
+            {
+                // Call the service method to retrieve progress details for the specified employee
+                DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+
+                // Return a 200 OK response with the retrieved progress details
+                return Ok(employeeDashboardProgress);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting progress details: {ex.Message}");
+            }
+        }
+
+        [HttpGet("request/notification")]
+
+        public async Task<IActionResult> getEmployeeRequestNotification(int empId)
+        {
+            try
+            {
+                var notification= await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
+                return Ok(notification);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error while fetching employee notification: {ex.Message}");
+            }
+        }
+
+        //to get the compleled trips of a given empId
+        [HttpGet("completedtrips/{empId}")]
+        public async Task<IActionResult> GetCompletedTrips(int empId)
+        {
+            try
+            {
+                var completedTrips = await _employeeService.GetCompletedTrips(empId);
+                if (completedTrips == null)
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+                return Ok(completedTrips);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("request/cancel")]
+        public async Task<IActionResult> CancelRequest([FromBody]CancelRequest cancelRequest)
+        {
+            try
+            {
+                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
+                bool requestData = await _employeeService.EmployeeCancelRequest(cancelRequest.requestId, cancelRequest.empId);
+                // Return a 200 OK response with the retrieved ongoing travel request details
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
+            }
+        }
+
+    }
+}
 
 
 

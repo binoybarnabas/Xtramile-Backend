@@ -82,6 +82,27 @@ namespace XtramileBackend.Services.ProjectService
             }
         }
 
+        /// <summary>
+        /// To return only project codes and corresponding project id
+        /// </summary>
+        /// <returns>List of objects containing project codes and corresponding project id </returns>
+        public async Task<IEnumerable<object>> GetProjectIdAndCode()
+        {
+            try
+            {
+                var projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                var projectCode = projectData.Select(p => new { ProjectId = p.ProjectId, ProjectCode = p.ProjectCode }).ToList();
+
+                return projectCode;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions appropriately, e.g., log them
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
         //Get Project Code By Project ID
         public async Task<string> GetProjectCodeByProjectIdAsync(int projectId)
         {

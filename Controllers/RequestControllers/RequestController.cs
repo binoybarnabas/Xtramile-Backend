@@ -95,6 +95,13 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 string RequestCode = "REQ" + randomCode;
 
+                DateTime? returnDate = null; // Declare returnDate as nullable DateTime
+
+                if (!string.IsNullOrEmpty(request.ReturnDate))
+                {
+                    returnDate = DateTime.Parse(request.ReturnDate); // Parse returnDate if it's not null or empty
+                }
+
 
                 //Handling text data of travel request
                 var tblRequest = new TBL_REQUEST
@@ -114,7 +121,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                     
                     DepartureDate = DateTime.Parse(request.DepartureDate),
                     
-                    ReturnDate = DateTime.Parse(request.ReturnDate),
+                    ReturnDate = returnDate,
                     
                     SourceCity = request.SourceCity,
                     

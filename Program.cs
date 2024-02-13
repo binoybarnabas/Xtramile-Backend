@@ -52,6 +52,7 @@ using XtramileBackend.Services.ManagerService;
 using XtramileBackend.Repositories.RequestMappingRepository;
 using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Services.FileMetaDataService;
+using OfficeOpenXml;
 using XtramileBackend.Repositories.TravelOptionRepository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,7 +73,7 @@ string CONNECTION_TIMEOUT = DotNetEnv.Env.GetString("CONNECTION_TIMEOUT");*/
 /*string connectionString = $"Server={DB_SERVER};Initial Catalog={DB_NAME};Persist Security Info={PERSIST_SECURITY_INFO};User ID={DB_USER_ID};Password={DB_PASSWORD};MultipleActiveResultSets={MULTIPLE_ACTIVE_RESULT_SETS};Encrypt={ENCRYPT};TrustServerCertificate={TRUST_SERVER_CERTIFICATE};Connection Timeout={CONNECTION_TIMEOUT};";
 */
 string connectionString = DotNetEnv.Env.GetString("DB_STRING");
-
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 var secretkey = DotNetEnv.Env.GetString("SECRET_KEY");
 var issuer = DotNetEnv.Env.GetString("ISSUER");
 
