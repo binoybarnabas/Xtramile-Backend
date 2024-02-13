@@ -41,6 +41,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("info/{id}")]
         public async Task<IActionResult> GetEmployeeInfo(int id)
         {
