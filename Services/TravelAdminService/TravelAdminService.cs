@@ -476,7 +476,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = travelType.TypeName,
-                                        PriorityName = priorityItem?.PriorityName ?? "High",// Using ?. to handle null in case of no priority
+                                        PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
             return incomingRequests;
@@ -518,7 +518,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = travelType.TypeName,
-                                        PriorityName = priorityItem?.PriorityName ?? "High",// Using ?. to handle null in case of no priority
+                                        PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
             return incomingRequests;
