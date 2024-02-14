@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -171,7 +172,11 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                     travelOptionsViewData.RequestId = travelOption.RequestId.ToString();
                     travelOptionsViewData.Description = travelOption.Description;
 
-                    var OptionFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "OptionFile");
+                    int? fileId = travelOption.FileId; // Assuming travelOption.FileId is int?
+                    //Get file path by fileID--bug
+                    var OptionFilePath = await _fileMetaDataServices.GetFilePathByFileIdAsync(fileId.Value);
+                   
+                   // travelOptionsViewData.OptionFileURL = HttpUtility.UrlEncode( OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found");
                     travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found";
 
                     travelOptionsViewDataList.Add(travelOptionsViewData);

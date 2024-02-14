@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Web;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
@@ -296,11 +297,13 @@ namespace XtramileBackend.Controllers.RequestControllers
                 var passportFileUrl = PassportFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
                 var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{TravelAuthMailFilePath}" : "file_not_found";
 
+                //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
+                //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
 
-/*                // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\Uploads\\RequestFiles\\TravelAuthorizationEmails\\REQ36015why2.png" : "file_not_found";
-*//*                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
-*/
+                /*                // Construct file URLs
+                                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\Uploads\\RequestFiles\\TravelAuthorizationEmails\\REQ36015why2.png" : "file_not_found";
+                *//*                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
+                */
 
                 var travelrequestViewData = new TravelRequestViewModel
                 {
@@ -315,6 +318,8 @@ namespace XtramileBackend.Controllers.RequestControllers
                     RequestCode = request.RequestCode,
                     TravelModeId = TravelMode,
                     PrimaryStatus = Status,
+                    //PassportFileUrl = HttpUtility.UrlEncode(passportFileUrl),
+                    //TravelAuthMailFileUrl = HttpUtility.UrlEncode(passportFileUrl)
                     PassportFileUrl = passportFileUrl,
                     TravelAuthMailFileUrl = travelAuthMailFileUrl
 
