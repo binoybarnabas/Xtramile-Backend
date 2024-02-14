@@ -294,8 +294,8 @@ namespace XtramileBackend.Controllers.RequestControllers
                 Console.WriteLine(reqId);*/
 
                // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
-                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{TravelAuthMailFilePath}" : "file_not_found";
+                var passportFileUrl = PassportFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{{{TravelAuthMailFilePath}" : "file_not_found";
 
                 //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
                 //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);

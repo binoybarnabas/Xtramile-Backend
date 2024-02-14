@@ -831,10 +831,18 @@ namespace XtramileBackend.Services.TravelAdminService
             try
             {
                 IEnumerable<TBL_TRAVEL_OPTION_MAPPING> selected = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
-                var option = selected.FirstOrDefault(options => options.RequestId == reqId).OptionId;
-                return option;
+                var option = selected.FirstOrDefault(options => options.RequestId == reqId);
+                if (option != null)
+                {
+                    return option.OptionId;
+                }
+                else
+                {
+                    // No option found for the given reqId
+                    return null;
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while getting selected option: {ex.Message}");
                 return null; // or throw the exception
