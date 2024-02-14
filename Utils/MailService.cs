@@ -84,7 +84,7 @@ namespace XtramileBackend.Utils
                             salutation = $"Dear {mailInfo.recipientName},\n";
 
                             // Body of the email
-                            body = $"Your request with code <b>{mailInfo.requestCode}</b> has been Approved by travel admin {mailInfo.managerName}\n" +
+                            body = $"Options for your request with code <b>{mailInfo.requestCode}</b> has been sent by travel admin {mailInfo.managerName}\n" +
                                     "Pick the tickets for the trip based on your interest.\n" +
                                           "Thank you \n\n";
 
@@ -109,7 +109,23 @@ namespace XtramileBackend.Utils
                             mail.Body = emailContent;
                             mail.IsBodyHtml = true;
                             break;
-                    }
+
+                        case "sendToTAOnOptionSelect":
+
+                           // Salutation
+                           salutation = $"Dear {mailInfo.recipientName},\n";
+
+                           // Body of the email
+                           body = $"An option has been selected for the request with code <b>{mailInfo.requestCode}</b> by {mailInfo.requestSubmittedBy}\n" +
+                                   "Please verify the option and do the needful.\n" +
+                                         "Thank you \n\n";
+
+                           // Concatenate the salutation and body
+                           emailContent = salutation + "\n\n" + body;
+                           mail.Body = emailContent;
+                           mail.IsBodyHtml = true;
+                        break;
+                }
 
                     // SMTP client configuration
                     SmtpClient smtpClient = new SmtpClient("smtp-mail.outlook.com");
