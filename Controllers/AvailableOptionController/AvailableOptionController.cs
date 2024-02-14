@@ -168,7 +168,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                 foreach (var travelOption in travelOptionsData)
                 {
                     var travelOptionsViewData = new TravelOptionViewModel();
-
+                    travelOptionsViewData.OptionId = travelOption.OptionId;
                     travelOptionsViewData.RequestId = travelOption.RequestId.ToString();
                     travelOptionsViewData.Description = travelOption.Description;
 

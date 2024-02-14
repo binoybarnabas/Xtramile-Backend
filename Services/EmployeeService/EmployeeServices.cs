@@ -802,6 +802,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <returns></returns>
         public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
         {
+            Console.WriteLine(travelOption);
             try
             {
                 await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
