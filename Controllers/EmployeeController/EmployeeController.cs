@@ -338,11 +338,6 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
-    }
-}
-
-
-
         //submit selected option-
 
         [HttpPost("submit_selected_travel_option")]
@@ -359,12 +354,5 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
-
-
-
-
-
-
-
     }
-}
+} 
