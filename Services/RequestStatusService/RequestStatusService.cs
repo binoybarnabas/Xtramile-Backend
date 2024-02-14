@@ -38,6 +38,11 @@ namespace XtramileBackend.Services.RequestStatusService
                 requestStatus.date = DateTime.Now;
                 await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
                 _unitOfWork.Complete();
+
+                if(requestStatus.PrimaryStatusId == 10 && requestStatus.SecondaryStatusId == 10)
+                {
+
+                }
             }
             catch (Exception ex)
             {

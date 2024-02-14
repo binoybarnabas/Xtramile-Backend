@@ -274,7 +274,7 @@ namespace XtramileBackend.Services.ManagerService
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                   where employee.ReportsTo == managerId && status.StatusCode == "OP"
-                  orderby request.CreatedOn
+                  orderby request.CreatedOn descending
 
                   select new EmployeeRequestDto
                   {

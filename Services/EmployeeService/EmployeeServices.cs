@@ -304,7 +304,7 @@ namespace XtramileBackend.Services.EmployeeService
                                join project in projectData on request.ProjectId equals project.ProjectId
                                join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" || primarystatus.StatusCode != "DD" || primarystatus.StatusCode != "CD" || primarystatus.StatusCode != "CL")
+                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" && primarystatus.StatusCode != "DD" && primarystatus.StatusCode != "CD" && primarystatus.StatusCode != "CL")
                                select new PendingRequetsViewEmployee
                                {
                                    requestId = request.RequestId,
@@ -365,7 +365,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
                               join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where request.CreatedBy == empId
-                               && (secondarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CL")
+                               && (primarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CD" || primarystatus.StatusCode == "DD")
                               select new EmployeeViewReq
                               {
                                   RequestId = request.RequestId,
@@ -788,8 +788,6 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
-    }
-
 
         public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
         {
@@ -804,10 +802,5 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
-
-
-
-
-
     }
 }
