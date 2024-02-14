@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Web;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.EmployeeService;
@@ -194,9 +195,9 @@ namespace XtramileBackend.Controllers.RequestControllers
                         // Mapping between form field names and target folders
                         var folderMapping = new Dictionary<string, string>
                                 {
-                                      { "idCardAttachment", "Uploads\\ProfileFiles\\IdCards" },
-                                      { "travelAuthorizationEmailCapture", "Uploads\\RequestFiles\\TravelAuthorizationEmails" },
-                                      { "passportAttachment", "Uploads\\ProfileFiles\\Passports" }
+                                      { "idCardAttachment", "Uploads/ProfileFiles/IdCards" },
+                                      { "travelAuthorizationEmailCapture", "Uploads/RequestFiles/TravelAuthorizationEmails" },
+                                      { "passportAttachment", "Uploads/ProfileFiles/Passports" }
 
                                 };
 
@@ -204,7 +205,8 @@ namespace XtramileBackend.Controllers.RequestControllers
                         // Determine the target folder based on the form field name
                         if (folderMapping.TryGetValue(keyName, out var targetFolder))
                         {
-                            var filePath = Path.Combine(targetFolder, fileName);
+                           // var filePath = Path.Combine(targetFolder, fileName);
+                            var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
 
                             using (var stream = System.IO.File.Create(filePath))
                             {
@@ -287,16 +289,21 @@ namespace XtramileBackend.Controllers.RequestControllers
                 // Fetch file paths from tbl_file_metadata
                 var PassportFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "passportAttachment");
                 var TravelAuthMailFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "travelAuthorizationEmailCapture");
+/*
+                Console.Write("Path"+PassportFilePath);
+                Console.WriteLine(reqId);*/
 
                // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{PassportFilePath}" : "file_not_found";
-                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
+                var passportFileUrl = PassportFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{TravelAuthMailFilePath}" : "file_not_found";
 
+                //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
+                //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
 
-/*                // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\Uploads\\RequestFiles\\TravelAuthorizationEmails\\REQ36015why2.png" : "file_not_found";
-*//*                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
-*/
+                /*                // Construct file URLs
+                                var passportFileUrl = PassportFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\Uploads\\RequestFiles\\TravelAuthorizationEmails\\REQ36015why2.png" : "file_not_found";
+                *//*                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:\\SPECIALIZATION\\XtraMile Project\\Back End V2\\Xtramile-Backend\\{TravelAuthMailFilePath}" : "file_not_found";
+                */
 
                 var travelrequestViewData = new TravelRequestViewModel
                 {
@@ -306,13 +313,15 @@ namespace XtramileBackend.Controllers.RequestControllers
                     SourceCountry = request.SourceCountry,
                     DestinationCity = request.DestinationCity,
                     DestinationCountry = request.DestinationCountry,
-                    DepartureDate = string.Concat(request.DepartureDate),
-                    ReturnDate = string.Concat(request.ReturnDate),
+                    DepartureDate = request.DepartureDate.ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                    ReturnDate = request.ReturnDate?.ToString("yyyy-MM-dd HH:mm:ss.fff"),
                     RequestCode = request.RequestCode,
                     TravelModeId = TravelMode,
                     PrimaryStatus = Status,
+                    //PassportFileUrl = HttpUtility.UrlEncode(passportFileUrl),
+                    //TravelAuthMailFileUrl = HttpUtility.UrlEncode(passportFileUrl)
                     PassportFileUrl = passportFileUrl,
-                   // TravelAuthMailFileUrl = travelAuthMailFileUrl
+                    TravelAuthMailFileUrl = travelAuthMailFileUrl
 
                 };
 

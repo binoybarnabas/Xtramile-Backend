@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -103,7 +104,8 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                         // Define the target folder
                         var targetFolder = "Uploads/RequestFiles/TravelOptions";
 
-                        var filePath = Path.Combine(targetFolder, fileName);
+/*                        var filePath = Path.Combine(targetFolder, fileName);
+*/                        var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
 
                         using (var stream = System.IO.File.Create(filePath))
                         {
@@ -151,9 +153,6 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
 
 
 
-
-
-
         //Get Travel Options By Req ID
         [HttpGet("get_travel_options_by_request_id/{reqId}")]
         public async Task<IActionResult> GetTravelOptionsByReqIdAsync(int reqId)
@@ -161,7 +160,29 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
             try
             {
                 IEnumerable<TBL_TRAVEL_OPTION> travelOptionsData = await _availableOptionServices.GetTravelOptionsByRequestIdAsync(reqId);
-                return Ok(travelOptionsData);
+
+                //var OptionFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "OptionFile");
+
+                var travelOptionsViewDataList = new List<TravelOptionViewModel>();
+
+                foreach (var travelOption in travelOptionsData)
+                {
+                    var travelOptionsViewData = new TravelOptionViewModel();
+
+                    travelOptionsViewData.RequestId = travelOption.RequestId.ToString();
+                    travelOptionsViewData.Description = travelOption.Description;
+
+                    int? fileId = travelOption.FileId; // Assuming travelOption.FileId is int?
+                    //Get file path by fileID--bug
+                    var OptionFilePath = await _fileMetaDataServices.GetFilePathByFileIdAsync(fileId.Value);
+                   
+                   // travelOptionsViewData.OptionFileURL = HttpUtility.UrlEncode( OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found");
+                    travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found";
+
+                    travelOptionsViewDataList.Add(travelOptionsViewData);
+                }
+
+                return Ok(travelOptionsViewDataList);
             }
             catch (Exception ex)
             {
