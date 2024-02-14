@@ -56,7 +56,6 @@ namespace XtramileBackend.Utils
             // Fetch sender password from a secure storage or configuration
             return DotNetEnv.Env.GetString("senderPassword");
         }
-
         private static string GetEmailContent(Mail mailInfo)
         {
             switch (mailInfo.mailContext)
