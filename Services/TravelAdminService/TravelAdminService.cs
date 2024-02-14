@@ -380,7 +380,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
                                     where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                    orderby request.CreatedOn
+                                    orderby request.CreatedOn descending
                                     select new RequestTableViewTravelAdmin
                                     {
                                         RequestId = request.RequestId,
