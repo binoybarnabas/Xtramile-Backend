@@ -24,8 +24,8 @@ namespace XtramileBackend.Services.AuthService
             //get the userid and create token if userid exists
             //return to controller
 
-            /*string password = HashPassword(credential.Password);
-            Console.WriteLine("~"+password+'~');*/
+            string password = HashPassword(credential.Password);
+            //Console.WriteLine("~" + password + '~');
             var userData = from user in _dbContext.TBL_USER where credential.Email == user.Email && credential.Password == user.Password select new { UserId = user.EmpId };
             var userId = userData?.FirstOrDefault()?.UserId;
 
@@ -100,7 +100,7 @@ namespace XtramileBackend.Services.AuthService
         }
 
 
-        /*private string HashPassword(string password)
+        private string HashPassword(string password)
         {
             // In a production environment, use a secure password hashing library (e.g., BCrypt)
             // For simplicity, we'll use a basic hashing method here for demonstration purposes
@@ -109,7 +109,7 @@ namespace XtramileBackend.Services.AuthService
                 byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(hashedBytes);
             }
-        }*/
+        }
 
     }
 }

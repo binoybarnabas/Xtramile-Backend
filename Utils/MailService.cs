@@ -1,135 +1,80 @@
-﻿using System.Net.Mail;
+﻿using System;
 using System.Net;
-using Azure.Core;
+using System.Net.Mail;
+using System.Threading.Tasks;
 using XtramileBackend.Models.APIModels;
 
 namespace XtramileBackend.Utils
 {
     public class MailService
     {
-
-        /// <summary>
-        /// To send mail based on activities like request submission from employees, request approval, request rejection, when the travel admin send ticket options to 
-        /// the employee.
-        /// </summary>
-        /// <param name="mailInfo"></param>
-        public static void SendMail(Mail mailInfo)
+        public static async Task SendMail(Mail mailInfo)
         {
-                DotNetEnv.Env.Load();
-                //sender email and password
-                string senderEmail = DotNetEnv.Env.GetString("senderEmail");
-                string senderPassword = DotNetEnv.Env.GetString("senderPassword");
-                //receipient email 
+            try
+            {
+                string senderEmail = GetSenderEmail();
+                string senderPassword = GetSenderPassword();
                 string recipientEmail = mailInfo.recipientEmail;
 
-                if (!string.IsNullOrEmpty(senderEmail) && !string.IsNullOrEmpty(recipientEmail))
+                if (string.IsNullOrEmpty(senderEmail) || string.IsNullOrEmpty(senderPassword) || string.IsNullOrEmpty(recipientEmail))
                 {
-                    // Mail message
-                    MailMessage mail = new MailMessage(senderEmail, recipientEmail);
-                    mail.Subject = "Travel Request Status";
-                    string salutation, body, emailContent;
+                    Console.WriteLine("Sender email, sender password, or recipient email is missing.");
+                    return;
+                }
 
-                    switch (mailInfo.mailContext)
-                    {
+                MailMessage mail = new MailMessage(senderEmail, recipientEmail);
+                mail.Subject = "Travel Request Status";
+                string emailContent = GetEmailContent(mailInfo);
+                mail.Body = emailContent;
+                mail.IsBodyHtml = true;
 
-                        case "submit":
-
-                            // Salutation
-                            salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
-
-                            // Body of the email
-                            body = $"Your request with code <b>{mailInfo.requestCode}</b> has been submitted.\n" +
-                                          "Thank you \n\n";
-
-                            // Concatenate the salutation and body
-                            emailContent = salutation + "\n\n" + body;
-                            mail.Body = emailContent;
-                            mail.IsBodyHtml = true;
-                            break;
-
-                        case "approve":
-
-                            // Salutation
-                            salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
-
-                            // Body of the email
-                            body = $"The request with code <b>{mailInfo.requestCode}</b> has been Approved by {mailInfo.managerName}\n" +
-                                          "Thank you \n\n";
-
-                            // Concatenate the salutation and body
-                            emailContent = salutation + "\n\n" + body;
-                            mail.Body = emailContent;
-                            mail.IsBodyHtml = true;
-                            break;
-
-                        case "reject":
-
-                            // Salutation
-                            salutation = $"Dear {mailInfo.recipientName},\n"; // Replace "John" with the recipient's name
-
-                            // Body of the email
-                            body = $"The request with code <b>{mailInfo.requestCode}</b> has been Rejected by {mailInfo.managerName}\n" +
-                                    $"The reason for your rejection is {mailInfo.reasonForRejection} \n" +
-                                          "Thank you \n\n";
-
-                            // Concatenate the salutation and body
-                            emailContent = salutation + "\n\n" + body;
-                            mail.Body = emailContent;
-                            mail.IsBodyHtml = true;
-                            break;
-
-                        case "options":
-
-                            // Salutation
-                            salutation = $"Dear {mailInfo.recipientName},\n";
-
-                            // Body of the email
-                            body = $"Your request with code <b>{mailInfo.requestCode}</b> has been Approved by travel admin {mailInfo.managerName}\n" +
-                                    "Pick the tickets for the trip based on your interest.\n" +
-                                          "Thank you \n\n";
-
-                            // Concatenate the salutation and body
-                            emailContent = salutation + "\n\n" + body;
-                            mail.Body = emailContent;
-                            mail.IsBodyHtml = true;
-                            break;
-
-                        case "sendToHigherPersonnelOnSubmit":
-
-                            // Salutation
-                            salutation = $"Dear {mailInfo.recipientName},\n";
-
-                            // Body of the email
-                            body = $"A request with code <b>{mailInfo.requestCode}</b> has been submitted by {mailInfo.requestSubmittedBy}\n" +
-                                    "Please verify the details and do the needful.\n" +
-                                          "Thank you \n\n";
-
-                            // Concatenate the salutation and body
-                            emailContent = salutation + "\n\n" + body;
-                            mail.Body = emailContent;
-                            mail.IsBodyHtml = true;
-                            break;
-                    }
-
-                    // SMTP client configuration
-                    SmtpClient smtpClient = new SmtpClient("smtp-mail.outlook.com");
-                    smtpClient.Port = 587; // Port for SMTP 
+                using (SmtpClient smtpClient = new SmtpClient("smtp.office365.com", 587))
+                {
                     smtpClient.UseDefaultCredentials = false;
                     smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
-                    smtpClient.EnableSsl = true; // Enable SSL/TLS
+                    smtpClient.EnableSsl = true;
 
-                    try
-                    {
-                        // Send the email
-                        smtpClient.Send(mail);
-                        Console.WriteLine("Email sent successfully!");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to send email: {ex.Message}");
-                    }
+                    await smtpClient.SendMailAsync(mail); // Await SendMailAsync method
+
+                    Console.WriteLine("Email sent successfully!");
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send email: {ex.Message}");
+            }
         }
 
+        private static string GetSenderEmail()
+        {
+            // Fetch sender email from a secure storage or configuration
+            return DotNetEnv.Env.GetString("senderEmail");
+        }
+
+        private static string GetSenderPassword()
+        {
+            // Fetch sender password from a secure storage or configuration
+            return DotNetEnv.Env.GetString("senderPassword");
+        }
+
+        private static string GetEmailContent(Mail mailInfo)
+        {
+            switch (mailInfo.mailContext)
+            {
+                case "submit":
+                    return $"Dear {mailInfo.recipientName},\n\nYour request with code <b>{mailInfo.requestCode}</b> has been submitted.\nThank you\n";
+                case "approve":
+                    return $"Dear {mailInfo.recipientName},\n\nThe request with code <b>{mailInfo.requestCode}</b> has been Approved by {mailInfo.managerName}\nThank you\n";
+                case "reject":
+                    return $"Dear {mailInfo.recipientName},\n\nThe request with code <b>{mailInfo.requestCode}</b> has been Rejected by {mailInfo.managerName}\nThe reason for your rejection is {mailInfo.reasonForRejection}\nThank you\n";
+                case "options":
+                    return $"Dear {mailInfo.recipientName},\n\nOptions for your request with code <b>{mailInfo.requestCode}</b> has been sent by travel admin {mailInfo.managerName}\nPick the tickets for the trip based on your interest.\nThank you\n";
+                case "sendToHigherPersonnelOnSubmit":
+                    return $"Dear {mailInfo.recipientName},\n\nA request with code <b>{mailInfo.requestCode}</b> has been submitted by {mailInfo.requestSubmittedBy}\nPlease verify the details and do the needful.\nThank you\n";
+                case "sendToTAOnOptionSelect":
+                    return $"Dear {mailInfo.recipientName},\n\nAn option has been selected for the request with code <b>{mailInfo.requestCode}</b> by {mailInfo.requestSubmittedBy}\nPlease verify the option and do the needful.\nThank you\n";
+                default: return "xtramile";
+            }
+        }
     }
 }
