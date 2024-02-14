@@ -288,13 +288,13 @@ namespace XtramileBackend.Controllers.RequestControllers
                 // Fetch file paths from tbl_file_metadata
                 var PassportFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "passportAttachment");
                 var TravelAuthMailFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "travelAuthorizationEmailCapture");
-
+/*
                 Console.Write("Path"+PassportFilePath);
-                Console.WriteLine(reqId);
+                Console.WriteLine(reqId);*/
 
                // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D://SPECIALIZATION//XtraMile Project//Back End V2//Xtramile-Backend//{PassportFilePath} " : "404_file_not_found";
-                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/SPECIALIZATION/XtraMile Project/Back End V2/Xtramile-Backend/{TravelAuthMailFilePath}" : "file_not_found";
+                var passportFileUrl = PassportFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{TravelAuthMailFilePath}" : "file_not_found";
 
 
 /*                // Construct file URLs
