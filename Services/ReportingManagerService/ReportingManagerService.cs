@@ -151,8 +151,8 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
-    .GroupBy(approval => approval.RequestId)
-    .Select(group => group.OrderByDescending(approval => approval.date).First());
+                .GroupBy(approval => approval.RequestId)
+                .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var EmpRequest = (
                   from employee in employeeData

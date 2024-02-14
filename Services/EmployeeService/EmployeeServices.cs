@@ -341,7 +341,6 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="empId"> Employee id for retrieving requests</param>
         /// <returns>An asynchronous task return a collection of type EmpViewRequest</returns>
-
         public async Task<PagedEmployeeViewReqDto> GeRequestHistoryByEmpId(int empId, int pageIndex, int pageSize)
         {
             try
@@ -747,6 +746,12 @@ namespace XtramileBackend.Services.EmployeeService
         }
 
 
+        /// <summary>
+        /// An employee cancels a request after raising the request and before the request is being approved or rejected by the reporting manager
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <param name="empId"></param>
+        /// <returns></returns>
         public async Task<bool> EmployeeCancelRequest(int requestId,int empId)
         {
             try
@@ -789,6 +794,12 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
+
+        /// <summary>
+        /// Submission of a travel option from the employee among a list of travel request
+        /// </summary>
+        /// <param name="travelOption"></param>
+        /// <returns></returns>
         public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
         {
             try

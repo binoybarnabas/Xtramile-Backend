@@ -10,6 +10,7 @@ using XtramileBackend.Services.ProjectService;
 using Microsoft.AspNetCore.Cors;
 using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Repositories.EmployeeRepository;
 
 
 namespace XtramileBackend.Controllers.EmployeeController
@@ -26,13 +27,13 @@ namespace XtramileBackend.Controllers.EmployeeController
         private readonly IFileTypeServices _fileTypeServices;
 
         private readonly IFileMetaDataService _fileMetaDataServices;
-
         public EmployeeController(IEmployeeServices employeeService, IFileTypeServices fileTypeServices,
             IFileMetaDataService fileMetaDataServices)
 
         {
             _employeeService = employeeService;
             _fileTypeServices = fileTypeServices;
+
         }
 
         [HttpGet("employees")]
