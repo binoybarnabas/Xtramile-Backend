@@ -199,5 +199,22 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet("selectedoption/{reqId}")]
+        public async Task<ActionResult<int?>> GetSelectedTravelOptionFromEmployee(int reqId)
+        {
+            try
+            {
+                var optionId = await _travelAdminService.GetSelectedTravelOptionFromEmployee(reqId);
+                
+                
+                return Ok(optionId);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 }

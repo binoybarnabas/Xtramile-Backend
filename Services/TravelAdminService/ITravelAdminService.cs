@@ -20,7 +20,7 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<byte[]> GenerateModeCountFromProjectIdExcelReport(int projectId);
         public Task<Dictionary<string, int>> GetRequestsByMonth();
         public Task<byte[]> GenerateReportForMonth(string monthName);
-
+        public Task<int?> GetSelectedTravelOptionFromEmployee(int reqId);
 
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Azure.Core;
 using OfficeOpenXml;
+using System;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -824,7 +826,22 @@ namespace XtramileBackend.Services.TravelAdminService
                 return null; // or throw the exception
             }
         }
+        public async Task<int?> GetSelectedTravelOptionFromEmployee(int reqId)
+        {
+            try
+            {
+                IEnumerable<TBL_TRAVEL_OPTION_MAPPING> selected = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+                var option = selected.FirstOrDefault(options => options.RequestId == reqId).OptionId;
+                return option;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting selected option: {ex.Message}");
+                return null; // or throw the exception
+            }
+        }
     }
+   
 }
        
        
