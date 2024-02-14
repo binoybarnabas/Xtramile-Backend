@@ -1,4 +1,5 @@
-﻿using XtramileBackend.Models.EntityModels;
+﻿using Azure.Core;
+using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Services.FileMetaDataService
@@ -67,6 +68,7 @@ namespace XtramileBackend.Services.FileMetaDataService
             }
         }
 
+ 
         //Get File Path RequestId and description
         public async Task<string> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
         {
@@ -81,6 +83,26 @@ namespace XtramileBackend.Services.FileMetaDataService
                 return filePath;
             }
             catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
+                throw;
+            }
+        }
+
+        //Get FIle Path by file id
+        public async Task<string> GetFilePathByFileIdAsync(int fileId)
+        {
+            try
+            {
+                var fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+
+                var filePath = (from item in fileMetaData
+                                where item.FileId == fileId
+                                select item.FilePath).FirstOrDefault();
+
+                return filePath;
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
                 throw;
