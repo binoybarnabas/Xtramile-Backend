@@ -1,6 +1,9 @@
 ﻿using Azure.Core;
 using OfficeOpenXml;
+using System;
+using System.Globalization;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -751,7 +754,102 @@ namespace XtramileBackend.Services.TravelAdminService
 
 
         }
+        /// <summary>
+        /// To generate an excel file conataning details of all requests and its corresponding changes in the input month
+        /// </summary>
+        /// <param name="monthName"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GenerateReportForMonth(string monthName)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> modes = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> status = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                //to compare approval date with passed in month
+                var filteredApprovals = approves.Where(a => a.date.Month == DateTime.ParseExact(monthName, "MMMM", CultureInfo.InvariantCulture).Month);
+
+                var excelData = from approve in filteredApprovals
+                                join request in requests on approve.RequestId equals request.RequestId
+                                join mode in modes on request.TravelModeId equals mode.ModeId
+                                join project in projects on request.ProjectId equals project.ProjectId
+                                join employee in employees on request.CreatedBy equals employee.EmpId
+                                join s in status on approve.PrimaryStatusId equals s.StatusId
+                                select new
+                                {
+                                    request.RequestCode,
+                                    EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                                    CreatedOn = request.CreatedOn.ToString("dd-MM-yyyy"),
+                                    mode.ModeName,
+                                    project.ProjectCode,
+                                    StatusName = s.StatusName == "Forwarded" ? "Approved by Manager" : s.StatusName,
+                                    StatusDate = approve.date.ToString("dd-MM-yyyy")
+                                };
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Requests");
+
+                    // Add headers
+                    worksheet.Cells[1, 1].Value = "Request Code";
+                    worksheet.Cells[1, 2].Value = "Employee Name";
+                    worksheet.Cells[1, 3].Value = "Created On";
+                    worksheet.Cells[1, 4].Value = "Mode Name";
+                    worksheet.Cells[1, 5].Value = "Project Code";
+                    worksheet.Cells[1, 6].Value = "Status Name";
+                    worksheet.Cells[1, 7].Value = "Status Date";
+
+                    // Populate data
+                    var row = 2;
+                    foreach (var data in excelData)
+                    {
+                        worksheet.Cells[row, 1].Value = data.RequestCode;
+                        worksheet.Cells[row, 2].Value = data.EmployeeName;
+                        worksheet.Cells[row, 3].Value = data.CreatedOn;
+                        worksheet.Cells[row, 4].Value = data.ModeName;
+                        worksheet.Cells[row, 5].Value = data.ProjectCode;
+                        worksheet.Cells[row, 6].Value = data.StatusName;
+                        worksheet.Cells[row, 7].Value = data.StatusDate;
+                        row++;
+                    }
+
+                    return package.GetAsByteArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return null; // or throw the exception
+            }
+        }
+        public async Task<int?> GetSelectedTravelOptionFromEmployee(int reqId)
+        {
+            try
+            {
+                IEnumerable<TBL_TRAVEL_OPTION_MAPPING> selected = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+                var option = selected.FirstOrDefault(options => options.RequestId == reqId);
+                if (option != null)
+                {
+                    return option.OptionId;
+                }
+                else
+                {
+                    // No option found for the given reqId
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting selected option: {ex.Message}");
+                return null; // or throw the exception
+            }
+        }
     }
+   
 }
        
        

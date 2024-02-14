@@ -180,5 +180,41 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        //to genrate a report of request related details of the input month
+       [HttpGet("generateReport/{monthName}")]
+        public async Task<IActionResult> GenerateReportForMonth(string monthName)
+        {
+            try
+            {
+                var excelBytes = await _travelAdminService.GenerateReportForMonth( monthName);
+
+                if (excelBytes == null)
+                    return NotFound();
+
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Requests.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpGet("selectedoption/{reqId}")]
+        public async Task<ActionResult<int?>> GetSelectedTravelOptionFromEmployee(int reqId)
+        {
+            try
+            {
+                var optionId = await _travelAdminService.GetSelectedTravelOptionFromEmployee(reqId);
+                
+                
+                return Ok(optionId);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 }
