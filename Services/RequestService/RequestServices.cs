@@ -48,7 +48,7 @@ namespace XtramileBackend.Services.RequestService
                 await _unitOfWork.RequestRepository.AddAsync(request);         
                  _unitOfWork.Complete();
 
-             /*   int empId = request.CreatedBy;
+                int empId = request.CreatedBy;
 
                 //Mail information to be sent to employee on submit
 
@@ -134,7 +134,7 @@ namespace XtramileBackend.Services.RequestService
                 {
                     MailService.SendMail(mail);
                 }
-*/
+
 
             }
             catch (Exception ex)
