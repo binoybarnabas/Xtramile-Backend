@@ -21,6 +21,5 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<Dictionary<string, int>> GetRequestsByMonth();
         public Task<byte[]> GenerateReportForMonth(string monthName);
         public Task<int?> GetSelectedTravelOptionFromEmployee(int reqId);
-
     }
 }
