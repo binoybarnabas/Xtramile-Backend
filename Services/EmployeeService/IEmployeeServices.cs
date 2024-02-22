@@ -33,12 +33,12 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<TBL_USER> updatePassword(string email, string newPassword);
 
         public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
-        public Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId);
+        public Task<IEnumerable<DashboardEmployeeprogress>> GetEmployeeDashboardProgressAsync(int employeeId);
 
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
         public Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId);
 
-        public Task<bool> EmployeeCancelRequest(int requestId,int empId);
+        public Task<bool> EmployeeCancelRequest(int requestId, int empId);
 
         public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
 

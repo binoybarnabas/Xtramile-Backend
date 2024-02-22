@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
-    [Authorize(Roles="Employee")]
+    [Authorize(Roles = "Employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -276,7 +276,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 // Call the service method to retrieve progress details for the specified employee
-                DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+                IEnumerable<DashboardEmployeeprogress> employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
 
                 // Return a 200 OK response with the retrieved progress details
                 return Ok(employeeDashboardProgress);
@@ -294,7 +294,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                var notification= await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
+                var notification = await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
                 return Ok(notification);
             }
             catch (Exception ex)
@@ -323,7 +323,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         }
 
         [HttpPost("request/cancel")]
-        public async Task<IActionResult> CancelRequest([FromBody]CancelRequest cancelRequest)
+        public async Task<IActionResult> CancelRequest([FromBody] CancelRequest cancelRequest)
         {
             try
             {
