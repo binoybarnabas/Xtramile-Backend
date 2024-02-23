@@ -54,6 +54,7 @@ using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Services.FileMetaDataService;
 using OfficeOpenXml;
 using XtramileBackend.Repositories.TravelOptionRepository;
+using XtramileBackend.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -172,6 +173,7 @@ builder.Services.AddScoped<ITravelAdminService, TravelAdminService>();
 builder.Services.AddScoped<IReportingManagerService, ReportingManagerService>();
 builder.Services.AddScoped<IFileMetaDataService, FileMetaDataService>();
 //builder.Services.AddScoped<ITravelOptionService, TravelOptionService>();
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddCors(options =>
 {
