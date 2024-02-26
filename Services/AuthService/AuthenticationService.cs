@@ -27,8 +27,12 @@ namespace XtramileBackend.Services.AuthService
             string password = HashPassword(credential.Password);
             //Console.WriteLine("~" + password + '~');
             var userData = from user in _dbContext.TBL_USER where credential.Email == user.Email && password == user.Password select new { UserId = user.EmpId };
+            Console.WriteLine(_dbContext.TBL_USER);
             var userId = userData?.FirstOrDefault()?.UserId;
-
+            //var userId = _dbContext.TBL_USER
+            //.Where(user => credential.Email == user.Email && password == user.Password)
+            //.Select(user => user.EmpId)
+            //.FirstOrDefault();
             if (userId == null)
                 return null;
 
