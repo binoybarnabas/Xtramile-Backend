@@ -45,10 +45,10 @@ namespace XtramileBackend.Services.RequestService
         {
             try
             {
-                await _unitOfWork.RequestRepository.AddAsync(request);         
-                 _unitOfWork.Complete();
+                await _unitOfWork.RequestRepository.AddAsync(request);
+                _unitOfWork.Complete();
 
-                int empId = request.CreatedBy;git 
+                int empId = request.CreatedBy;
 
                 //Mail information to be sent to employee on submit
 
@@ -186,7 +186,7 @@ namespace XtramileBackend.Services.RequestService
             {
                 TBL_REQUEST travelRequest = await _unitOfWork.RequestRepository.GetByIdAsync(id);
                 return travelRequest;
-             
+
             }
             catch (Exception ex)
             {
