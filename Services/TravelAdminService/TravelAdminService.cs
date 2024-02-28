@@ -25,7 +25,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// return a list of data which consists of ongoingTrips which contains information like requestId, Project code
         /// project name,first name and last name of the employee source city and destination city.
         /// </returns>
-        public async Task<IEnumerable<OngoingTravelAdmin>> OnGoingTravel()
+        public async Task<OngoingTravelAdminPaged> OnGoingTravel(int pageSize, int pageIndex)
         {
 
             try
@@ -40,7 +40,7 @@ namespace XtramileBackend.Services.TravelAdminService
     .GroupBy(approval => approval.RequestId)
     .Select(group => group.OrderByDescending(approval => approval.date).First());
 
-                var onGoingData = from employee in employeeData
+                var onGoingData = ( from employee in employeeData
                                   join requestStatus in latestStatusApprovals on employee.EmpId equals requestStatus.EmpId
                                   join request in requestData on requestStatus.RequestId equals request.RequestId
                                   join project in projectData on request.ProjectId equals project.ProjectId
@@ -54,9 +54,17 @@ namespace XtramileBackend.Services.TravelAdminService
                                       Name = employee.FirstName+ " "+employee.LastName,
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity
-                                  };
+                                  } ).ToList();
 
-                return onGoingData.ToList();
+                int totalCount = onGoingData.Count();
+                var pagedOngoingData = onGoingData.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                return new OngoingTravelAdminPaged
+                {
+                    OngoingTravel= pagedOngoingData,
+                    TotalCount=totalCount,
+
+                };
+           
             }
 
             catch (Exception ex)
@@ -201,7 +209,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// </summary>
         /// <param name="statusCode">The status code to filter the requests.</param>
         /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID with the specified status.</returns>
-        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetTravelRequests(string statusCode)
+        public async Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string statusCode,int pageSize, int pageIndex)
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -234,7 +242,18 @@ namespace XtramileBackend.Services.TravelAdminService
                               ApprovalDate = latestApproval.date
                           }).ToList();
 
-            return result;
+            var totalCount = result.Count();
+            var pagedResult = result.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var totalPages= (int)Math.Ceiling(totalCount / (double)pageSize);
+
+
+
+            return new RequestTableViewTravelAdminPaged
+            {
+                TravelRequest= pagedResult,
+                PageCount= totalCount,
+                TotalPages= totalPages,
+            } ;
         }
 
         /// <summary>
@@ -321,7 +340,7 @@ namespace XtramileBackend.Services.TravelAdminService
 
                 if (employeeName)
                 {
-                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSoryByDate();
+                    incomingRequests = (List<RequestTableViewTravelAdmin>)await GetIncomingRequestSortByDate();
                 }
                 else if (date)
                 {
@@ -358,7 +377,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// Sort the request based on the request date
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSoryByDate()
+        public async Task<IEnumerable<RequestTableViewTravelAdmin>> GetIncomingRequestSortByDate()
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
