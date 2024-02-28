@@ -17,7 +17,7 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles="Employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -220,7 +220,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                EmployeeCurrentRequest request = await _employeeService.getEmployeeCurrentTravel(empId);
+                IEnumerable<EmployeeCurrentRequest> request = await _employeeService.getEmployeeCurrentTravel(empId);
                 return Ok(request);
             }
             catch (Exception ex)

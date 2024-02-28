@@ -603,26 +603,48 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId)
+        public async Task<IEnumerable<EmployeeCurrentRequest>> getEmployeeCurrentTravel(int empId)
         {
             try
             {
-                var date = DateTime.Now;
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                var request = requestData.FirstOrDefault(r => r.CreatedBy == empId && date >= r.DepartureDate && date <= r.ReturnDate);
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_ROLES> roleData= await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData= await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData= await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departmentData= await _unitOfWork.DepartmentRepository.GetAllAsync();
 
-                if (request != null)
-                {
-                    return new EmployeeCurrentRequest
-                    {
-                        DepartureDate = request.DepartureDate,
-                        ReturnDate = request.ReturnDate
-                    };
-                }
-                else
-                {
-                    return null; // Or throw an exception, or return a default EmployeeCurrentRequest
-                }
+                var currentRequest = (from request in requestData
+                                      join
+                              employee in employeeData on request.CreatedBy equals employee.EmpId
+                                      join
+                              role in roleData on employee.RoleId equals role.RoleId
+                                      join
+                              statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                                      join
+                              status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                                      join
+                              projectMapping in projectMappingData on statusApproval.EmpId equals projectMapping.EmpId
+                                      join
+                              project in projectData on projectMapping.ProjectId equals project.ProjectId
+                                      join
+                              department in departmentData on project.DepartmentId equals department.DepartmentId
+                                      where status.StatusCode == "OG" || status.StatusCode == "FW" && department.DepartmentName == "Travel"
+
+                                      select new EmployeeCurrentRequest
+                                      {
+                                          DepartureDate = request.DepartureDate,
+                                          ReturnDate = request.ReturnDate,
+                                          DepartureTime= request.PrefDepartureTime,
+                                          Source= request.SourceState,
+                                          Destination= request.DestinationState,
+                                          Purpose= request.TripPurpose
+                                      }
+
+                ).ToList();
+                return currentRequest;
 
             }
             catch (Exception ex)

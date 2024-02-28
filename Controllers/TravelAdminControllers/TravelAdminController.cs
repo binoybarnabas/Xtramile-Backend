@@ -17,11 +17,11 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         [HttpGet("ongoing")]
-        public async Task<IActionResult> GetOnGoingTravel()
+        public async Task<IActionResult> GetOnGoingTravel([FromBody] int pageSize=10, int pageIndex=1)
         {
             try
             {
-                var onGoingTravelData = await _travelAdminService.OnGoingTravel();
+                var onGoingTravelData = await _travelAdminService.OnGoingTravel(pageSize,pageIndex);
                 return Ok(onGoingTravelData);
             }
             catch (Exception ex)
@@ -60,11 +60,11 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             }
         }
         [HttpGet("requestsView/{statusCode}")]
-        public async Task<IActionResult> viewTravelRequestByCode(string statusCode)
+        public async Task<IActionResult> viewTravelRequestByCode(string statusCode,int pageSize=10, int pageIndex=1)
         {
             try
             {
-                IEnumerable<RequestTableViewTravelAdmin> requestData = await _travelAdminService.GetTravelRequests(statusCode);
+                RequestTableViewTravelAdminPaged requestData = await _travelAdminService.GetTravelRequests(statusCode,pageSize,pageIndex);
                 return Ok(requestData);
             }
             catch(Exception ex)
