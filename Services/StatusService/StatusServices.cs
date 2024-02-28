@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Reflection.Metadata.Ecma335;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -103,6 +104,30 @@ namespace XtramileBackend.Services.StatusService
                 throw; // Re-throw the exception to propagate it
 
             }
+        }
+
+        public string GetStatusName(int primaryStatusId, int secondaryStatusId)
+        {
+            if (primaryStatusId == 1 && secondaryStatusId == 2)
+                return "Open";
+            else if (primaryStatusId == 12 && secondaryStatusId == 2)
+                return "Approved";
+            else if (primaryStatusId == 2 && secondaryStatusId == 10)
+                return "Waiting";
+            else if (primaryStatusId == 2 && secondaryStatusId == 11)
+                return "Selected";
+            else if (primaryStatusId == 12 && secondaryStatusId == 12)
+                return "Approved";
+            else if (primaryStatusId == 5 && secondaryStatusId == 5)
+                return "Ongoing";
+            else if (primaryStatusId == 9 && secondaryStatusId == 9)
+                return "Cancelled";
+            else if (primaryStatusId == 6 && secondaryStatusId == 2)
+                return "Denied";
+            else if (primaryStatusId == 1 && secondaryStatusId == 6)
+                return "Resubmitted";
+            else
+                return " ";            
         }
 
 

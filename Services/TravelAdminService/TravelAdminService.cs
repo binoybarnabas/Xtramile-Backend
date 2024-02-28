@@ -7,6 +7,7 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Services.TravelAdminService
@@ -14,8 +15,10 @@ namespace XtramileBackend.Services.TravelAdminService
     public class TravelAdminService : ITravelAdminService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public TravelAdminService(IUnitOfWork unitOfWork) { 
-        _unitOfWork = unitOfWork;
+        private readonly IStatusServices _statusServices;
+        public TravelAdminService(IUnitOfWork unitOfWork, IStatusServices statusServices) { 
+            _unitOfWork = unitOfWork;
+            _statusServices = statusServices;
         }
 
         /// <summary>
@@ -99,26 +102,27 @@ namespace XtramileBackend.Services.TravelAdminService
                                    .Select(group => group.OrderByDescending(approval => approval.date).FirstOrDefault());
 
 
-                var incomingRequests = ( from request in requestData
-                                       join reqApprove in latestApprovals on request.RequestId equals reqApprove.RequestId
-                                       join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
-                                       from priorityItem in priorityGroup.DefaultIfEmpty()
-                                       join project in projectData on request.ProjectId equals project.ProjectId
-                                       join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
-                                       join employee in employeeData on request.CreatedBy equals employee.EmpId
-                                       join approver in employeeData on reqApprove.EmpId equals approver.EmpId
-                                       join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
-                                       where (reqApprove.PrimaryStatusId == 1) || (reqApprove.PrimaryStatusId == 12 && approver.RoleId == 2)
-                                       select new RequestTableViewTravelAdmin
-                                       {
-                                           RequestId = request.RequestId,
-                                           EmployeeName = $"{employee.FirstName} {employee.LastName}",
-                                           ProjectCode = project.ProjectCode,
-                                           CreatedOn = request.CreatedOn,
-                                           TravelTypeName = travelType.TypeName,
-                                           PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                           StatusName = status.StatusName
-                                       } ).ToList();
+                var incomingRequests = (from request in requestData
+                                        join reqApprove in latestApprovals on request.RequestId equals reqApprove.RequestId
+                                        join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
+                                        from priorityItem in priorityGroup.DefaultIfEmpty()
+                                        join project in projectData on request.ProjectId equals project.ProjectId
+                                        join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                                        join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                        join primaryStatus in statusData on reqApprove.PrimaryStatusId equals primaryStatus.StatusId
+                                        join secondaryStatus in statusData on reqApprove.SecondaryStatusId equals secondaryStatus.StatusId
+                                        where ((primaryStatus.StatusId == 1 && secondaryStatus.StatusId == 2) ||
+                                        (primaryStatus.StatusId == 12 && secondaryStatus.StatusId == 2))
+                                        select new RequestTableViewTravelAdmin
+                                        {
+                                            RequestId = request.RequestId,
+                                            EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                                            ProjectCode = project.ProjectCode,
+                                            CreatedOn = request.CreatedOn,
+                                            TravelTypeName = travelType.TypeName,
+                                            PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
+                                            StatusName = _statusServices.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId)
+                                        }).OrderByDescending(incomingRequests => incomingRequests.RequestId).ToList();
 
 
                 // Execute the query and retrieve the results
