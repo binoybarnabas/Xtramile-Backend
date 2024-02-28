@@ -52,8 +52,9 @@ namespace XtramileBackend.Services.ManagerService
                   join request in requestData on employee.EmpId equals request.CreatedBy
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
-                  join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  join primaryStatus in statusData on statusApproval.PrimaryStatusId equals primaryStatus.StatusId
+                  join secondaryStatus in statusData on statusApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                  where primaryStatus.StatusId == 1 && secondaryStatus.StatusId == 2
                   select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
@@ -62,8 +63,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
-                  }).ToList();
+                      Status = "Open"
+                  }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();
                 var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
