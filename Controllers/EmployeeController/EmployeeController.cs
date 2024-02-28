@@ -220,7 +220,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                EmployeeCurrentRequest request = await _employeeService.getEmployeeCurrentTravel(empId);
+                IEnumerable<EmployeeCurrentRequest> request = await _employeeService.getEmployeeCurrentTravel(empId);
                 return Ok(request);
             }
             catch (Exception ex)
