@@ -719,6 +719,8 @@ namespace XtramileBackend.Services.ManagerService
 
                     var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "DD");
 
+                    var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
+
                     TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
 
                     approve.RequestId = managerCancelRequest.RequestId;
@@ -727,7 +729,7 @@ namespace XtramileBackend.Services.ManagerService
 
                     approve.PrimaryStatusId = primaryStatus.StatusId;
 
-                    approve.SecondaryStatusId = primaryStatus.StatusId;
+                    approve.SecondaryStatusId = secondaryStatus.StatusId;
 
                     approve.date = DateTime.Now;
 

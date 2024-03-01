@@ -42,7 +42,7 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
 
-
+        public Task<IEnumerable<PendingRequetsViewEmployee>> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode);
 
     }
 }

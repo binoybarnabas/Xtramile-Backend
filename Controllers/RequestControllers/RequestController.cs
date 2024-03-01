@@ -42,10 +42,10 @@ namespace XtramileBackend.Controllers.RequestControllers
         public RequestController(IRequestServices requestServices, IRequestStatusServices requestStatusServices,
 
             IStatusServices statusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices,
-            
+
             IEmployeeServices employeeServices, IProjectServices projectServices, ITravelModeService travelModeService
 
-            
+
             )
         {
             _requestServices = requestServices;
@@ -113,33 +113,33 @@ namespace XtramileBackend.Controllers.RequestControllers
                     ProjectId = Int32.Parse(request.ProjectId),
 
                     TripType = request.TripType,
-                    
+
                     TravelModeId = Int32.Parse(request.TravelModeId),
-                    
+
                     TravelTypeId = Int32.Parse(request.TravelTypeId),
-                    
+
                     TripPurpose = request.TripPurpose,
-                    
+
                     DepartureDate = DateTime.Parse(request.DepartureDate),
-                    
+
                     ReturnDate = returnDate,
-                    
+
                     SourceCity = request.SourceCity,
-                    
+
                     DestinationCity = request.DestinationCity,
-                    
+
                     SourceCountry = request.SourceCountry,
-                    
+
                     DestinationCountry = request.DestinationCountry,
-                    
+
                     CabRequired = request.CabRequired,
-                    
+
                     PrefPickUpTime = request.PrefPickUpTime,
-                    
+
                     AccommodationRequired = request.AccommodationRequired,
-                    
+
                     PrefDepartureTime = request.PrefDepartureTime,
-                    
+
                     AdditionalComments = request.AdditionalComments,
 
                     PriorityId = null,
@@ -205,7 +205,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                         // Determine the target folder based on the form field name
                         if (folderMapping.TryGetValue(keyName, out var targetFolder))
                         {
-                           // var filePath = Path.Combine(targetFolder, fileName);
+                            // var filePath = Path.Combine(targetFolder, fileName);
                             var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
 
                             using (var stream = System.IO.File.Create(filePath))
@@ -267,7 +267,7 @@ namespace XtramileBackend.Controllers.RequestControllers
             try
             {
 
-                
+
 
                 TBL_REQUEST request = await _requestServices.GetRequestById(reqId);
 
@@ -289,11 +289,11 @@ namespace XtramileBackend.Controllers.RequestControllers
                 // Fetch file paths from tbl_file_metadata
                 var PassportFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "passportAttachment");
                 var TravelAuthMailFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "travelAuthorizationEmailCapture");
-/*
-                Console.Write("Path"+PassportFilePath);
-                Console.WriteLine(reqId);*/
+                /*
+                                Console.Write("Path"+PassportFilePath);
+                                Console.WriteLine(reqId);*/
 
-               // Construct file URLs
+                // Construct file URLs
                 var passportFileUrl = PassportFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
                 var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{{{TravelAuthMailFilePath}" : "file_not_found";
 
@@ -325,7 +325,7 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 };
 
-               
+
                 return Ok(travelrequestViewData);
 
             }
@@ -336,16 +336,19 @@ namespace XtramileBackend.Controllers.RequestControllers
             }
         }
 
-
-
-
-
-
-
-
-
-
-
+        [HttpGet("request/reason/{requestId}")]
+        public async Task<IActionResult> GetReasonDescriptionByRequestId(int requestId)
+        {
+            try
+            {
+                string reasonDescription = await _requestServices.GetReasonDescriptionByRequestId(requestId);
+                return Ok(reasonDescription);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting reason description: {ex.Message}");
+            }
+        }
 
     }
 }
