@@ -106,5 +106,32 @@ namespace XtramileBackend.Services.RequestService
                 throw; // Re-throw the exception to propagate it
             }
         }
+
+        /// <summary>
+        /// Function to get the Reason Description for a particular request
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
+        public async Task<string> GetReasonDescriptionByRequestId(int requestId)
+        {
+            try
+            {
+                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                IEnumerable<TBL_REASON> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
+
+                string? reasonDescription = (from reason in reasonData
+                                            where reason.ReasonId == request.ReasonId
+                                            select reason.Description).FirstOrDefault();
+
+                return reasonDescription;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting reason description: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
     }
 }

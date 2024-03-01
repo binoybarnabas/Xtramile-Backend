@@ -842,5 +842,68 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
+        /// <summary>
+        /// function to get the requests in the pending section which are filtered based on the status
+        /// </summary>
+        /// <param name="empId"></param>
+        /// <param name="primaryStatusCode"></param>
+        /// <param name="secondaryStatusCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalMap
+                    .GroupBy(approval => approval.RequestId)
+                    .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                int primaryStatusId = await _statusServices.GetStatusIdByCode(primaryStatusCode);
+                int secondaryStatusId = await _statusServices.GetStatusIdByCode(secondaryStatusCode);
+
+                var results = (from request in requestData
+                               join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
+                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                               join project in projectData on request.ProjectId equals project.ProjectId
+                               join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
+                               join employee in employeeData on statusApproval.EmpId equals employee.EmpId
+                               where (request.CreatedBy == empId && 
+                               (primarystatus.StatusId == primaryStatusId && secondarystatus.StatusId == secondaryStatusId))
+                               select new PendingRequetsViewEmployee
+                               {
+                                   requestId = request.RequestId,
+                                   requestCode = request.RequestCode,
+                                   projectCode = project.ProjectCode,
+                                   tripPurpose = request.TripPurpose,
+                                   sourceCity = request.SourceCity,
+                                   sourceCountry = request.SourceCountry,
+                                   destinationCity = request.DestinationCity,
+                                   destinationCountry = request.DestinationCountry,
+                                   departureDate = request.DepartureDate,
+                                   returnDate = request.ReturnDate,
+                                   travelMode = travelMode.ModeName,
+                                   statusName = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
+                                   statusModifiedBy = employee.FirstName + " " + employee.LastName
+                                   /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
+                                   *//*                                   dateOfTravel = request.DepartureDate
+                                   */
+                               }).OrderByDescending(result => result.requestId).ToList();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
     }
 }

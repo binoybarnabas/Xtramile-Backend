@@ -355,6 +355,20 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [HttpGet("viewpendingrequest/status/{empId}")]
+        public async Task<IActionResult> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode)
+        {
+            try
+            {
+                IEnumerable<PendingRequetsViewEmployee> filteredPendingRequestData = await _employeeService.GetFilteredPendingRequestsByEmpId(empId,primaryStatusCode,secondaryStatusCode);
+                return Ok(filteredPendingRequestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
+            }
+        }
 
 
     }

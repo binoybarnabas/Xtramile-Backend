@@ -17,6 +17,8 @@ namespace XtramileBackend.Services.RequestService
 
         public Task<TBL_REQUEST> GetRequestById (int id);
 
+        public Task<string> GetReasonDescriptionByRequestId(int requestId);
+
     }
 }
 

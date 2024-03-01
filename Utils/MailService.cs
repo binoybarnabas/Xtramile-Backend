@@ -274,6 +274,27 @@ namespace XtramileBackend.Utils
             }
         }
 
+        /// <summary>
+        /// Sends an email to the requester when a travel admin personnel has approved their request
+        /// </summary>
+        /// <param name="requestId">Request Id of the approved request</param>
+        /// <returns></returns>
+        public async Task SendToEmployeeOnTravelAdminApproval(int requestId)
+        {
+            Mail mail = new Mail();
+
+            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+
+            if(employee!= null)
+            {
+                mail.recipientName = employee.FirstName + " " + employee.LastName;
+                mail.recipientEmail = employee.Email;
+                mail.emailBody = $"Dear {mail.recipientName},<br><br>Your request with code <b>{request.RequestCode}</b> has been Approved by the travel admin team.<br><br>Thank you.<br>";
+                await SendMail(mail);
+            }
+        }
+
         private async Task SendMail(Mail mailInfo)
         {
             try
