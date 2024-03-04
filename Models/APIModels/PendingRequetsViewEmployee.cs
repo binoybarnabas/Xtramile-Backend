@@ -38,6 +38,8 @@
         public string travelMode { get; set; }
 
         public string statusModifiedBy { get; set; }
+
+        public DateTime date { get; set; }
     }
 
 

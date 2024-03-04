@@ -280,6 +280,7 @@ namespace XtramileBackend.Services.EmployeeService
             }
 
         }
+
         /// <summary>
         /// Retrieves pending travel requests for a specific employee.
         /// </summary>
@@ -325,11 +326,15 @@ namespace XtramileBackend.Services.EmployeeService
                                    returnDate = request.ReturnDate,
                                    travelMode = travelMode.ModeName,
                                    statusName = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
-                                   statusModifiedBy = employee.FirstName + " " + employee.LastName
+                                   statusModifiedBy = employee.FirstName + " " + employee.LastName,
+                                   date = statusApproval.date
                                    /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
                                    *//*                                   dateOfTravel = request.DepartureDate
                                    */
-                               }).OrderByDescending(result => result.requestId).ToList();
+                               })
+                               .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
+                               .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
+                               .ToList();
                 return results;
             }
             catch (Exception ex)
@@ -690,6 +695,7 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
         public async Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId)
         {
             try
