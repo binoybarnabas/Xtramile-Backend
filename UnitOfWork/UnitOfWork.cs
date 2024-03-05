@@ -22,6 +22,8 @@ using XtramileBackend.Repositories.RequestMappingRepository;
 using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Repositories.TravelOptionRepository;
 using XtramileBackend.Repositories.TravelOptionMappingRepository;
+using XtramileBackend.Repositories.TravelDocumentType;
+using XtramileBackend.Repositories.TravelDocumentFileData;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -49,10 +51,10 @@ namespace XtramileBackend.UnitOfWork
         public IProjectMappingRepository ProjectMappingRepository { get; }
         public IRequestMappingRepsitory RequestMappingRepository { get; }
         public IFileMetaDataRepository FileMetaDataRepository { get; }
-
         public ITravelOptionRepository TravelOptionRepository { get; }
-
         public ITravelOptionMappingRepository TravelOptionMappingRepository {  get; }        
+        public ITravelDocumentTypeRepository TravelDocumentTypeRepository { get; }
+        public ITravelDocumentFileDataRepository TravelDocumentFileDataRepository { get; }
 
 
         public readonly AppDBContext _dbContext;
@@ -82,6 +84,8 @@ namespace XtramileBackend.UnitOfWork
             FileMetaDataRepository = new FileMetaDataRepository(_dbContext);
             TravelOptionRepository = new TravelOptionRepository(_dbContext);
             TravelOptionMappingRepository = new TravelOptionMappingRepository(_dbContext);
+            TravelDocumentTypeRepository = new TravelDocumentTypeRepository(_dbContext);
+            TravelDocumentFileDataRepository = new TravelDocumentFileDataRepository(_dbContext);
 
         }
 
