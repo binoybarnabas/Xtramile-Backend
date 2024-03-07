@@ -37,9 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Uploads\TravelDocuments\IdCards\" />
     <Folder Include="Uploads\TravelDocuments\Visas\" />
-    <Folder Include="Uploads\TravelDocuments\Passports\" />
   </ItemGroup>
 
 </Project>

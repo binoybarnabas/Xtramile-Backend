@@ -92,7 +92,7 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                 };
 
                 await _travelDocumentFileDataService.AddTravelDocumentFileAsync(travelDocuments);
-                return CreatedAtAction(nameof(GetTravelDocumentFilesById), 4, travelDocuments);
+                return CreatedAtAction(nameof(GetTravelDocumentFilesById), new { id = travelDocuments.TravelDocFileId }, travelDocuments);
             }
             catch (Exception ex)
             {
