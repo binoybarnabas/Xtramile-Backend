@@ -16,7 +16,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         {
             try
             {
-                var travelDocumentFileData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
+                IEnumerable<TravelDocumentFileDataModel> travelDocumentFileData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
                 return travelDocumentFileData;
             }
             catch (Exception ex)
@@ -27,7 +27,22 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             }
         }
 
-        public async Task AddTravelDocumentTypeAsync(TravelDocumentFileDataModel TravelDocumentFileData)
+        public async Task<TravelDocumentFileDataModel> GetTravelDocumentFileByIdAsync(int id)
+        {
+            try
+            {
+                TravelDocumentFileDataModel travelDocumentFile = await _unitOfWork.TravelDocumentFileDataRepository.GetByIdAsync(id);
+                return travelDocumentFile;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting travel document file data: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        public async Task AddTravelDocumentFileAsync(TravelDocumentFileDataModel TravelDocumentFileData)
         {
             try
             {
@@ -37,7 +52,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             catch (Exception ex)
             {
                 // Handle or log the exception
-                Console.WriteLine($"An error occurred while adding a travel document file data: {ex.Message}");
+                Console.WriteLine($"An error occurred while adding a travel document file : {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }

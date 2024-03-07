@@ -22,7 +22,6 @@ using XtramileBackend.Repositories.RequestMappingRepository;
 using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Repositories.TravelOptionRepository;
 using XtramileBackend.Repositories.TravelOptionMappingRepository;
-using XtramileBackend.Repositories.TravelDocumentType;
 using XtramileBackend.Repositories.TravelDocumentFileData;
 
 namespace XtramileBackend.UnitOfWork
@@ -52,7 +51,6 @@ namespace XtramileBackend.UnitOfWork
         public IFileMetaDataRepository FileMetaDataRepository { get; }
         public ITravelOptionRepository TravelOptionRepository { get; }
         public ITravelOptionMappingRepository TravelOptionMappingRepository { get; }
-        public ITravelDocumentTypeRepository TravelDocumentTypeRepository { get; }
         public ITravelDocumentFileDataRepository TravelDocumentFileDataRepository { get; }
 
 

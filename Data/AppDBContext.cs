@@ -41,7 +41,7 @@ namespace XtramileBackend.Data
 
         public DbSet<TBL_TRAVEL_TYPE>TBL_TRAVEL_TYPE  { get; set; }
 
-        public DbSet<TBL_TRAVEL_MODE> tBL_TRAVEL_MODE { get; set; }
+        public DbSet<TBL_TRAVEL_MODE> TBL_TRAVEL_MODE { get; set; }
 
         public DbSet<TBL_AVAIL_OPTION> TBL_AVAIL_OPTION { get; set; }
 
@@ -58,8 +58,6 @@ namespace XtramileBackend.Data
         public DbSet<TBL_TRAVEL_OPTION> TBL_TRAVEL_OPTIONS { get; set; }
 
         public DbSet<TBL_TRAVEL_OPTION_MAPPING> TBL_TRAVEL_OPTION_MAPPING { get; set; } 
-
-        public DbSet<TravelDocumentTypeModel> TravelDocumentTypes { get; set; }
 
         public DbSet<TravelDocumentFileDataModel> TravelDocumentFileData {  get; set; }
 
