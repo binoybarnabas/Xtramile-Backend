@@ -89,6 +89,7 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                     UploadedBy = travelDocFile.UploadedBy,
                     Country = travelDocFile.Country,
                     ExpiryDate = travelDocFile.ExpiryDate,
+                    DocId = travelDocFile.DocId,
                 };
 
                 await _travelDocumentFileDataService.AddTravelDocumentFileAsync(travelDocuments);

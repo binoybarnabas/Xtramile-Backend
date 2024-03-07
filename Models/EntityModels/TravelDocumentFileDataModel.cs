@@ -15,5 +15,6 @@ namespace XtramileBackend.Models.EntityModels
         public int UploadedBy { get; set; }
         public string? Country { get; set; }
         public DateTime? ExpiryDate { get; set; }
+        public string DocId { get; set; }
     }
 }

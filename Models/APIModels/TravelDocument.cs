@@ -7,5 +7,6 @@
         public IFormFile File { get; set; }
         public string TravelDocType { get; set; }
         public int UploadedBy { get; set; }
+        public string DocId { get; set; }
     }
 }
