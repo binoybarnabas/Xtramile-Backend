@@ -8,12 +8,12 @@ namespace XtramileBackend.Models.EntityModels
     {
         [Key]
         public int TravelDocFileId { get; set; }
-        public int TravelDocTypeId { get; set; }
+        public string TravelDocType { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public int FileTypeId { get; set; }
         public int UploadedBy { get; set; }
-        public int? CountryId { get; set; }
+        public string? Country { get; set; }
         public DateTime? ExpiryDate { get; set; }
     }
 }

@@ -36,4 +36,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Uploads\TravelDocuments\Visas\" />
+  </ItemGroup>
+
 </Project>
