@@ -503,7 +503,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorities = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -517,7 +516,6 @@ namespace XtramileBackend.Services.ManagerService
                     from request in travelRequests
                     join employee in employees on request.CreatedBy equals employee.EmpId
                     join project in projects on request.ProjectId equals project.ProjectId
-                    join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                     join priority in priorities on request.PriorityId equals priority.PriorityId
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
@@ -532,7 +530,7 @@ namespace XtramileBackend.Services.ManagerService
                         EmployeeEmail = employee.Email,
                         ProjectCode = project.ProjectCode,
                         CreatedOn = request.CreatedOn,
-                        TravelTypeName = travelType.TypeName,
+                        TravelTypeName = request.TravelType,
                         PriorityName = priority.PriorityName,
                         StatusName = primaryStatus.StatusName
                     }
@@ -569,7 +567,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
@@ -578,7 +575,6 @@ namespace XtramileBackend.Services.ManagerService
 
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
-                                             join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
                                              join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
@@ -596,7 +592,7 @@ namespace XtramileBackend.Services.ManagerService
                                                  DepartmentName = department.DepartmentName,
                                                  ProjectCode = project.ProjectCode,
                                                  ProjectName = project.ProjectName,
-                                                 TravelType = travelType.TypeName,
+                                                 TravelType = travelRequest.TravelType,
                                                  TripPurpose = travelRequest.TripPurpose,
                                                  DepartureDate = travelRequest.DepartureDate,
                                                  ReturnDate = travelRequest.ReturnDate,

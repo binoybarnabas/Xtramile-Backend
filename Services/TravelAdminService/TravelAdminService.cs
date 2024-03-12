@@ -94,7 +94,6 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -107,7 +106,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                         join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
                                         from priorityItem in priorityGroup.DefaultIfEmpty()
                                         join project in projectData on request.ProjectId equals project.ProjectId
-                                        join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                                         join employee in employeeData on request.CreatedBy equals employee.EmpId
                                         join primaryStatus in statusData on reqApprove.PrimaryStatusId equals primaryStatus.StatusId
                                         join secondaryStatus in statusData on reqApprove.SecondaryStatusId equals secondaryStatus.StatusId
@@ -119,7 +117,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                             EmployeeName = $"{employee.FirstName} {employee.LastName}",
                                             ProjectCode = project.ProjectCode,
                                             CreatedOn = request.CreatedOn,
-                                            TravelTypeName = travelType.TypeName,
+                                            TravelTypeName = request.TravelType,
                                             PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                             StatusName = _statusServices.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId)
                                         }).OrderByDescending(incomingRequests => incomingRequests.RequestId).ToList();
@@ -163,7 +161,6 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_AVAIL_OPTION> availableOptions = await _unitOfWork.AvailableOptionRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_COUNTRY> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
 
                 // Perform the join and projection
@@ -173,7 +170,6 @@ namespace XtramileBackend.Services.TravelAdminService
                               join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
-                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where reqMapping.RequestId == reqId
                               select new OptionCard
                               {
@@ -193,8 +189,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
-                                  TravelTypeId = request.TravelTypeId,
-                                  TravelTypeName = travelType.TypeName,
+                                  TravelTypeName = request.TravelType,
                               })
                               .FirstOrDefault(); // Return the first matching result or null
 
@@ -219,7 +214,6 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
             IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -231,7 +225,6 @@ namespace XtramileBackend.Services.TravelAdminService
                           join requests in requestData on latestApproval.RequestId equals requests.RequestId
                           join priority in priorityData on requests.PriorityId equals priority.PriorityId
                           join status in statusData on latestApproval.PrimaryStatusId equals status.StatusId
-                          join travelType in travelTypeData on requests.TravelTypeId equals travelType.TravelTypeID
                           join employee in employeeData on requests.CreatedBy equals employee.EmpId
                           join project in projectData on requests.ProjectId equals project.ProjectId
                           where status.StatusCode == statusCode
@@ -241,7 +234,7 @@ namespace XtramileBackend.Services.TravelAdminService
                               EmployeeName = employee.FirstName + " " + employee.LastName,
                               ProjectCode = project.ProjectCode,
                               CreatedOn = requests.CreatedOn,
-                              TravelTypeName = travelType.TypeName,
+                              TravelTypeName = requests.TravelType,
                               PriorityName = priority.PriorityName,
                               ApprovalDate = latestApproval.date
                           }).ToList();
@@ -274,12 +267,10 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
-                                             join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
                                              join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
@@ -294,7 +285,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                                  DepartmentName = department.DepartmentName,
                                                  ProjectCode = project.ProjectCode,
                                                  ProjectName = project.ProjectName,
-                                                 TravelType = travelType.TypeName,
+                                                 TravelType = travelRequest.TravelType,
                                                  TripPurpose = travelRequest.TripPurpose,
                                                  DepartureDate = travelRequest.DepartureDate,
                                                  ReturnDate = travelRequest.ReturnDate,
@@ -387,7 +378,6 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
             IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -401,7 +391,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
                                     from priorityItem in priorityGroup.DefaultIfEmpty()
                                     join project in projectData on request.ProjectId equals project.ProjectId
-                                    join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                                     join employee in employeeData on request.CreatedBy equals employee.EmpId
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
@@ -413,7 +402,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         EmployeeName = $"{employee.FirstName} {employee.LastName}",
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
-                                        TravelTypeName = travelType.TypeName,
+                                        TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
@@ -432,7 +421,6 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
             IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -445,7 +433,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
                                     from priorityItem in priorityGroup.DefaultIfEmpty()
                                     join project in projectData on request.ProjectId equals project.ProjectId
-                                    join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                                     join employee in employeeData on request.CreatedBy equals employee.EmpId
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
@@ -457,7 +444,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         EmployeeName = $"{employee.FirstName} {employee.LastName}",
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
-                                        TravelTypeName = travelType.TypeName,
+                                        TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
@@ -476,7 +463,6 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
             IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -489,7 +475,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
                                     from priorityItem in priorityGroup.DefaultIfEmpty()
                                     join project in projectData on request.ProjectId equals project.ProjectId
-                                    join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                                     join employee in employeeData on request.CreatedBy equals employee.EmpId
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
@@ -501,7 +486,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         EmployeeName = $"{employee.FirstName} {employee.LastName}",
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
-                                        TravelTypeName = travelType.TypeName,
+                                        TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();
@@ -518,7 +503,6 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
             IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
@@ -531,7 +515,6 @@ namespace XtramileBackend.Services.TravelAdminService
                                     join priority in priorityData on request.PriorityId equals priority.PriorityId into priorityGroup
                                     from priorityItem in priorityGroup.DefaultIfEmpty()
                                     join project in projectData on request.ProjectId equals project.ProjectId
-                                    join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                                     join employee in employeeData on request.CreatedBy equals employee.EmpId
                                     join approver in employeeData on reqApprove.EmpId equals approver.EmpId
                                     join status in statusData on reqApprove.PrimaryStatusId equals status.StatusId
@@ -543,7 +526,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                         EmployeeName = $"{employee.FirstName} {employee.LastName}",
                                         ProjectCode = project.ProjectCode,
                                         CreatedOn = request.CreatedOn,
-                                        TravelTypeName = travelType.TypeName,
+                                        TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                         StatusName = status.StatusName
                                     }).ToList();

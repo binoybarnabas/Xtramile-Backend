@@ -84,7 +84,7 @@ namespace XtramileBackend.Controllers.RequestControllers
         [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
         {
-            Console.WriteLine(request.TravelTypeId);
+            Console.WriteLine(request.TravelType);
 
             try
             {
@@ -116,7 +116,7 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                     TravelModeId = Int32.Parse(request.TravelModeId),
 
-                    TravelTypeId = Int32.Parse(request.TravelTypeId),
+                    TravelType = request.TravelType,
 
                     TripPurpose = request.TripPurpose,
 
@@ -282,7 +282,7 @@ namespace XtramileBackend.Controllers.RequestControllers
                 string Status = await _statusServices.GetPrimaryStatusByRequestIdAsync(request.RequestId);
 
                 //Get Mode
-                string TravelMode = await _travelModeService.GetTravelModeByIdAsync(request.TravelTypeId);
+                string TravelMode = await _travelModeService.GetTravelModeByIdAsync(request.TravelModeId);
 
 
                 //Get Files

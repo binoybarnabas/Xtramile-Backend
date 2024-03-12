@@ -17,7 +17,7 @@ namespace XtramileBackend.Models.EntityModels
 
 
         //Trip Informations
-        public int TravelTypeId { get; set; }
+        public string TravelType { get; set; }
 
         public string TripPurpose { get; set; }
 

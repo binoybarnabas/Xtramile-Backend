@@ -32,7 +32,7 @@ namespace XtramileBackend.Models.APIModels
 
         public string TravelModeId { get; set; }
 
-        public string TravelTypeId { get; set; }
+        public string TravelType { get; set; }
 
         public string SourceCity { get; set; }
 

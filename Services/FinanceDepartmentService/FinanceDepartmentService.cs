@@ -28,11 +28,9 @@ namespace XtramileBackend.Services.FinanceDepartment
             {
                 IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
 
                 var incomingRequestData = (from request in requests
                                            join employee in employees on request.CreatedBy equals employee.EmpId
-                                           join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
                                                requestId = request.RequestId,
@@ -40,7 +38,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                                LastName = employee.LastName,
                                                Email = employee.Email,
                                                RequestDate = request.CreatedOn,
-                                               TypeName = travelType.TypeName
+                                               TypeName = request.TravelType
                                            }).ToList();
 
                 return incomingRequestData;
@@ -67,11 +65,9 @@ namespace XtramileBackend.Services.FinanceDepartment
             {
                 IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
 
                 var incomingRequestData = (from request in requests
                                            join employee in employees on request.CreatedBy equals employee.EmpId
-                                           join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                                            select new FinanceRequest
                                            {
                                                requestId = request.RequestId,
@@ -79,7 +75,7 @@ namespace XtramileBackend.Services.FinanceDepartment
                                                LastName = employee.LastName,
                                                Email = employee.Email,
                                                RequestDate = request.CreatedOn,
-                                               TypeName = travelType.TypeName
+                                               TypeName = request.TravelType
                                            });
 
                 // Sort the data based on the input parameters
