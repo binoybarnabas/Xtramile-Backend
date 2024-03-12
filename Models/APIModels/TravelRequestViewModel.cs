@@ -19,8 +19,6 @@ namespace XtramileBackend.Models.APIModels
 
         public string? TravelAuthMailFileUrl { get; set; }
 
-
-
         public string CreatedBy { get; set; }
 
         public string ProjectId { get; set; }
@@ -62,6 +60,6 @@ namespace XtramileBackend.Models.APIModels
         public IFormFile? TravelAuthorizationEmailCapture { get; set; }
         public IFormFile? PassportAttachment { get; set; }
 /*        public IFormFile? IdCardAttachment { get; set; }
-*/        public string? AdditionalComments { get; set; }
+*/      public string? AdditionalComments { get; set; }
     }
 }

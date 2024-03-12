@@ -16,7 +16,7 @@
         public string DestinationCountry { get; set; }
         public int? ModeId { get; set; }
         public string ModeName { get; set; }
-        public int TravelTypeId { get; set; }
+        public string TravelType { get; set; }
         public string TravelTypeName { get; set; }
         public string DestinationCountryCode { get; set; }
         public string SourceCountryCode { get; set; }

@@ -241,7 +241,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
-                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              //join travelType in travelTypeData on request.TravelType equals travelType.TravelType
                               where request.RequestId == reqId
                               select new OptionCard
                               {
@@ -263,8 +263,8 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
-                                  TravelTypeId = request.TravelTypeId,
-                                  TravelTypeName = travelType.TypeName
+                                  TravelType = request.TravelType,
+                                 
                               })
                               .GroupBy(option => option.OptionId)
                               .Select(group => group.First()) // Keep the first record for each OptionId
@@ -373,7 +373,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                               join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              //join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where request.CreatedBy == empId
                                && (primarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CD" || primarystatus.StatusCode == "DD")
                               select new EmployeeViewReq
@@ -381,7 +381,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   RequestId = request.RequestId,
                                   ProjectCode = project.ProjectCode,
                                   ProjectName = project.ProjectName,
-                                  TravelType = travelType.TypeName,
+                                  TravelType = request.TravelType,
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
                                   Status = "Closed"
 
