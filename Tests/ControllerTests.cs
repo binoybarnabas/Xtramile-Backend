@@ -1,13 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using XtramileBackend.Controllers.DepartmentControllers;
+using XtramileBackend.Controllers.EmployeeController;
 using XtramileBackend.Controllers.ProductControllers;
 using XtramileBackend.Controllers.TravelModeController;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.DepartmentService;
+using XtramileBackend.Services.EmployeeService;
+using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.TravelModeService;
 using Xunit;
+using FluentAssertions;
+
 
 namespace XtramileBackend.Tests
 {
@@ -171,6 +178,41 @@ namespace XtramileBackend.Tests
             // Assert
             var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
             Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        }
+        [Fact]
+        public async Task GetEmployeeProfileDetails_ValidRequest_ReturnsOkResult()
+        {
+            // Arrange 
+            int employeeId = 1;
+            var employeeServiceMock = new Mock<IEmployeeServices>();
+            var fileTypeServicesMock = new Mock<IFileTypeServices>();
+            var fileMetaDataServiceMock = new Mock<IFileMetaDataService>();
+            var expectedEmployeeProfile = new EmployeeProfile
+            {
+                EmpId = 1,
+                FirstName = "Alvin",
+                LastName = "Ragi",
+                ContactNumber = "1237836272",
+                Address = "Kerala",
+                Email = "alvinragi@gmail.com",
+                ReportsTo = "Mehanoor Basheer",
+                DepartmentName = "DU1",
+                ProjectCode = "PC007",
+                ProjectName = "Xtramile"
+            };
+
+            employeeServiceMock.Setup(service => service.GetEmployeeProfileByIdAsync(employeeId))
+                            .ReturnsAsync(expectedEmployeeProfile);
+
+            var controller = new EmployeeController(employeeServiceMock.Object, fileTypeServicesMock.Object, fileMetaDataServiceMock.Object);
+
+            // Act
+            var result = await controller.GetEmployeeProfileByIdAsync(employeeId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var actualEmployeeDetails = Assert.IsType<EmployeeProfile>(okResult.Value);
+            actualEmployeeDetails.Should().BeEquivalentTo(expectedEmployeeProfile);
         }
 
     }

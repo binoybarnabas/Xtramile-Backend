@@ -308,7 +308,7 @@ namespace XtramileBackend.Services.EmployeeService
                                join project in projectData on request.ProjectId equals project.ProjectId
                                join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               where request.CreatedBy == empId && 
+                               where request.CreatedBy == empId &&
                                ((primarystatus.StatusId != 5 && secondarystatus.StatusId != 5) && //ongoing requests
                                 (primarystatus.StatusId != 3 && secondarystatus.StatusId != 3) && //closed requests
                                 (primarystatus.StatusId != 9 && secondarystatus.StatusId != 9)) //cancelled requests
@@ -622,10 +622,10 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_ROLES> roleData= await _unitOfWork.RoleRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData= await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData= await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departmentData= await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<TBL_ROLES> roleData = await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
                 var currentRequest = (from request in requestData
                                       join
@@ -648,10 +648,10 @@ namespace XtramileBackend.Services.EmployeeService
                                       {
                                           DepartureDate = request.DepartureDate,
                                           ReturnDate = request.ReturnDate,
-                                          DepartureTime= request.PrefDepartureTime,
-                                          Source= request.SourceState,
-                                          Destination= request.DestinationState,
-                                          Purpose= request.TripPurpose
+                                          DepartureTime = request.PrefDepartureTime,
+                                          Source = request.SourceState,
+                                          Destination = request.DestinationState,
+                                          Purpose = request.TripPurpose
                                       }
 
                 ).ToList();
@@ -881,7 +881,7 @@ namespace XtramileBackend.Services.EmployeeService
                                join project in projectData on request.ProjectId equals project.ProjectId
                                join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               where (request.CreatedBy == empId && 
+                               where (request.CreatedBy == empId &&
                                (primarystatus.StatusId == primaryStatusId && secondarystatus.StatusId == secondaryStatusId))
                                select new PendingRequetsViewEmployee
                                {
