@@ -13,5 +13,6 @@ namespace XtramileBackend.Models.EntityModels
 
         public int? FileId { get; set; }
 
+
     }
 }

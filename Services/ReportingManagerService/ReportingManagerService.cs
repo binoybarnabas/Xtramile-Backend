@@ -334,9 +334,9 @@ namespace XtramileBackend.Services.ManagerService
                     join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                    join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
+                   /* join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId*/
                     where employee.ReportsTo == managerId
-                    && status.StatusCode == "FD" || status1.StatusCode == "FD"
+                    && status.StatusCode == "FD" || status.StatusCode == "WT" || status.StatusCode == "SD"
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
@@ -859,6 +859,26 @@ namespace XtramileBackend.Services.ManagerService
                 return null;
             }
 
+        }
+
+        /// <summary>
+        /// Submission of a travel option from the employee among a list of travel request
+        /// </summary>
+        /// <param name="travelOption"></param>
+        /// <returns></returns>
+        public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
+        {
+            Console.WriteLine(travelOption);
+            try
+            {
+                await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
+                _unitOfWork.Complete();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured");
+                throw;
+            }
         }
     }
 
