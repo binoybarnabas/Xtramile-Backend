@@ -52,8 +52,9 @@ namespace XtramileBackend.Services.ManagerService
                   join request in requestData on employee.EmpId equals request.CreatedBy
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
-                  join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  join primaryStatus in statusData on statusApproval.PrimaryStatusId equals primaryStatus.StatusId
+                  join secondaryStatus in statusData on statusApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                  where primaryStatus.StatusId == 1 && secondaryStatus.StatusId == 2
                   select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
@@ -62,8 +63,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
-                  }).ToList();
+                      Status = "Open"
+                  }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();
                 var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
@@ -502,7 +503,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PRIORITY> priorities = await _unitOfWork.PriorityRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
@@ -516,7 +516,6 @@ namespace XtramileBackend.Services.ManagerService
                     from request in travelRequests
                     join employee in employees on request.CreatedBy equals employee.EmpId
                     join project in projects on request.ProjectId equals project.ProjectId
-                    join travelType in travelTypes on request.TravelTypeId equals travelType.TravelTypeID
                     join priority in priorities on request.PriorityId equals priority.PriorityId
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
@@ -531,7 +530,7 @@ namespace XtramileBackend.Services.ManagerService
                         EmployeeEmail = employee.Email,
                         ProjectCode = project.ProjectCode,
                         CreatedOn = request.CreatedOn,
-                        TravelTypeName = travelType.TypeName,
+                        TravelTypeName = request.TravelType,
                         PriorityName = priority.PriorityName,
                         StatusName = primaryStatus.StatusName
                     }
@@ -568,7 +567,6 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypes = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
@@ -577,7 +575,6 @@ namespace XtramileBackend.Services.ManagerService
 
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
-                                             join travelType in travelTypes on travelRequest.TravelTypeId equals travelType.TravelTypeID
                                              join project in projects on travelRequest.ProjectId equals project.ProjectId
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
@@ -595,7 +592,7 @@ namespace XtramileBackend.Services.ManagerService
                                                  DepartmentName = department.DepartmentName,
                                                  ProjectCode = project.ProjectCode,
                                                  ProjectName = project.ProjectName,
-                                                 TravelType = travelType.TypeName,
+                                                 TravelType = travelRequest.TravelType,
                                                  TripPurpose = travelRequest.TripPurpose,
                                                  DepartureDate = travelRequest.DepartureDate,
                                                  ReturnDate = travelRequest.ReturnDate,
@@ -685,73 +682,7 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.RequestRepository.Update(existingRequest);
 
                 _unitOfWork.Complete();
-
-                //Data for sending email notification when request approved by manager
-                Mail sendToEmployee = new Mail();
-
-                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(existingRequest.CreatedBy);
-                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(approve.EmpId);
-
-
-                if (employeeData != null)
-                {
-                    sendToEmployee.recipientName = employeeData.FirstName + " " + employeeData.LastName;
-                    sendToEmployee.recipientEmail = employeeData.Email;
-                    sendToEmployee.managerName = managerData.FirstName + " " + managerData.LastName;
-                }
-
-                sendToEmployee.requestCode = existingRequest.RequestCode;
-
-                sendToEmployee.mailContext = "approve";
-
-                //sending the mail
-                MailService.SendMail(sendToEmployee);
-
-                //List of mails for each travek admin
-                List<Mail> travelAdminMails = new List<Mail>();
-
-                // Retrieve data from repositories
-                IEnumerable<TBL_EMPLOYEE> travelAdminData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_ROLES> rolesData = await _unitOfWork.RoleRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
-
-                // Query to get travel admin details
-                var travelAdminEmails = (from travelAdmin in travelAdminData
-                                         join projectMapping in projectMappingData on travelAdmin.EmpId equals projectMapping.EmpId
-                                         join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                                         join department in departmentData on project.DepartmentId equals department.DepartmentId
-                                         join role in rolesData on travelAdmin.RoleId equals role.RoleId
-                                         where department.DepartmentCode == "TA" && (travelAdmin.RoleId == 2 || travelAdmin.RoleId == 3)
-                                         select new { travelAdmin.FirstName, travelAdmin.LastName, travelAdmin.Email }).ToList();
-
-                // Iterate through each travel admin and create a separate mail for each
-                foreach (var travelAdminAndManager in travelAdminEmails)
-                {
-                    // Create a new mail instance for each travel admin
-                    Mail sendToTravelAdmin = new Mail();
-
-                    // Set recipient details
-                    sendToTravelAdmin.recipientName = travelAdminAndManager.FirstName + " " + travelAdminAndManager.LastName;
-                    sendToTravelAdmin.recipientEmail = travelAdminAndManager.Email;
-
-                    // Set other mail details
-                    sendToTravelAdmin.requestCode = existingRequest.RequestCode;
-                    sendToTravelAdmin.managerName = managerData.FirstName + " " + managerData.LastName;
-
-                    sendToTravelAdmin.mailContext = "approve";
-
-                    // Add the mail to the list
-                    travelAdminMails.Add(sendToTravelAdmin);
-                }
-
-                // Send mails to all travel admins
-                foreach (var mail in travelAdminMails)
-                {
-                    MailService.SendMail(mail);
-                }
-
+                
                 return true;
             }
             catch (Exception ex)
@@ -782,7 +713,9 @@ namespace XtramileBackend.Services.ManagerService
 
                     var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
 
-                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
+                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "DD");
+
+                    var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
 
                     TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
 
@@ -792,7 +725,7 @@ namespace XtramileBackend.Services.ManagerService
 
                     approve.PrimaryStatusId = primaryStatus.StatusId;
 
-                    approve.SecondaryStatusId = primaryStatus.StatusId;
+                    approve.SecondaryStatusId = secondaryStatus.StatusId;
 
                     approve.date = DateTime.Now;
 
@@ -831,21 +764,6 @@ namespace XtramileBackend.Services.ManagerService
                 request.ReasonId = reason.ReasonId;
                 _unitOfWork.RequestRepository.Update(request);
                 _unitOfWork.Complete();
-
-                //cancellation or rejection mail when the manager rejects a travel request raised by an employee
-                Mail mailData = new Mail();
-                TBL_REQUEST requestData = await _unitOfWork.RequestRepository.GetByIdAsync(reqId);
-                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(requestData.CreatedBy);
-                TBL_EMPLOYEE managerData = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeData.ReportsTo ?? -1);
-                TBL_REASON reasonData = await _unitOfWork.ReasonRepository.GetByIdAsync(requestData.ReasonId ?? -1);
-
-                mailData.mailContext = "reject";
-                mailData.managerName = managerData.FirstName + " " + managerData.LastName;
-                mailData.recipientName = employeeData.FirstName + " " + employeeData.LastName;
-                mailData.recipientEmail = employeeData.Email;
-                mailData.requestCode = requestData.RequestCode;
-                mailData.reasonForRejection = reasonData.Description;
-                MailService.SendMail(mailData);
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred while adding reason to the request {ex.Message}");

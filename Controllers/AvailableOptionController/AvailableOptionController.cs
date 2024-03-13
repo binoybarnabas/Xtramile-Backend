@@ -159,7 +159,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
         {
             try
             {
-                IEnumerable<TBL_TRAVEL_OPTION> travelOptionsData = await _availableOptionServices.GetTravelOptionsByRequestIdAsync(reqId);
+                IEnumerable<TBL_TRAVEL_OPTION> travelOptionsData = await _availableOptionServices.GetTravelOptionsByRequestIdAsync(reqId,false);
 
                 //var OptionFilePath = await _fileMetaDataServices.GetFilePathByRequestIdAndDescriptionAsync(reqId, "OptionFile");
 
@@ -171,7 +171,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                     travelOptionsViewData.OptionId = travelOption.OptionId;
                     travelOptionsViewData.RequestId = travelOption.RequestId.ToString();
                     travelOptionsViewData.Description = travelOption.Description;
-
+                
                     int? fileId = travelOption.FileId; // Assuming travelOption.FileId is int?
                     //Get file path by fileID--bug
                     var OptionFilePath = await _fileMetaDataServices.GetFilePathByFileIdAsync(fileId.Value);
@@ -192,7 +192,40 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
         }
 
 
+        //add new option in the form of text
+        [HttpPost("addtextoption")]
+        public async Task<IActionResult> AddTextsAsTravelAvailableOption([FromBody] AvailableOption availableOption)
+        {
 
+            try {
+                string response = await _availableOptionServices.AddAvailableTextOptionAsync(availableOption);
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {  
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
+
+            }
+
+        }
+
+        [HttpGet("gettextoptions/${requestId}")]
+        public async Task<IActionResult> AddTextsAsTravelAvailableOption(int requestId)
+        {
+            try
+            {
+                IEnumerable< TBL_TRAVEL_OPTION> travelOptions = await _availableOptionServices.GetTravelOptionsByRequestIdAsync(requestId,true);
+                return Ok(travelOptions);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
+
+            }
+
+        }
 
     }
 }

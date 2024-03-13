@@ -28,7 +28,7 @@ namespace XtramileBackend.Controllers.CountryControllers
             }
             catch(Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving countries.");
+                return StatusCode(500, "An error occurred while retrieving countries : " + ex.Message);
             }
         }
 
@@ -42,7 +42,7 @@ namespace XtramileBackend.Controllers.CountryControllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while adding a country.");
+                return StatusCode(500, "An error occurred while adding a country : " + ex.Message);
             }
         }
 

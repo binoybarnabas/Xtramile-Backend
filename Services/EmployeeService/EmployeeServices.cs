@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -13,15 +14,17 @@ namespace XtramileBackend.Services.EmployeeService
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDBContext _dbContext;
- 
+        private readonly IStatusServices _statusServices;
 
-        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext)
+
+        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext, IStatusServices statusServices)
         {
             _unitOfWork = unitOfWork;
             _dbContext = dbContext;
+            _statusServices = statusServices;
         }
 
-      
+
 
         public async Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync()
         {
@@ -238,7 +241,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
-                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              //join travelType in travelTypeData on request.TravelType equals travelType.TravelType
                               where request.RequestId == reqId
                               select new OptionCard
                               {
@@ -260,8 +263,8 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
-                                  TravelTypeId = request.TravelTypeId,
-                                  TravelTypeName = travelType.TypeName
+                                  TravelType = request.TravelType,
+                                 
                               })
                               .GroupBy(option => option.OptionId)
                               .Select(group => group.First()) // Keep the first record for each OptionId
@@ -277,6 +280,7 @@ namespace XtramileBackend.Services.EmployeeService
             }
 
         }
+
         /// <summary>
         /// Retrieves pending travel requests for a specific employee.
         /// </summary>
@@ -294,8 +298,8 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalMap
-                .GroupBy(approval => approval.RequestId)
-                .Select(group => group.OrderByDescending(approval => approval.date).First());
+                    .GroupBy(approval => approval.RequestId)
+                    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var results = (from request in requestData
                                join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
@@ -304,7 +308,10 @@ namespace XtramileBackend.Services.EmployeeService
                                join project in projectData on request.ProjectId equals project.ProjectId
                                join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
-                               where request.CreatedBy == empId && (primarystatus.StatusCode != "OG" && primarystatus.StatusCode != "DD" && primarystatus.StatusCode != "CD" && primarystatus.StatusCode != "CL")
+                               where request.CreatedBy == empId && 
+                               ((primarystatus.StatusId != 5 && secondarystatus.StatusId != 5) && //ongoing requests
+                                (primarystatus.StatusId != 3 && secondarystatus.StatusId != 3) && //closed requests
+                                (primarystatus.StatusId != 9 && secondarystatus.StatusId != 9)) //cancelled requests
                                select new PendingRequetsViewEmployee
                                {
                                    requestId = request.RequestId,
@@ -318,12 +325,16 @@ namespace XtramileBackend.Services.EmployeeService
                                    departureDate = request.DepartureDate,
                                    returnDate = request.ReturnDate,
                                    travelMode = travelMode.ModeName,
-                                   statusName = primarystatus.StatusName,
-                                   statusModifiedBy = employee.FirstName + " " +employee.LastName
+                                   statusName = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
+                                   statusModifiedBy = employee.FirstName + " " + employee.LastName,
+                                   date = statusApproval.date
                                    /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
                                    *//*                                   dateOfTravel = request.DepartureDate
                                    */
-                               }).ToList();
+                               })
+                               .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
+                               .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
+                               .ToList();
                 return results;
             }
             catch (Exception ex)
@@ -362,7 +373,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                               join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                              join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
+                              //join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where request.CreatedBy == empId
                                && (primarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CD" || primarystatus.StatusCode == "DD")
                               select new EmployeeViewReq
@@ -370,7 +381,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   RequestId = request.RequestId,
                                   ProjectCode = project.ProjectCode,
                                   ProjectName = project.ProjectName,
-                                  TravelType = travelType.TypeName,
+                                  TravelType = request.TravelType,
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
                                   Status = "Closed"
 
@@ -498,30 +509,25 @@ namespace XtramileBackend.Services.EmployeeService
                     from reqApproval in reqApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
-                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where request.CreatedBy == employeeId
-                        && request.PerdiemId != null
                         && reqApproval.PrimaryStatusId == 5
                         && primaryStatus.StatusCode == "OG"
-                        && secondaryStatus.StatusCode == "OG"
                     select new DashboardUpcomingTrip
                     {
                         StartDate = request.DepartureDate,
                         EndDate = request.ReturnDate,
                         TripPurpose = request.TripPurpose,
                         SourceCity = request.SourceCity,
-                        SourceState = request.SourceState,
                         SourceCountry = request.SourceCountry,
                         DestinationCity = request.DestinationCity,
-                        DestinationState = request.DestinationState,
                         DestinationCountry = request.DestinationCountry
                     }
-                );
+                ).ToList();
 
                 // Checking if the result is not null and returning
                 if (result != null && result.Any()) // Check if there are any results
                 {
-                    return result.ToList(); // If there are results, return the list
+                    return result;// If there are results, return the list
                 }
                 else
                 {
@@ -544,7 +550,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="employeeId">The ID of the employee.</param>
         /// <returns>A collection of dashboard progress details for the employee.</returns>
-        public async Task<DashboardEmployeeprogress> GetEmployeeDashboardProgressAsync(int employeeId)
+        public async Task<IEnumerable<DashboardEmployeeprogress>> GetEmployeeDashboardProgressAsync(int employeeId)
         {
             try
             {
@@ -557,37 +563,42 @@ namespace XtramileBackend.Services.EmployeeService
 
                 // Querying for dashboard details
                 var result = (
-                    from reqApproval in reqApprovals
-                    join request in travelRequests on reqApproval.RequestId equals request.RequestId
-                    join employee in employees on request.CreatedBy equals employee.EmpId
-                    join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
-                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    join employeeRole in employeeRoles on reqApproval.EmpId equals employeeRole.RoleId into er
-                    from empRole in er.DefaultIfEmpty()
-                    where request.CreatedBy == employeeId
-                    select new DashboardEmployeeprogress
-                    {
-                        RequestCode = request.RequestCode, // Add RequestId property
-                        Status = primaryStatus.StatusName, // Assuming StatusName is the property you want to include
-                        Progress = (
-                            (primaryStatus.StatusCode == "OP" && secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
-                            (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Manager") ? "Manager Forwarded" :
-                            (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "FD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
-                            (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Approved" :
-                            (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
-                            (primaryStatus.StatusCode == "CD" && secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
-                            (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Manager") ? "Manager Denied" :
-                            (primaryStatus.StatusCode == "DD" && secondaryStatus.StatusCode == "DD" && empRole.RoleName == "Travel Admin") ? "Travel Admin Denied" :
-                            (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") ? "Finance Denied" :
-                            "Unknown"
-                        )
-                    }
-                ).FirstOrDefault();
+                         from reqApproval in reqApprovals
+                         join request in travelRequests on reqApproval.RequestId equals request.RequestId
+                         join employee in employees on request.CreatedBy equals employee.EmpId
+                         join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
+                         where request.CreatedBy == employeeId && primaryStatus.StatusCode != "CL"
+                         group new { reqApproval, request, primaryStatus } by request.RequestId into requestGroup
+                         let latestEntry = requestGroup.OrderByDescending(entry => entry.reqApproval.date).FirstOrDefault()
+                         let empRole = (
+                             from emp in employees
+                             join role in employeeRoles on emp.RoleId equals role.RoleId
+                             where emp.EmpId == latestEntry?.reqApproval.EmpId
+                             select role
+                         ).FirstOrDefault()
+                         select new DashboardEmployeeprogress
+                         {
+                             RequestCode = latestEntry.request.RequestCode, // Add RequestCode property
+                             Status = latestEntry.primaryStatus.StatusName, // Assuming StatusName is the property you want to include
+                             Progress = (
+                                 (latestEntry.primaryStatus.StatusCode == "OP") ? "Request Submitted" :
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && empRole?.RoleName == "Manager") ? "Manager Forwarded" :
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
+                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Finance Approved" :
+                                 (latestEntry.primaryStatus.StatusCode == "CL") ? "Trip Completed" :
+                                 (latestEntry.primaryStatus.StatusCode == "CD") ? "Request Cancelled" :
+                                 (latestEntry.primaryStatus.StatusCode == "DD" && empRole?.RoleName == "Manager") ? "Manager Denied" :
+                                 (latestEntry.primaryStatus.StatusCode == "DD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Denied" :
+                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Finance Denied" :
+                                 "Unknown"
+                             )
+                         }
+                         ).ToList();
 
-                // Checking if the result is not null and returning
-                if (result != null) // Check if there is a result
+                // Checking if the result is not empty and returning
+                if (result.Any())
                 {
-                    return result; // If there is a result, return the status
+                    return result;
                 }
                 else
                 {
@@ -603,26 +614,48 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<EmployeeCurrentRequest> getEmployeeCurrentTravel(int empId)
+        public async Task<IEnumerable<EmployeeCurrentRequest>> getEmployeeCurrentTravel(int empId)
         {
             try
             {
-                var date = DateTime.Now;
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                var request = requestData.FirstOrDefault(r => r.CreatedBy == empId && date >= r.DepartureDate && date <= r.ReturnDate);
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_ROLES> roleData= await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData= await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData= await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_DEPARTMENT> departmentData= await _unitOfWork.DepartmentRepository.GetAllAsync();
 
-                if (request != null)
-                {
-                    return new EmployeeCurrentRequest
-                    {
-                        DepartureDate = request.DepartureDate,
-                        ReturnDate = request.ReturnDate
-                    };
-                }
-                else
-                {
-                    return null; // Or throw an exception, or return a default EmployeeCurrentRequest
-                }
+                var currentRequest = (from request in requestData
+                                      join
+                              employee in employeeData on request.CreatedBy equals employee.EmpId
+                                      join
+                              role in roleData on employee.RoleId equals role.RoleId
+                                      join
+                              statusApproval in statusApprovalData on request.RequestId equals statusApproval.RequestId
+                                      join
+                              status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
+                                      join
+                              projectMapping in projectMappingData on statusApproval.EmpId equals projectMapping.EmpId
+                                      join
+                              project in projectData on projectMapping.ProjectId equals project.ProjectId
+                                      join
+                              department in departmentData on project.DepartmentId equals department.DepartmentId
+                                      where status.StatusCode == "OG" || status.StatusCode == "FW" && department.DepartmentName == "Travel"
+
+                                      select new EmployeeCurrentRequest
+                                      {
+                                          DepartureDate = request.DepartureDate,
+                                          ReturnDate = request.ReturnDate,
+                                          DepartureTime= request.PrefDepartureTime,
+                                          Source= request.SourceState,
+                                          Destination= request.DestinationState,
+                                          Purpose= request.TripPurpose
+                                      }
+
+                ).ToList();
+                return currentRequest;
 
             }
             catch (Exception ex)
@@ -662,6 +695,7 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
+
         public async Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId)
         {
             try
@@ -671,15 +705,15 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQ_APPROVE> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 var travelRequest = (
-                    from request in requestData 
+                    from request in requestData
                     join reqApproval in reqApprovalData on request.RequestId equals reqApproval.RequestId
                     join status in statusData on reqApproval.PrimaryStatusId equals status.StatusId
-                    where request.CreatedBy== empId
+                    where request.CreatedBy == empId
                     orderby reqApproval.date
                     select new RequestNotification
                     {
-                        RequestCode= request.RequestCode,
-                        StatusName= status.StatusName,
+                        RequestCode = request.RequestCode,
+                        StatusName = status.StatusName,
                         Date = reqApproval.date,
                     }
 
@@ -752,7 +786,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <param name="requestId"></param>
         /// <param name="empId"></param>
         /// <returns></returns>
-        public async Task<bool> EmployeeCancelRequest(int requestId,int empId)
+        public async Task<bool> EmployeeCancelRequest(int requestId, int empId)
         {
             try
             {
@@ -812,6 +846,69 @@ namespace XtramileBackend.Services.EmployeeService
             {
                 Console.WriteLine("An error occured");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// function to get the requests in the pending section which are filtered based on the status
+        /// </summary>
+        /// <param name="empId"></param>
+        /// <param name="primaryStatusCode"></param>
+        /// <param name="secondaryStatusCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode)
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var latestStatusApprovals = statusApprovalMap
+                    .GroupBy(approval => approval.RequestId)
+                    .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                int primaryStatusId = await _statusServices.GetStatusIdByCode(primaryStatusCode);
+                int secondaryStatusId = await _statusServices.GetStatusIdByCode(secondaryStatusCode);
+
+                var results = (from request in requestData
+                               join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
+                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
+                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
+                               join project in projectData on request.ProjectId equals project.ProjectId
+                               join travelMode in travelModeData on request.TravelModeId equals travelMode.ModeId
+                               join employee in employeeData on statusApproval.EmpId equals employee.EmpId
+                               where (request.CreatedBy == empId && 
+                               (primarystatus.StatusId == primaryStatusId && secondarystatus.StatusId == secondaryStatusId))
+                               select new PendingRequetsViewEmployee
+                               {
+                                   requestId = request.RequestId,
+                                   requestCode = request.RequestCode,
+                                   projectCode = project.ProjectCode,
+                                   tripPurpose = request.TripPurpose,
+                                   sourceCity = request.SourceCity,
+                                   sourceCountry = request.SourceCountry,
+                                   destinationCity = request.DestinationCity,
+                                   destinationCountry = request.DestinationCountry,
+                                   departureDate = request.DepartureDate,
+                                   returnDate = request.ReturnDate,
+                                   travelMode = travelMode.ModeName,
+                                   statusName = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
+                                   statusModifiedBy = employee.FirstName + " " + employee.LastName
+                                   /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
+                                   *//*                                   dateOfTravel = request.DepartureDate
+                                   */
+                               }).OrderByDescending(result => result.requestId).ToList();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
             }
         }
     }

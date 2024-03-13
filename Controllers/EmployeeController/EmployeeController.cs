@@ -220,7 +220,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                EmployeeCurrentRequest request = await _employeeService.getEmployeeCurrentTravel(empId);
+                IEnumerable<EmployeeCurrentRequest> request = await _employeeService.getEmployeeCurrentTravel(empId);
                 return Ok(request);
             }
             catch (Exception ex)
@@ -276,7 +276,7 @@ namespace XtramileBackend.Controllers.EmployeeController
             try
             {
                 // Call the service method to retrieve progress details for the specified employee
-                DashboardEmployeeprogress employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
+                IEnumerable<DashboardEmployeeprogress> employeeDashboardProgress = await _employeeService.GetEmployeeDashboardProgressAsync(employeeId);
 
                 // Return a 200 OK response with the retrieved progress details
                 return Ok(employeeDashboardProgress);
@@ -294,7 +294,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
-                var notification= await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
+                var notification = await _employeeService.GetEmployeeRequestNotificationsAsync(empId);
                 return Ok(notification);
             }
             catch (Exception ex)
@@ -323,7 +323,7 @@ namespace XtramileBackend.Controllers.EmployeeController
         }
 
         [HttpPost("request/cancel")]
-        public async Task<IActionResult> CancelRequest([FromBody]CancelRequest cancelRequest)
+        public async Task<IActionResult> CancelRequest([FromBody] CancelRequest cancelRequest)
         {
             try
             {
@@ -355,6 +355,20 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        [HttpGet("viewpendingrequest/status/{empId}")]
+        public async Task<IActionResult> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode)
+        {
+            try
+            {
+                IEnumerable<PendingRequetsViewEmployee> filteredPendingRequestData = await _employeeService.GetFilteredPendingRequestsByEmpId(empId,primaryStatusCode,secondaryStatusCode);
+                return Ok(filteredPendingRequestData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting pending requests: {ex.Message}");
+            }
+        }
 
 
     }

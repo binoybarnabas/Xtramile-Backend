@@ -29,7 +29,7 @@ namespace XtramileBackend.Controllers.PerdiemController
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving perdiem data.");
+                return StatusCode(500, "An error occurred while retrieving perdiem data : " + ex.Message);
             }
         }
 
@@ -43,7 +43,7 @@ namespace XtramileBackend.Controllers.PerdiemController
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while adding perdiem.");
+                return StatusCode(500, "An error occurred while adding perdiem : " + ex.Message);
             }
         }
 

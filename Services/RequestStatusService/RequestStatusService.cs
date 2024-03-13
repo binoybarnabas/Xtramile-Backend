@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Core;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XtramileBackend.Models.APIModels;
@@ -11,10 +12,12 @@ namespace XtramileBackend.Services.RequestStatusService
     public class RequestStatusServices : IRequestStatusServices
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMailService _mailService;
 
-        public RequestStatusServices(IUnitOfWork unitOfWork)
+        public RequestStatusServices(IUnitOfWork unitOfWork, IMailService mailService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mailService = mailService;
         }
 
         public async Task<IEnumerable<TBL_REQ_APPROVE>> GetRequestStatusesAsync()
@@ -22,6 +25,7 @@ namespace XtramileBackend.Services.RequestStatusService
             try
             {
                 var requestStatusData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                await _mailService.SendToManagersOnSubmit(1069);
                 return requestStatusData;
             }
             catch (Exception ex)
@@ -40,71 +44,51 @@ namespace XtramileBackend.Services.RequestStatusService
                 await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
                 _unitOfWork.Complete();
 
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestStatus.RequestId);
-                TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-                TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(requestStatus.EmpId);
-
-                //Send an email to employee once an option is sent by the travel admin 
-                if (requestStatus.PrimaryStatusId == 10 && requestStatus.SecondaryStatusId == 10)
+                if(requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
                 {
-                    Mail sentOptions = new Mail();
+                    //mail to be sent to employee on reuqest submit
+                    await _mailService.SendToEmployeeOnSubmit(requestStatus.RequestId);
 
-                    if (employee != null)
-                    {
-                        sentOptions.recipientName = employee.FirstName + " " + employee.LastName;
-                        sentOptions.recipientEmail = employee.Email;
-                        sentOptions.managerName = manager.FirstName + " " + manager.LastName;
-                        sentOptions.requestCode = request.RequestCode;
-                        sentOptions.mailContext = "options";
-                        MailService.SendMail(sentOptions);
-                    }
+                    //mail to be sent to reporting manager on request submit
+                    await _mailService.SendToManagersOnSubmit(requestStatus.RequestId);
+
+                    //mail to be sent to the travelAdminTeam on request submit
+                    await _mailService.SendToTravelAdminTeamOnSubmit(requestStatus.RequestId);
                 }
 
-                //Send an email to travel admins once employee picks an option
-                if (requestStatus.PrimaryStatusId == 11 && requestStatus.SecondaryStatusId == 11)
+                if(requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 2)
                 {
-                    List<Mail> travelAdminMails = new List<Mail>();
+                        //send mail to employee on manager approval
+                        await _mailService.SendToEmployeeOnManagerApproval(requestStatus.RequestId);
 
-                    // Retrieve data from repositories
-                    IEnumerable<TBL_EMPLOYEE> travelAdminData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                    IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                    IEnumerable<TBL_ROLES> rolesData = await _unitOfWork.RoleRepository.GetAllAsync();
-                    IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                    IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                        //send mail to travel admin team on manager approval
+                        await _mailService.SendToTravelAdminTeamOnManagerApproval(requestStatus.RequestId);
+                }
 
-                    // Query to get travel admin details
-                    var travelAdminEmails = (from travelAdmin in travelAdminData
-                                             join projectMapping in projectMappingData on travelAdmin.EmpId equals projectMapping.EmpId
-                                             join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                                             join department in departmentData on project.DepartmentId equals department.DepartmentId
-                                             join role in rolesData on travelAdmin.RoleId equals role.RoleId
-                                             where department.DepartmentCode == "TA" && (travelAdmin.RoleId == 2 || travelAdmin.RoleId == 3)
-                                             select new { travelAdmin.FirstName, travelAdmin.LastName, travelAdmin.Email }).ToList();
+                if(requestStatus.PrimaryStatusId == 6 && requestStatus.SecondaryStatusId == 2)
+                {
+                        //mail to be sent to Employee on request denial by manager
+                        await _mailService.SendToEmployeeOnManagerDenial(requestStatus.RequestId);
 
-                    // Iterate through each travel admin and create a separate mail for each
-                    foreach (var travelAdminAndManager in travelAdminEmails)
-                    {
-                        // Create a new mail instance for each travel admin
-                        Mail selectedOption = new Mail();
+                        //mail to be sent to travel admin team on request denial by a manager
+                        await _mailService.SendToTravelAdminTeamOnManagerDenial(requestStatus.RequestId);
+                }
 
-                        // Set recipient details
-                        selectedOption.recipientName = travelAdminAndManager.FirstName + " " + travelAdminAndManager.LastName;
-                        selectedOption.recipientEmail = travelAdminAndManager.Email;
+                if(requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 10)
+                {
+                    //mail to be sent to reporting manager on option sent
+                    await _mailService.SendToReportingManagerOnOptionSent(requestStatus.RequestId);
+                }
 
-                        // Set other mail details
-                        selectedOption.requestCode = request.RequestCode;
-                        selectedOption.mailContext = "sendToTAOnOptionSelect";
-                        selectedOption.requestSubmittedBy = employee.FirstName + " " + employee.LastName;
+                if(requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 11)
+                {
+                    //mail to be sent to travel admin once the manager has picked the travel option
+                    await _mailService.SendToTrvaelAdminTeamOnOptionSelection(requestStatus.RequestId);
+                }
 
-                        // Add the mail to the list
-                        travelAdminMails.Add(selectedOption);
-                    }
-
-                    // Send mails to all travel admins
-                    foreach (var mail in travelAdminMails)
-                    {
-                        MailService.SendMail(mail);
-                    }
+                if(requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 12)
+                {
+                    await _mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
                 }
             }
             catch (Exception ex)
