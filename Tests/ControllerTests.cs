@@ -14,6 +14,13 @@ using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.TravelModeService;
 using Xunit;
 using FluentAssertions;
+using XtramileBackend.Repositories.EmployeeRepository;
+using XtramileBackend.UnitOfWork;
+using XtramileBackend.Data;
+using XtramileBackend.Services.StatusService;
+using System.Net;
+using Sprache;
+using Microsoft.AspNetCore.Routing;
 
 
 namespace XtramileBackend.Tests
@@ -190,15 +197,15 @@ namespace XtramileBackend.Tests
             var expectedEmployeeProfile = new EmployeeProfile
             {
                 EmpId = 1,
-                FirstName = "Alvin",
-                LastName = "Ragi",
-                ContactNumber = "1237836272",
-                Address = "Kerala",
-                Email = "alvinragi@gmail.com",
-                ReportsTo = "Mehanoor Basheer",
-                DepartmentName = "DU1",
-                ProjectCode = "PC007",
-                ProjectName = "Xtramile"
+                FirstName = "First Name",
+                LastName = "Last Name",
+                ContactNumber = "1234567890",
+                Address = "Current Address",
+                Email = "useremail@gmail.com",
+                ReportsTo = "Manager Name",
+                DepartmentName = "Department Name",
+                ProjectCode = "Project Code",
+                ProjectName = "Project Name"
             };
 
             employeeServiceMock.Setup(service => service.GetEmployeeProfileByIdAsync(employeeId))
@@ -213,6 +220,28 @@ namespace XtramileBackend.Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
             var actualEmployeeDetails = Assert.IsType<EmployeeProfile>(okResult.Value);
             actualEmployeeDetails.Should().BeEquivalentTo(expectedEmployeeProfile);
+        }
+        [Fact]
+        public async Task UpdateEmployeeDetails_ValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            int employeeId = 1;
+            var mockEmployeeService = new Mock<IEmployeeServices>();
+            var mockFileTypeServices = new Mock<IFileTypeServices>();
+            var mockFileMetaDataService = new Mock<IFileMetaDataService>();
+
+            var profileEdit = new ProfileEdit { ContactNumber = "123456789", Address = "New Address" };
+
+            mockEmployeeService.Setup(service => service.UpdateEmployeeDetailsAsync(employeeId, profileEdit))
+                .Returns(Task.CompletedTask);
+
+            var controller = new EmployeeController(mockEmployeeService.Object, mockFileTypeServices.Object, mockFileMetaDataService.Object);
+
+            // Act
+            var result = await controller.UpdateEmployeeDetailsAsync(employeeId, profileEdit);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
         }
 
     }

@@ -264,7 +264,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
                                   TravelType = request.TravelType,
-                                 
+
                               })
                               .GroupBy(option => option.OptionId)
                               .Select(group => group.First()) // Keep the first record for each OptionId

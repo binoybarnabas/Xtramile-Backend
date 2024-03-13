@@ -2,7 +2,8 @@
 
 namespace XtramileBackend.Repositories.EmployeeRepository
 {
-    public interface IEmployeeRepository:IRepository<TBL_EMPLOYEE>
+    public interface IEmployeeRepository : IRepository<TBL_EMPLOYEE>
     {
+
     }
 }
