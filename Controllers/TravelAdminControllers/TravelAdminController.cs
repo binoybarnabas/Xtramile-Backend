@@ -206,10 +206,10 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             try
             {
                 var optionId = await _travelAdminService.GetSelectedTravelOptionFromEmployee(reqId);
-                
-                
+
+
                 return Ok(optionId);
-                
+
             }
             catch (Exception ex)
             {

@@ -192,7 +192,23 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
         }
 
 
+        //add new option in the form of text
+        [HttpPost("addtextoption")]
+        public async Task<IActionResult> AddTextsAsTravelAvailableOption([FromBody] AvailableOption availableOption)
+        {
 
+            try {
+                string response = await _availableOptionServices.AddAvailableTextOptionAsync(availableOption);
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {  
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
+
+            }
+
+        }
 
     }
 }
