@@ -1,6 +1,7 @@
 ﻿    using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -115,5 +116,32 @@ namespace XtramileBackend.Services.AvailableOptionService
 
             }
         }
+        /// <summary>
+        /// To add available travel option ticket details in the form of text
+        /// </summary>
+        /// <param name="availableOption"></param>
+        /// <returns></returns>
+        public async Task<string> AddAvailableTextOptionAsync(AvailableOption availableOption)
+        {
+            try{
+
+                TBL_TRAVEL_OPTION availableTravelOption = new TBL_TRAVEL_OPTION();
+                availableTravelOption.RequestId = availableOption.RequestId;
+                availableTravelOption.Description = availableOption.HtmlContent;
+                availableTravelOption.FileId = null;
+
+                await _unitOfWork.TravelOptionRepository.AddAsync(availableTravelOption);
+                _unitOfWork.Complete();
+                return "successfully inserted";
+
+            }
+            catch (Exception ex) { 
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting adding text available options : {ex.Message}");
+                throw; // Re-throw the exception to propagate ;
+            }
+
+        }
+
     }
 }
