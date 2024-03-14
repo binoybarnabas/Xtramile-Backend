@@ -96,15 +96,20 @@ namespace XtramileBackend.Services.AvailableOptionService
             }
         }
 
-        public async Task<IEnumerable<TBL_TRAVEL_OPTION>> GetTravelOptionsByRequestIdAsync(int reqId)
+        public async Task<IEnumerable<TBL_TRAVEL_OPTION>> GetTravelOptionsByRequestIdAsync(int reqId, bool travelOptiontext)
         {
             try
             {
                 var allOptions = await _unitOfWork.TravelOptionRepository.GetAllAsync();
                 
-                var travelOptions = (from item in allOptions
-                                     where item.RequestId == reqId
-                                     select item).ToList();
+
+                var travelOptions = (travelOptiontext == true) ?
+                                     (from item in allOptions
+                                      where item.RequestId == reqId && item.FileId == null
+                                      select item).ToList():
+                                     (from item in allOptions
+                                     where item.RequestId == reqId && item.FileId != null
+                                      select item).ToList();
 
                 return travelOptions;
             }
@@ -116,6 +121,7 @@ namespace XtramileBackend.Services.AvailableOptionService
 
             }
         }
+
         /// <summary>
         /// To add available travel option ticket details in the form of text
         /// </summary>
