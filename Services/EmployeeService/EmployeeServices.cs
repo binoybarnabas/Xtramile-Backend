@@ -232,7 +232,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_AVAIL_OPTION> availableOptions = await _unitOfWork.AvailableOptionRepository.GetAllAsync();
                 IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_COUNTRY> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
 
                 // Perform the join and projection
@@ -241,7 +240,6 @@ namespace XtramileBackend.Services.EmployeeService
                               join mode in travelModeData on option.ModeId equals mode.ModeId
                               join sourceCountry in countryData on request.SourceCountry equals sourceCountry.CountryName
                               join destinationCountry in countryData on request.DestinationCountry equals destinationCountry.CountryName
-                              //join travelType in travelTypeData on request.TravelType equals travelType.TravelType
                               where request.RequestId == reqId
                               select new OptionCard
                               {
@@ -263,7 +261,11 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
+<<<<<<< HEAD
                                   TravelType = request.TravelType,
+=======
+                                  TravelTypeName = request.TravelType
+>>>>>>> 6f8d7030b4daa2655ab8aa0fcd64462c848c647d
 
                               })
                               .GroupBy(option => option.OptionId)
@@ -360,7 +362,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_TYPE> travelTypeData = await _unitOfWork.TravelTypeRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
@@ -373,7 +374,6 @@ namespace XtramileBackend.Services.EmployeeService
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                               join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
-                              //join travelType in travelTypeData on request.TravelTypeId equals travelType.TravelTypeID
                               where request.CreatedBy == empId
                                && (primarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CD" || primarystatus.StatusCode == "DD")
                               select new EmployeeViewReq
@@ -762,7 +762,7 @@ namespace XtramileBackend.Services.EmployeeService
                                          SourceCountryCode = sourceCountry.CountryCode,
                                          DestinationCountryCode = destCountry.CountryCode ?? null,
                                          DepartureDate = req.DepartureDate,
-                                         ReturnDate = (DateTime)(req.ReturnDate ?? null),
+                                         ReturnDate = req.ReturnDate ?? null,
                                          ModeName = mode.ModeName,
                                          ProjectCode = project.ProjectCode,
                                          TripPurpose = req.TripPurpose,

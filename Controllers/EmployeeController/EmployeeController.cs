@@ -17,8 +17,8 @@ namespace XtramileBackend.Controllers.EmployeeController
 {
     [EnableCors("AllowAngularDev")]
     [Route("api/employee")]
-    [Authorize(Roles="Employee")]
-    [ApiController]
+/*    [Authorize(Roles="Employee")]
+*/    [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
