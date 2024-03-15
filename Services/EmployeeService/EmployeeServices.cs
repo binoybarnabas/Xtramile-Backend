@@ -758,7 +758,7 @@ namespace XtramileBackend.Services.EmployeeService
                                          SourceCountryCode = sourceCountry.CountryCode,
                                          DestinationCountryCode = destCountry.CountryCode ?? null,
                                          DepartureDate = req.DepartureDate,
-                                         ReturnDate = (DateTime)(req.ReturnDate ?? null),
+                                         ReturnDate = req.ReturnDate ?? null,
                                          ModeName = mode.ModeName,
                                          ProjectCode = project.ProjectCode,
                                          TripPurpose = req.TripPurpose,

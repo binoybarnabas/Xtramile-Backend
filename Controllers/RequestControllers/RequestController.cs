@@ -84,8 +84,6 @@ namespace XtramileBackend.Controllers.RequestControllers
         [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
         {
-            Console.WriteLine(request.TravelType);
-
             try
             {
 
@@ -294,8 +292,10 @@ namespace XtramileBackend.Controllers.RequestControllers
                                 Console.WriteLine(reqId);*/
 
                 // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
-                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{{{TravelAuthMailFilePath}" : "file_not_found";
+                var urlRequest = HttpContext.Request;
+
+                var passportFileUrl = PassportFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{PassportFilePath}".Replace(" ", "%20") : "404_file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{TravelAuthMailFilePath}".Replace(" ", "%20") : "file_not_found";
 
                 //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
                 //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
