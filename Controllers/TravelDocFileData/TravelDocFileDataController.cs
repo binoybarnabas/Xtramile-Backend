@@ -67,6 +67,24 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                 else if (string.Compare(travelDocFile.TravelDocType, "Visa") == 0)
                     uploadsDirectory = "Uploads/TravelDocuments/Visas";
 
+                if (!Directory.Exists(uploadsDirectory))
+                {
+                    // Create directory
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsDirectory);
+                        Console.WriteLine("Directory created successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating directory: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Directory already exists.");
+                }
+
                 if (HttpContext.Request.Form.Files != null)
                 {
                     var file = HttpContext.Request.Form.Files[0];

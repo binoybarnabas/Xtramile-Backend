@@ -57,6 +57,7 @@ using XtramileBackend.Repositories.TravelOptionRepository;
 using XtramileBackend.Utils;
 using XtramileBackend.Repositories.TravelDocumentFileData;
 using XtramileBackend.Services.TravelDocumentFileData;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -213,5 +214,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+    RequestPath = "/Uploads"
+});
 
 app.Run();
