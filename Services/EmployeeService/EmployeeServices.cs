@@ -731,7 +731,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="empId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId)
+        public async Task<object> GetCompletedTrips(int empId)
         {
             try
             {
@@ -756,7 +756,16 @@ namespace XtramileBackend.Services.EmployeeService
                                          Count = groupedRequests.Count()
                                      }).OrderByDescending(completedTrips => completedTrips.CompletedDate);
 
-                return completedTrips;
+                int totalCount = completedTrips.Sum(trip => trip.Count); // Calculate the total count of completed trips
+
+                var result = new
+                {
+                    completedTrips = completedTrips,
+                    totalCount = totalCount
+                };
+
+                return result;
+
             }
             catch (Exception ex)
             {

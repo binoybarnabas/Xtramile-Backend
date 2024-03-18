@@ -301,10 +301,10 @@ namespace XtramileBackend.Controllers.RequestControllers
 /*                string passportFilePath = PassportFileData.FilePath;
                 string passportFileName = PassportFileData.FileName;*/
                 string travelAuthFilePath = TravelAuthMailFileData.FilePath;
-                string travelAuthFileName = TravelAuthMailFileData.FileName;                
+                string travelAuthFileName = TravelAuthMailFileData.FileName;
 
 /*                var passportFileUrl = passportFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{passportFilePath}/{Uri.EscapeDataString(passportFileName)}" : "404_file_not_found";
-*/                var travelAuthMailFileUrl = travelAuthFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{travelAuthFilePath  }/{Uri.EscapeDataString(travelAuthFileName)}".Replace(" ", "%20") : "file_not_found";
+*/                var travelAuthMailFileUrl = travelAuthFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{travelAuthFilePath  }/{Uri.EscapeDataString(travelAuthFileName)}" : "file_not_found";
 
                 //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
                 //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
