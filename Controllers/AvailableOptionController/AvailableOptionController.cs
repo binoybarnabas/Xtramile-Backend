@@ -175,10 +175,11 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                     int? fileId = travelOption.FileId; // Assuming travelOption.FileId is int?
                     //Get file path by fileID--bug
                     var OptionFilePath = await _fileMetaDataServices.GetFilePathByFileIdAsync(fileId.Value);
-                   
-                   // travelOptionsViewData.OptionFileURL = HttpUtility.UrlEncode( OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found");
-                    travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{OptionFilePath}" : "file_not_found";
-                
+
+                    // travelOptionsViewData.OptionFileURL = HttpUtility.UrlEncode( OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found");
+                    var urlRequest = HttpContext.Request;
+                    travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{Uri.EscapeUriString(OptionFilePath)}" : "file_not_found";
+
                     travelOptionsViewDataList.Add(travelOptionsViewData);
                 }
 

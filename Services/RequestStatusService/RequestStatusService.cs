@@ -44,7 +44,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
                 _unitOfWork.Complete();
 
-                if(requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
+                /*if(requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
                 {
                     //mail to be sent to employee on reuqest submit
                     await _mailService.SendToEmployeeOnSubmit(requestStatus.RequestId);
@@ -89,7 +89,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 if(requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 12)
                 {
                     await _mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
-                }
+                }*/
             }
             catch (Exception ex)
             {

@@ -84,8 +84,6 @@ namespace XtramileBackend.Controllers.RequestControllers
         [HttpPost("add")]
         public async Task<IActionResult> AddRequestAsync([FromForm] TravelRequestViewModel request)
         {
-            Console.WriteLine(request.TravelType);
-
             try
             {
 
@@ -96,12 +94,16 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                 string RequestCode = "REQ" + randomCode;
 
+                string travelType = "";
+
                 DateTime? returnDate = null; // Declare returnDate as nullable DateTime
 
                 if (!string.IsNullOrEmpty(request.ReturnDate))
                 {
                     returnDate = DateTime.Parse(request.ReturnDate); // Parse returnDate if it's not null or empty
                 }
+                if (request.TravelType.CompareTo("domestic") == 0) travelType = "Domestic";
+                else if (request.TravelType.CompareTo("international") == 0) travelType = "International";
 
 
                 //Handling text data of travel request
@@ -116,7 +118,7 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                     TravelModeId = Int32.Parse(request.TravelModeId),
 
-                    TravelType = request.TravelType,
+                    TravelType = travelType,
 
                     TripPurpose = request.TripPurpose,
 
@@ -294,8 +296,10 @@ namespace XtramileBackend.Controllers.RequestControllers
                                 Console.WriteLine(reqId);*/
 
                 // Construct file URLs
-                var passportFileUrl = PassportFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{PassportFilePath} " : "404_file_not_found";
-                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"D:/Travel_Requisition/BackEndV3/Xtramile-Backend/{{{TravelAuthMailFilePath}" : "file_not_found";
+                var urlRequest = HttpContext.Request;
+
+                var passportFileUrl = PassportFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{Uri.EscapeUriString(PassportFilePath)}" : "404_file_not_found";
+                var travelAuthMailFileUrl = TravelAuthMailFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{Uri.EscapeUriString(TravelAuthMailFilePath)}".Replace(" ", "%20") : "file_not_found";
 
                 //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
                 //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
