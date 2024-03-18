@@ -40,8 +40,8 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
 
                 var latestStatusApprovals = requestStatusMappingData
-    .GroupBy(approval => approval.RequestId)
-    .Select(group => group.OrderByDescending(approval => approval.date).First());
+                                            .GroupBy(approval => approval.RequestId)
+                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var onGoingData = ( from employee in employeeData
                                   join requestStatus in latestStatusApprovals on employee.EmpId equals requestStatus.EmpId
@@ -208,7 +208,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// </summary>
         /// <param name="statusCode">The status code to filter the requests.</param>
         /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID with the specified status.</returns>
-        public async Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string statusCode,int pageSize, int pageIndex)
+        public async Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string primaryStatusCode, string secondaryStatusCode,int pageSize, int pageIndex)
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -224,10 +224,11 @@ namespace XtramileBackend.Services.TravelAdminService
             var result = (from latestApproval in latestStatusApprovals
                           join requests in requestData on latestApproval.RequestId equals requests.RequestId
                           join priority in priorityData on requests.PriorityId equals priority.PriorityId
-                          join status in statusData on latestApproval.PrimaryStatusId equals status.StatusId
+                          join primaryStatus in statusData on latestApproval.PrimaryStatusId equals primaryStatus.StatusId
+                          join secondaryStatus in statusData on latestApproval.SecondaryStatusId equals secondaryStatus.StatusId
                           join employee in employeeData on requests.CreatedBy equals employee.EmpId
                           join project in projectData on requests.ProjectId equals project.ProjectId
-                          where status.StatusCode == statusCode
+                          where (primaryStatus.StatusCode == primaryStatusCode && secondaryStatus.StatusCode == secondaryStatusCode)
                           select new RequestTableViewTravelAdmin
                           {
                               RequestId = requests.RequestId,

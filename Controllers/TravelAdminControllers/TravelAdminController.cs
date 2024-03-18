@@ -59,12 +59,12 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
             }
         }
-        [HttpGet("requestsView/{statusCode}")]
-        public async Task<IActionResult> viewTravelRequestByCode(string statusCode,int pageSize=10, int pageIndex=1)
+        [HttpGet("requestsView/{primaryStatusCode}/{secondaryStatusCode}")]
+        public async Task<IActionResult> viewTravelRequestByCode(string primaryStatusCode, string secondaryStatusCode,int pageSize=10, int pageIndex=1)
         {
             try
             {
-                RequestTableViewTravelAdminPaged requestData = await _travelAdminService.GetTravelRequests(statusCode,pageSize,pageIndex);
+                RequestTableViewTravelAdminPaged requestData = await _travelAdminService.GetTravelRequests(primaryStatusCode,secondaryStatusCode,pageSize,pageIndex);
                 return Ok(requestData);
             }
             catch(Exception ex)
