@@ -760,8 +760,8 @@ namespace XtramileBackend.Services.EmployeeService
 
                 var result = new
                 {
-                    completedTrips = completedTrips,
-                    totalCount = totalCount
+                    completedTrips,
+                    totalCount
                 };
 
                 return result;
