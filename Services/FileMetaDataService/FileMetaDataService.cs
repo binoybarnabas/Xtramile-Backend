@@ -70,19 +70,19 @@ namespace XtramileBackend.Services.FileMetaDataService
 
  
         //Get File Path RequestId and description
-        public async Task<string> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
+        public async Task<TBL_FILE_METADATA> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
         {
             try
             {
                 var fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
-              
-                var filePath = (from item in fileMetaData
-                               where item.RequestId == requestId && item.Description == description
-                               select item.FilePath).FirstOrDefault();
 
-                return filePath;
+                var fileData = (from item in fileMetaData
+                                where item.RequestId == requestId && item.Description == description
+                                select item).FirstOrDefault();
+
+                return fileData;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
                 throw;
@@ -106,6 +106,21 @@ namespace XtramileBackend.Services.FileMetaDataService
             {
                 Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
                 throw;
+            }
+        }
+
+        public async Task<TBL_FILE_METADATA> GetFileMetaDataById(int Fileid)
+        {
+            try
+            {
+                TBL_FILE_METADATA fileData = await _unitOfWork.FileMetaDataRepository.GetByIdAsync(Fileid);
+                return fileData;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting FileData: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
             }
         }
 

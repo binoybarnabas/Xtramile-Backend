@@ -10,10 +10,12 @@ namespace XtramileBackend.Services.FileMetaDataService
          public Task<int> GetFileIdByFileNameAsync(string fileName);
 
 
-        public Task<string> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description);
+        public Task<TBL_FILE_METADATA   > GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description);
 
 
         public Task<string> GetFilePathByFileIdAsync(int fileId);
+
+        public Task<TBL_FILE_METADATA> GetFileMetaDataById(int fileId);
  
 
     }
