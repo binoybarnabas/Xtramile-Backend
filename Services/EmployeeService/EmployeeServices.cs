@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
@@ -261,11 +262,11 @@ namespace XtramileBackend.Services.EmployeeService
                                   DestinationCountryCode = destinationCountry.CountryCode,
                                   ModeId = option.ModeId,
                                   ModeName = mode.ModeName,
-<<<<<<< HEAD
+
                                   TravelType = request.TravelType,
-=======
+
                                   TravelTypeName = request.TravelType
->>>>>>> 6f8d7030b4daa2655ab8aa0fcd64462c848c647d
+
 
                               })
                               .GroupBy(option => option.OptionId)
@@ -578,8 +579,10 @@ namespace XtramileBackend.Services.EmployeeService
                          ).FirstOrDefault()
                          select new DashboardEmployeeprogress
                          {
-                             RequestCode = latestEntry.request.RequestCode, // Add RequestCode property
-                             Status = latestEntry.primaryStatus.StatusName, // Assuming StatusName is the property you want to include
+                             RequestCode = latestEntry.request.RequestCode,
+                             SourceCity = latestEntry.request.SourceCity,
+                             DestinationCity = latestEntry.request.DestinationCity,
+                             Status = latestEntry.primaryStatus.StatusName,
                              Progress = (
                                  (latestEntry.primaryStatus.StatusCode == "OP") ? "Request Submitted" :
                                  (latestEntry.primaryStatus.StatusCode == "FD" && empRole?.RoleName == "Manager") ? "Manager Forwarded" :
