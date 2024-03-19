@@ -178,7 +178,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
 
                     // travelOptionsViewData.OptionFileURL = HttpUtility.UrlEncode( OptionFilePath != null ? $"D:/SPECIALIZATION/XtraMileProject/BackEndV2/Xtramile-Backend/{OptionFilePath}" : "file_not_found");
                     var urlRequest = HttpContext.Request;
-                    travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{OptionFilePath}".Replace(" ", "%20") : "file_not_found";
+                    travelOptionsViewData.OptionFileURL = OptionFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{Uri.EscapeUriString(OptionFilePath)}" : "file_not_found";
 
                     travelOptionsViewDataList.Add(travelOptionsViewData);
                 }

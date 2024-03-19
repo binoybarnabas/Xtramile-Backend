@@ -7,7 +7,7 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<OngoingTravelAdminPaged> OnGoingTravel(int pageSize, int pageIndex);
         public Task<RequestTableViewTravelAdminPaged> GetIncomingRequests(int pageIndex, int pageSize);
         public Task<OptionCard> GetSelectedOptionFromEmployee(int reqId);
-        public Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string statusCode,int pageSize,int pageIndex);
+        public Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string primaryStatusCode, string secondaryStatusCode, int pageSize,int pageIndex);
 
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
 

@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -741,43 +742,33 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> approves = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_COUNTRY> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> requestsData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> requestApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
-                var completedTrips = from req in requests
-                                     join employee in employees on req.CreatedBy equals employee.EmpId
-                                     where req.CreatedBy == empId
-                                     join app in approves on req.RequestId equals app.RequestId
-                                     where app.PrimaryStatusId == 3
-                                     join mode in travelModeData on req.TravelModeId equals mode.ModeId
-                                     join project in projectData on req.ProjectId equals project.ProjectId
-                                     join sourceCountry in countryData on req.SourceCountry equals sourceCountry.CountryName
-                                     join destCountry in countryData on req.DestinationCountry equals destCountry.CountryName into destCountryJoin
-                                     from destCountry in destCountryJoin.DefaultIfEmpty()
-                                     select new CompletedTripsCard
+                var latestStatusApprovals = requestApprovalData
+                                            .GroupBy(approval => approval.RequestId)
+                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                var completedTrips = (from request in requestsData
+                                     join requestApproval in latestStatusApprovals on request.RequestId equals requestApproval.RequestId
+                                     where (request.CreatedBy == empId && (requestApproval.PrimaryStatusId == 3 && requestApproval.SecondaryStatusId == 3))
+                                     group new { request, requestApproval } by new { request.SourceCity, request.DestinationCity } into groupedRequests
+                                     select new CompletedTripsCard 
                                      {
-                                         SourceCity = req.SourceCity,
-                                         DestinationCity = req.DestinationCity ?? null,
-                                         SourceCountryCode = sourceCountry.CountryCode,
-                                         DestinationCountryCode = destCountry.CountryCode ?? null,
-                                         DepartureDate = req.DepartureDate,
-                                         ReturnDate = req.ReturnDate ?? null,
-                                         ModeName = mode.ModeName,
-                                         ProjectCode = project.ProjectCode,
-                                         TripPurpose = req.TripPurpose,
-                                         RequestCode = req.RequestCode,
-                                     };
+                                         From = groupedRequests.Key.SourceCity,
+                                         To = groupedRequests.Key.DestinationCity,
+                                         DepartureDate = groupedRequests.First().request.DepartureDate,
+                                         ReturnDate = groupedRequests.First().request.ReturnDate,
+                                         CompletedDate = groupedRequests.First().requestApproval.date,
+                                         Count = groupedRequests.Count()
+                                     }).OrderByDescending(completedTrips => completedTrips.CompletedDate);
 
                 return completedTrips;
             }
             catch (Exception ex)
             {
                 // Handle exception
-                Console.WriteLine("An error occured");
+                Console.WriteLine("An error occured : " + ex.Message);
                 throw;
             }
         }
