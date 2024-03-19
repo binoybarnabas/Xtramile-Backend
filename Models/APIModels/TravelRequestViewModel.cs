@@ -61,5 +61,6 @@ namespace XtramileBackend.Models.APIModels
         public IFormFile? PassportAttachment { get; set; }
 /*        public IFormFile? IdCardAttachment { get; set; }
 */      public string? AdditionalComments { get; set; }
+        public int RequestId { get; set; }
     }
 }

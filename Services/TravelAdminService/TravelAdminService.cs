@@ -212,7 +212,6 @@ namespace XtramileBackend.Services.TravelAdminService
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-            IEnumerable<TBL_PRIORITY> priorityData = await _unitOfWork.PriorityRepository.GetAllAsync();
             IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
             IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
@@ -223,7 +222,6 @@ namespace XtramileBackend.Services.TravelAdminService
 
             var result = (from latestApproval in latestStatusApprovals
                           join requests in requestData on latestApproval.RequestId equals requests.RequestId
-                          join priority in priorityData on requests.PriorityId equals priority.PriorityId
                           join primaryStatus in statusData on latestApproval.PrimaryStatusId equals primaryStatus.StatusId
                           join secondaryStatus in statusData on latestApproval.SecondaryStatusId equals secondaryStatus.StatusId
                           join employee in employeeData on requests.CreatedBy equals employee.EmpId
@@ -236,7 +234,6 @@ namespace XtramileBackend.Services.TravelAdminService
                               ProjectCode = project.ProjectCode,
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
-                              PriorityName = priority.PriorityName,
                               ApprovalDate = latestApproval.date
                           }).ToList();
 
