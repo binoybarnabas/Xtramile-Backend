@@ -738,12 +738,8 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_REQUEST> requestsData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<TBL_REQ_APPROVE> requestApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
-                var latestStatusApprovals = requestApprovalData
-                                            .GroupBy(approval => approval.RequestId)
-                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
-
                 var completedTrips = (from request in requestsData
-                                     join requestApproval in latestStatusApprovals on request.RequestId equals requestApproval.RequestId
+                                     join requestApproval in requestApprovalData on request.RequestId equals requestApproval.RequestId
                                      where (request.CreatedBy == empId && (requestApproval.PrimaryStatusId == 3 && requestApproval.SecondaryStatusId == 3))
                                      group new { request, requestApproval } by new { request.SourceCity, request.DestinationCity } into groupedRequests
                                      select new CompletedTripsCard 

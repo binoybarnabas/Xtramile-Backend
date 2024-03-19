@@ -70,7 +70,7 @@ namespace XtramileBackend.Services.FileMetaDataService
 
  
         //Get File Path RequestId and description
-        public async Task<TBL_FILE_METADATA> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
+        public async Task<TBL_FILE_METADATA?> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
         {
             try
             {
@@ -80,7 +80,9 @@ namespace XtramileBackend.Services.FileMetaDataService
                                 where item.RequestId == requestId && item.Description == description
                                 select item).FirstOrDefault();
 
-                return fileData;
+                if (fileData != null)
+                    return fileData;
+                else return null;
             }
             catch (Exception ex)
             {
