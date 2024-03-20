@@ -569,8 +569,9 @@ namespace XtramileBackend.Services.EmployeeService
                          join request in travelRequests on reqApproval.RequestId equals request.RequestId
                          join employee in employees on request.CreatedBy equals employee.EmpId
                          join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
-                         where request.CreatedBy == employeeId && primaryStatus.StatusCode != "CL"
-                         group new { reqApproval, request, primaryStatus } by request.RequestId into requestGroup
+                         join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                         where request.CreatedBy == employeeId 
+                         group new { reqApproval, request, primaryStatus, secondaryStatus } by request.RequestId into requestGroup
                          let latestEntry = requestGroup.OrderByDescending(entry => entry.reqApproval.date).FirstOrDefault()
                          let empRole = (
                              from emp in employees
@@ -585,15 +586,16 @@ namespace XtramileBackend.Services.EmployeeService
                              DestinationCity = latestEntry.request.DestinationCity,
                              Status = latestEntry.primaryStatus.StatusName,
                              Progress = (
-                                 (latestEntry.primaryStatus.StatusCode == "OP") ? "Request Submitted" :
-                                 (latestEntry.primaryStatus.StatusCode == "FD" && empRole?.RoleName == "Manager") ? "Manager Forwarded" :
-                                 (latestEntry.primaryStatus.StatusCode == "FD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
-                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Finance Approved" :
-                                 (latestEntry.primaryStatus.StatusCode == "CL") ? "Trip Completed" :
-                                 (latestEntry.primaryStatus.StatusCode == "CD") ? "Request Cancelled" :
-                                 (latestEntry.primaryStatus.StatusCode == "DD" && empRole?.RoleName == "Manager") ? "Manager Denied" :
-                                 (latestEntry.primaryStatus.StatusCode == "DD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Denied" :
-                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Finance Denied" :
+                                 (latestEntry.primaryStatus.StatusCode == "OP" && latestEntry.secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "PE" && empRole?.RoleName == "Manager") ? "Approved by Manager" :
+                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "WT" && empRole?.RoleName == "Travel Admin") ? "Options Sent by Travel Admin" :
+                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "SD" && empRole?.RoleName == "Manager") ? "Options Selected by Manager ":
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "FD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
+                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Trip Ongoing" :
+                                 (latestEntry.primaryStatus.StatusCode == "CL" && latestEntry.secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
+                                 (latestEntry.primaryStatus.StatusCode == "CD" && latestEntry.secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
+                                 (latestEntry.primaryStatus.StatusCode == "DD" && latestEntry.secondaryStatus.StatusCode == "PE" && empRole?.RoleName == "Manager") ? "Manager Denied" :
+                                 (latestEntry.primaryStatus.StatusCode == "DD" && latestEntry.secondaryStatus.StatusCode == "CD") ? "Resubmitted by Employee" :
                                  "Unknown"
                              )
                          }
