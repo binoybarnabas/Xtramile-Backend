@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -17,13 +19,19 @@ namespace XtramileBackend.Services.EmployeeService
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppDBContext _dbContext;
         private readonly IStatusServices _statusServices;
+        private readonly IFileMetaDataService _fileMetaDataService;
+        private readonly IFileTypeServices _fileTypeServices;
 
 
-        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext, IStatusServices statusServices)
+        public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext, IStatusServices statusServices, 
+            IFileMetaDataService fileMetaDataService,
+            IFileTypeServices fileTypeServices)
         {
             _unitOfWork = unitOfWork;
             _dbContext = dbContext;
             _statusServices = statusServices;
+            _fileMetaDataService = fileMetaDataService;
+            _fileTypeServices = fileTypeServices;
         }
 
 
@@ -124,7 +132,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="employeeId">The ID of the employee.</param>
         /// <returns>An EmployeeProfile object representing the employee's details.</returns>
-        public async Task<EmployeeProfile> GetEmployeeProfileByIdAsync(int employeeId)
+        public async Task<EmployeeProfile> GetEmployeeProfileByIdAsync(int employeeId, HttpContext httpContext)
         {
             try
             {
@@ -133,6 +141,13 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+
+                TBL_FILE_METADATA? profilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
+                string? filePath = profilePictureData != null ? profilePictureData.FilePath : null;
+                string? fileName = profilePictureData != null ? profilePictureData.FileName : null;
+                var urlRequest = httpContext.Request;
+
+                string? profilePictureURL = filePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{filePath}/{Uri.EscapeDataString(fileName)}" : null;
 
                 // Querying and joining data to get employee profile
                 var result = (
@@ -155,6 +170,7 @@ namespace XtramileBackend.Services.EmployeeService
                         DepartmentName = department.DepartmentName,
                         ProjectCode = project.ProjectCode,
                         ProjectName = project.ProjectName,
+                        ProfilePicture = profilePictureURL
                     }
                 ).FirstOrDefault();
 
@@ -910,6 +926,105 @@ namespace XtramileBackend.Services.EmployeeService
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        /// <summary>
+        /// Method to add an employee's profile picture.
+        /// </summary>
+        /// <param name="File">The profile picture file.</param>
+        /// <param name="employeeId">The ID of the employee whose profile picture is being added.</param>
+        /// <param name="httpContext">The HttpContext containing the HTTP request information.</param>
+        /// <returns>Returns the metadata of the added profile picture.</returns>
+        public async Task<TBL_FILE_METADATA> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext)
+        {
+            try
+            {
+                string uploadsDirectory = "Uploads/Profiles/ProfilePicture";
+                string fileName = $"{profilePicture.FileName}";
+                string filePath = "";
+                int fileTypeId = 0;
+
+                if (!Directory.Exists(uploadsDirectory))
+                {
+                    // Create directory
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsDirectory);
+                        Console.WriteLine("Directory created successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating directory: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Directory already exists.");
+                }
+
+                if (httpContext.Request.Form.Files != null)
+                {
+                    var file = httpContext.Request.Form.Files[0];
+                    filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
+                    string fileExtension = Path.GetExtension(filePath);
+                    fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
+                    using (var stream = File.Create(filePath))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                }
+
+                TBL_FILE_METADATA FileData = new TBL_FILE_METADATA
+                {
+                    FileName = fileName,
+                    Description = "Profile Picture",
+                    FilePath = uploadsDirectory,
+                    FileTypeId = fileTypeId,
+                    CreatedBy = employeeId,
+                    CreatedOn = DateTime.Now,
+                };
+                await _fileMetaDataService.AddFileMetaDataAsync(FileData);
+                _unitOfWork.Complete();
+                return FileData;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while adding profile picture: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        /// <summary>
+        /// Function to update the profile picture based on the employee id
+        /// </summary>
+        /// <param name="profilePicture"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        public async Task UpdateProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext)
+        {
+            TBL_FILE_METADATA? existingProfilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
+            if(existingProfilePictureData != null)
+            {
+                string uploadsDirectory = "Uploads/Profiles/ProfilePicture";
+                string fileName = $"{profilePicture.FileName}";
+                string filePath = "";
+                string existingFilePath = $"{uploadsDirectory}/{existingProfilePictureData.FileName}";
+                if(File.Exists(existingFilePath))
+                    File.Delete(existingFilePath);
+                if (httpContext.Request.Form.Files != null)
+                {
+                    var file = httpContext.Request.Form.Files[0];
+                    filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
+                    using (var stream = File.Create(filePath))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                }
+                existingProfilePictureData.FileName = fileName;
+                _unitOfWork.Complete();
             }
         }
     }
