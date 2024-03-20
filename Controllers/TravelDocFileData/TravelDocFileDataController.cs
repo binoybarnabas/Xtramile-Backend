@@ -89,7 +89,7 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                 {
                     var file = HttpContext.Request.Form.Files[0];
                     fileName = $"{travelDocFile.TravelDocType}_{travelDocFile.UploadedBy}_{file.FileName}";
-                    filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
+                    filePath = uploadsDirectory;
                     string fileExtension = Path.GetExtension(filePath);
                     fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
                     using (var stream = System.IO.File.Create(filePath))
@@ -102,7 +102,7 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                 {
                     TravelDocType = travelDocFile.TravelDocType,
                     FileName = fileName,
-                    FilePath = filePath,
+                    FilePath = uploadsDirectory,
                     FileTypeId = fileTypeId,
                     UploadedBy = travelDocFile.UploadedBy,
                     Country = travelDocFile.Country,

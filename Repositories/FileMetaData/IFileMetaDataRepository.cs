@@ -6,5 +6,6 @@ namespace XtramileBackend.Repositories.FileMetaDataRepository
     {
         Task AddAsync(TBL_FILE_METADATA fileMetaData);
         Task<IEnumerable<TBL_FILE_METADATA>> GetAllAsync();
+        Task<TBL_FILE_METADATA> GetByIdAsync(int FileId);
     }
 }
