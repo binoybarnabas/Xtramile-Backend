@@ -334,9 +334,9 @@ namespace XtramileBackend.Services.ManagerService
                     join project in projectData on request.ProjectId equals project.ProjectId
                     join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                   /* join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId*/
+                    join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
                     where employee.ReportsTo == managerId
-                    && status.StatusCode == "FD" || status.StatusCode == "WT" || status.StatusCode == "SD"
+                    && status.StatusCode == "FD" && status1.StatusCode == "PE"
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
@@ -345,8 +345,12 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         Date = request.CreatedOn,
                         Mode = null,
-                        Status = status.StatusName  
-                    }).ToList();
+                        Status = status.StatusName,
+                        StatusDate = statusApproval.date
+                    })
+                    .OrderByDescending(result => result.StatusDate  ) // Add ordering based on the recent status change of a request
+                    .ThenByDescending(result => result.RequestId) // Add existing ordering by requestId
+                    .ToList();
 
                 var totalCount = EmpRequest.Count();    
                 var totalPages= (int)Math.Ceiling((double   )totalCount / pageSize);
@@ -674,8 +678,6 @@ namespace XtramileBackend.Services.ManagerService
                 approve.date = DateTime.Now;
 
                 await _unitOfWork.RequestStatusRepository.AddAsync(approve);
-
-                existingRequest.PriorityId = updatePriorityAndStatus.PriorityId;
 
                 //once the status is updated the new priority and status needs to be set is request status mapping
                 // and delete the older priority and status. here it is OP for open requests

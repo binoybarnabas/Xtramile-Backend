@@ -36,7 +36,7 @@ namespace XtramileBackend.Services.EmployeeService
         public Task<IEnumerable<DashboardEmployeeprogress>> GetEmployeeDashboardProgressAsync(int employeeId);
 
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
-        public Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId);
+        public Task<object> GetCompletedTrips(int empId);
 
         public Task<bool> EmployeeCancelRequest(int requestId, int empId);
 
