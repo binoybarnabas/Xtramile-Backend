@@ -165,24 +165,6 @@ namespace XtramileBackend.Controllers.RequestControllers
                 int primaryStatusId = await _statusServices.GetStatusIdByStatusCodeAsync("OP");
                 int secondaryStatusId = await _statusServices.GetStatusIdByStatusCodeAsync("PE");
 
-
-                //Object for updating status of request
-                var requestStatus = new TBL_REQ_APPROVE
-                {
-
-                    RequestId = requestId,
-                    EmpId = int.Parse(request.CreatedBy),
-                    PrimaryStatusId = primaryStatusId,
-                    date = DateTime.Now,
-                    SecondaryStatusId = secondaryStatusId
-
-                };
-
-
-                //Updating Requesting Status
-                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
-
-
                 // Check if files are attached and handle them
                 if (HttpContext.Request.Form.Files != null && HttpContext.Request.Form.Files.Count > 0)
                 {
@@ -237,6 +219,22 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                             //Adding files meta data
                             await _fileMetaDataServices.AddFileMetaDataAsync(fileMetaData);
+
+                            //Object for updating status of request
+                            var requestStatus = new TBL_REQ_APPROVE
+                            {
+
+                                RequestId = requestId,
+                                EmpId = int.Parse(request.CreatedBy),
+                                PrimaryStatusId = primaryStatusId,
+                                date = DateTime.Now,
+                                SecondaryStatusId = secondaryStatusId
+
+                            };
+
+
+                            //Updating Requesting Status
+                            await _requestStatusServices.AddRequestStatusAsync(requestStatus);
 
                         }
                         else

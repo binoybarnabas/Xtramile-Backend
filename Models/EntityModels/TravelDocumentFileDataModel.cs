@@ -13,8 +13,10 @@ namespace XtramileBackend.Models.EntityModels
         public string FilePath { get; set; }
         public int FileTypeId { get; set; }
         public int UploadedBy { get; set; }
-        public string? Country { get; set; }
+        public string Country { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public string DocId { get; set; }
+        public DateTime UploadedDate { get; set; }
+        public string Size { get; set; }
     }
 }

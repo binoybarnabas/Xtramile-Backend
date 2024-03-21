@@ -682,7 +682,7 @@ namespace XtramileBackend.Services.EmployeeService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occured");
+                Console.WriteLine("An error occured" + ex.Message);
                 throw;
             }
 
@@ -713,7 +713,7 @@ namespace XtramileBackend.Services.EmployeeService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occured");
+                Console.WriteLine("An error occured" + ex.Message);
                 throw;
             }
         }
@@ -861,7 +861,7 @@ namespace XtramileBackend.Services.EmployeeService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occured");
+                Console.WriteLine("An error occured" + ex.Message);
                 throw;
             }
         }
@@ -1024,6 +1024,8 @@ namespace XtramileBackend.Services.EmployeeService
                     }
                 }
                 existingProfilePictureData.FileName = fileName;
+                existingProfilePictureData.ModifiedBy = employeeId;
+                existingProfilePictureData.ModifiedOn = DateTime.Now;
                 _unitOfWork.Complete();
             }
         }
