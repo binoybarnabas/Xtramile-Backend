@@ -336,7 +336,7 @@ namespace XtramileBackend.Services.ManagerService
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
                     where employee.ReportsTo == managerId
-                    && status.StatusCode == "FD" && status1.StatusCode == "PE"
+                    && (status.StatusCode == "FD" && status1.StatusCode == "PE") || (status.StatusCode == "PE" && status1.StatusCode == "WT")
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
