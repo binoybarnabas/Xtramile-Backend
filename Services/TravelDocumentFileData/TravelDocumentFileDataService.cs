@@ -190,7 +190,8 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
                                            //+1 is used to include the current Date in the subtraction below
                                            RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
-                                       }).OrderByDescending(travelDocuments => travelDocuments.ExpiryDate).ToList();
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
+                                       .ToList();
 
                 return travelDocuments;
             }
@@ -230,7 +231,8 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
                                            RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
-                                       }).OrderBy(travelDocuments => travelDocuments.ExpiryDate).ToList();
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
+                                       .ToList();
 
                 return travelDocuments;
             }
