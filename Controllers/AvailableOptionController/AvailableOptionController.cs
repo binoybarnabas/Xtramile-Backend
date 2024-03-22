@@ -14,7 +14,6 @@ using XtramileBackend.Services.RequestService;
 namespace XtramileBackend.Controllers.AvailableOptionControllers
 {
 
-
     [EnableCors("AllowAngularDev")]
     [Route("api/availableoptions")]
     [ApiController]
@@ -83,6 +82,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
                 {
                     RequestId = int.Parse( travelOption.RequestId),
                     Description = travelOption.Description,
+
                 };
 
 /*                await _availableOptionServices.AddNewTravelOptionAsync(tblTravelOption);

@@ -236,6 +236,20 @@ using Microsoft.AspNetCore.Authorization;
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpPost("submit_selected_travel_option")]
+        public async Task<IActionResult> SubmitSelectedTravelOption([FromBody] TBL_TRAVEL_OPTION_MAPPING travelOption)
+        {
+            try
+            {
+                await _reportingManagerService.SubmitSelectedTravelOptionAsync(travelOption);
+                return Ok(travelOption);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating an option: {ex.Message}");
+            }
+        }
     }
 }
 

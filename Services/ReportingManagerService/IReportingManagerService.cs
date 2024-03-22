@@ -43,5 +43,8 @@ namespace XtramileBackend.Services.ManagerService
 
         // to get all completed trips in a month
         public Task<Dictionary<string, int>> GetRequestsByMonth(int empId);
+
+        // to submit the selected option from avail opttions.
+        public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
     }
 }
