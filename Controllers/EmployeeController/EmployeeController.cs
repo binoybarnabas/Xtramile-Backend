@@ -22,19 +22,13 @@ namespace XtramileBackend.Controllers.EmployeeController
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeServices _employeeService;
-
-
-        private readonly IFileTypeServices _fileTypeServices;
-
         private readonly IFileMetaDataService _fileMetaDataServices;
-        public EmployeeController(IEmployeeServices employeeService, IFileTypeServices fileTypeServices,
-            IFileMetaDataService fileMetaDataServices)
-
+        public EmployeeController(IEmployeeServices employeeService, IFileMetaDataService fileMetaDataServices)
         {
             _employeeService = employeeService;
-            _fileTypeServices = fileTypeServices;
-
+            _fileMetaDataServices = fileMetaDataServices;
         }
+
 
         [HttpGet("employees")]
         public async Task<IActionResult> GetEmployeesAsync()
@@ -108,9 +102,9 @@ namespace XtramileBackend.Controllers.EmployeeController
         {
             try
             {
+                var httpContext = HttpContext;
                 // Call the EmployeeService to get the employee's profile details
-                EmployeeProfile employeeData = await _employeeService.GetEmployeeProfileByIdAsync(employeeId);
-
+                EmployeeProfile employeeData = await _employeeService.GetEmployeeProfileByIdAsync(employeeId, httpContext);
                 // Return a 200 OK response with the employee's profile data
                 return Ok(employeeData);
             }
@@ -370,13 +364,57 @@ namespace XtramileBackend.Controllers.EmployeeController
             }
         }
 
+        /// <summary>
+        /// Controller for handling adding an employees profile picture
+        /// </summary>
+        /// <param name="File"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        [HttpPost("upload/profilePicture/{employeeId}")]
+        public async Task<IActionResult> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                TBL_FILE_METADATA fileData = await _employeeService.AddEmployeeProfilePicture(profilePicture, employeeId, httpContext);
+                return CreatedAtAction(nameof(GetFileDataById), new { id = fileData.FileId }, fileData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding the profile picture: {ex.Message}");
+            }
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> GetFileDataById(int fileId)
+        {
+            try
+            {
+                TBL_FILE_METADATA fileData = await _fileMetaDataServices.GetFileMetaDataById(fileId);
+                return Ok(fileData);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting the fileData: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("update/profilePicture/{employeeId}")]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture, int employeeId)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                await _employeeService.UpdateProfilePicture(profilePicture, employeeId, httpContext);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updateing the profile picture: {ex.Message}");
+            }
+        }
     }
 }
-
-
-
-
-
-
-

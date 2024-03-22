@@ -341,7 +341,7 @@ namespace XtramileBackend.Services.TravelAdminService
                 }
                 else
                 {
-                    GetIncomingRequests(pageIndex, pageSize);
+                    await GetIncomingRequests(pageIndex, pageSize);
                 }
 
                 // Pagination

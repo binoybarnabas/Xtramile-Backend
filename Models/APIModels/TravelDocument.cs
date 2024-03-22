@@ -8,5 +8,6 @@
         public string TravelDocType { get; set; }
         public int UploadedBy { get; set; }
         public string DocId { get; set; }
+        public string Size { get; set; }
     }
 }

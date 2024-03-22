@@ -194,6 +194,8 @@ namespace XtramileBackend.Tests
             var employeeServiceMock = new Mock<IEmployeeServices>();
             var fileTypeServicesMock = new Mock<IFileTypeServices>();
             var fileMetaDataServiceMock = new Mock<IFileMetaDataService>();
+            var httpContext = new DefaultHttpContext();
+
             var expectedEmployeeProfile = new EmployeeProfile
             {
                 EmpId = 1,
@@ -208,10 +210,10 @@ namespace XtramileBackend.Tests
                 ProjectName = "Project Name"
             };
 
-            employeeServiceMock.Setup(service => service.GetEmployeeProfileByIdAsync(employeeId))
+            employeeServiceMock.Setup(service => service.GetEmployeeProfileByIdAsync(employeeId,httpContext))
                             .ReturnsAsync(expectedEmployeeProfile);
 
-            var controller = new EmployeeController(employeeServiceMock.Object, fileTypeServicesMock.Object, fileMetaDataServiceMock.Object);
+            var controller = new EmployeeController(employeeServiceMock.Object, fileMetaDataServiceMock.Object);
 
             // Act
             var result = await controller.GetEmployeeProfileByIdAsync(employeeId);
@@ -235,7 +237,7 @@ namespace XtramileBackend.Tests
             mockEmployeeService.Setup(service => service.UpdateEmployeeDetailsAsync(employeeId, profileEdit))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(mockEmployeeService.Object, mockFileTypeServices.Object, mockFileMetaDataService.Object);
+            var controller = new EmployeeController(mockEmployeeService.Object, mockFileMetaDataService.Object);
 
             // Act
             var result = await controller.UpdateEmployeeDetailsAsync(employeeId, profileEdit);

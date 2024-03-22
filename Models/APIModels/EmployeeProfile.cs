@@ -1,4 +1,6 @@
-﻿namespace XtramileBackend.Models.APIModels
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+
+namespace XtramileBackend.Models.APIModels
 {
     public class EmployeeProfile
     {
@@ -12,5 +14,6 @@
         public string DepartmentName { get; set; }
         public string ProjectCode { get; set; }
         public string ProjectName { get; set; }
+        public string ProfilePicture {  get; set; }
     }
 }

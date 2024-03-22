@@ -79,7 +79,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests" + ex.Message);
                 return new PagedEmployeeRequestDto();
             }
         }
@@ -130,7 +130,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests" + ex.Message);
                 return new PagedEmployeeRequestDto();
             }
 
@@ -188,7 +188,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests" + ex.Message);
                 return new PagedEmployeeRequestDto();
             }
         }
@@ -244,7 +244,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests" + ex.Message);
                 return new PagedEmployeeRequestDto();
             }
         }
@@ -302,7 +302,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error fetching the Travel Requests");
+                Console.WriteLine("Error fetching the Travel Requests" + ex.Message);
                 return new PagedEmployeeRequestDto();
             }
         }

@@ -69,7 +69,7 @@ namespace XtramileBackend.Services.FileMetaDataService
         }
 
  
-        //Get File Path RequestId and description
+        //Get File Data RequestId and description
         public async Task<TBL_FILE_METADATA?> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
         {
             try
@@ -123,6 +123,28 @@ namespace XtramileBackend.Services.FileMetaDataService
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while getting FileData: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        //Get Profile Picture Data based on EmployeeId
+        public async Task<TBL_FILE_METADATA?> GetProfilePictureData(int empId)
+        {
+            try
+            {
+                var fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+
+                var fileData = (from item in fileMetaData
+                                where item.CreatedBy == empId && (item.Description.CompareTo("Profile Picture") == 0)
+                                select item).FirstOrDefault();
+
+                if (fileData != null)
+                    return fileData;
+                else return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting file path: {ex.Message}");
+                throw;
             }
         }
 
