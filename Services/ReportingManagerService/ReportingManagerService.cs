@@ -520,7 +520,6 @@ namespace XtramileBackend.Services.ManagerService
                     from request in travelRequests
                     join employee in employees on request.CreatedBy equals employee.EmpId
                     join project in projects on request.ProjectId equals project.ProjectId
-                    join priority in priorities on request.PriorityId equals priority.PriorityId
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
@@ -535,7 +534,6 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         CreatedOn = request.CreatedOn,
                         TravelTypeName = request.TravelType,
-                        PriorityName = priority.PriorityName,
                         StatusName = primaryStatus.StatusName
                     }
                 );
