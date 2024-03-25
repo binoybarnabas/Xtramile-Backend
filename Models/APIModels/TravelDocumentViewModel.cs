@@ -2,6 +2,7 @@
 {
     public class TravelDocumentViewModel
     {
+        public int FileId { get; set; }
         public string UploadedBy { get; set; }
         public string IdentificationNumber { get; set; }
         public DateTime UploadedDate { get; set; }
