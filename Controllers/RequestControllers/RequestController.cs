@@ -188,7 +188,25 @@ namespace XtramileBackend.Controllers.RequestControllers
 
                         // Determine the target folder based on the form field name
                         if (folderMapping.TryGetValue(keyName, out var targetFolder))
+
                         {
+                            if (!Directory.Exists(targetFolder))
+                            {
+                                // Create directory
+                                try
+                                {
+                                    Directory.CreateDirectory(targetFolder);
+                                    Console.WriteLine("Directory created successfully.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error creating directory: {ex.Message}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Directory already exists.");
+                            }
                             // var filePath = Path.Combine(targetFolder, fileName);
                             var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
 

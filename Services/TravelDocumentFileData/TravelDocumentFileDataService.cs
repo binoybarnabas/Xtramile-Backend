@@ -126,6 +126,12 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             }
         }
 
+        /// <summary>
+        /// Retrieves details of travel documents associated with a specific employee.
+        /// </summary>
+        /// <param name="employeeId">The ID of the employee whose travel documents are to be retrieved.</param>
+        /// <param name="httpContext">The HttpContext containing the HTTP request information.</param>
+        /// <returns>An enumerable collection of TravelDocumentViewModel objects containing details of travel documents.</returns>
         public async Task<IEnumerable<TravelDocumentViewModel>> GetDocumentDetailOnEmployeeScreen(int employeeId, HttpContext httpContext)
         {
             try
@@ -138,13 +144,14 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                                    where travelDocuments.UploadedBy == employeeId
                                                    select new TravelDocumentViewModel
                                                    {
+                                                       FileId = travelDocuments.TravelDocFileId,
                                                        IdentificationNumber = travelDocuments.DocId,
                                                        UploadedDate = travelDocuments.UploadedDate,
-                                                       ValidThru = travelDocuments.ExpiryDate,
+                                                       ExpiryDate = travelDocuments.ExpiryDate,
                                                        Country = travelDocuments.Country,
                                                        DocumentType = travelDocuments.TravelDocType,
                                                        DocumentSize = travelDocuments.Size,
-                                                       DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocuments.FilePath}/{travelDocuments.FileName}"
+                                                       DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocuments.FilePath}/{Uri.EscapeDataString(travelDocuments.FileName)}"
                                                    }).ToList();
 
                 return travelDocumentViewModelData;
@@ -153,6 +160,144 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             {
                 // Handle or log the exception
                 Console.WriteLine($"An error occurred while getting the travel documents : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        /// <summary>
+        /// Retrieves travel documents for display on the admin screen.
+        /// </summary>
+        /// <param name="httpContext">The HttpContext containing the request details.</param>
+        /// <returns>A task representing the asynchronous operation that yields a collection of TravelDocumentViewModel objects.</returns>
+        public async Task<IEnumerable<TravelDocumentViewModel>> GetDocumentsOnTravelAdminScreen(HttpContext httpContext)
+        {
+            try
+            {
+                IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                
+                var urlRequest = httpContext.Request;
+
+                var travelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           //+1 is used to include the current Date in the subtraction below
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
+                                       .ToList();
+
+                return travelDocuments;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting the travel documents : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        /// <summary>
+        /// Retrieves filtered travel documents based on the specified FileType for display on the Travel Admin screen.
+        /// </summary>
+        /// <param name="FileType">The type of travel document to filter by.</param>
+        /// <param name="httpContext">The HttpContext containing the request information.</param>
+        /// <returns>A collection of TravelDocumentViewModel objects representing the filtered travel documents.</returns>
+        public async Task<IEnumerable<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext)
+        {
+            try
+            {
+                IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var urlRequest = httpContext.Request;
+
+                var travelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       where travelDocument.TravelDocType == fileType
+                                       select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
+                                       .ToList();
+
+                return travelDocuments;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting the travel documents : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        public async Task<IEnumerable<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext)
+        {
+            try
+            {
+                IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var urlRequest = httpContext.Request;
+
+                var travelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate >= DateTime.Now
+                                       select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
+                                       .ToList();
+
+                return travelDocuments;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting the travel documents : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
+        public async Task DeleteTravelDocument(int FileId)
+        {
+            try
+            {
+                TravelDocumentFileDataModel travelDocument = await _unitOfWork.TravelDocumentFileDataRepository.GetByIdAsync(FileId);
+                if(travelDocument != null)
+                {
+                    _unitOfWork.TravelDocumentFileDataRepository.Delete(travelDocument);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while deleting the travel document : {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
         }

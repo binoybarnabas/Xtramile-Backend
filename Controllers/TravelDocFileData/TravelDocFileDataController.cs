@@ -19,11 +19,12 @@ namespace XtramileBackend.Controllers.TravelDocFileData
         }
 
         [HttpGet("traveldocumentfiles")]
-        public async Task<IActionResult> GetTravelDocumentFilesAsync()
+        public async Task<IActionResult> GetTravelDocumentsOnTAScreen()
         {
             try
             {
-                IEnumerable<TravelDocumentFileDataModel> travelDocumentFiles = await _travelDocumentFileDataService.GetTravelDocumentFileDatasAsync();
+                var httpContext = HttpContext;
+                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetDocumentsOnTravelAdminScreen(httpContext);
                 return Ok(travelDocumentFiles);
             }
             catch (Exception ex)
@@ -78,6 +79,53 @@ namespace XtramileBackend.Controllers.TravelDocFileData
             {
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting the travel documents: {ex.Message}");
+            }
+        }
+
+        [HttpGet("traveldocuments/{fileType}")]
+        public async Task<IActionResult> GetTravelDocumentsFilteredByFileType(string fileType)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetFilteredDocumentsOnTAScreen(fileType,httpContext);
+                return Ok(travelDocumentFiles);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
+            }
+        }
+
+        [HttpGet("expiredDocuments/{fileType}")]
+        public async Task<IActionResult> GetExpiredDocuments(string fileType)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetExpiredDocuments(fileType, httpContext);
+                return Ok(travelDocumentFiles);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("deleteDocument/{fileId}")]
+        public async Task<IActionResult> DeleteDocument(int fileId)
+        {
+            try
+            {
+                await _travelDocumentFileDataService.DeleteTravelDocument(fileId);
+                return Ok("File Deleted Successfully");
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while deleting travel document: {ex.Message}");
             }
         }
     }
