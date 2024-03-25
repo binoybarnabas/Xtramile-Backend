@@ -17,18 +17,17 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         [HttpGet("ongoing")]
-        public async Task<IActionResult> GetOnGoingTravel([FromBody] int pageSize=10, int pageIndex=1)
+        public async Task<IActionResult> GetOnGoingTravel([FromQuery] int pageSize = 10, int pageIndex = 1)
         {
             try
             {
-                var onGoingTravelData = await _travelAdminService.OnGoingTravel(pageSize,pageIndex);
+                var onGoingTravelData = await _travelAdminService.OnGoingTravel(pageSize, pageIndex);
                 return Ok(onGoingTravelData);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting on going travel updates: {ex.Message}");
             }
-
         }
 
         [HttpGet("incomingrequests")]
