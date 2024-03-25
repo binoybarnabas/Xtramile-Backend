@@ -47,8 +47,9 @@ namespace XtramileBackend.Services.TravelAdminService
                                   join requestStatus in latestStatusApprovals on employee.EmpId equals requestStatus.EmpId
                                   join request in requestData on requestStatus.RequestId equals request.RequestId
                                   join project in projectData on request.ProjectId equals project.ProjectId
-                                  join status in statusData on requestStatus.PrimaryStatusId equals status.StatusId
-                                  where status.StatusCode == "OG"
+                                  join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                  join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                  where primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"
                                   select new OngoingTravelAdmin
                                   {
                                       requestId = request.RequestId,
