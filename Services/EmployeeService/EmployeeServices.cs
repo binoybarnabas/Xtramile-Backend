@@ -603,14 +603,14 @@ namespace XtramileBackend.Services.EmployeeService
                              Status = latestEntry.primaryStatus.StatusName,
                              Progress = (
                                  (latestEntry.primaryStatus.StatusCode == "OP" && latestEntry.secondaryStatus.StatusCode == "PE") ? "Request Submitted" :
-                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "PE" && empRole?.RoleName == "Manager") ? "Approved by Manager" :
-                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "WT" && empRole?.RoleName == "Travel Admin") ? "Options Sent by Travel Admin" :
-                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "SD" && empRole?.RoleName == "Manager") ? "Options Selected by Manager ":
-                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "FD" && empRole?.RoleName == "Travel Admin") ? "Travel Admin Forwarded" :
-                                 (latestEntry.primaryStatus.StatusCode == "OG") ? "Trip Ongoing" :
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "PE") ? "Approved by Manager" :
+                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "WT") ? "Options Sent by Travel Admin" :
+                                 (latestEntry.primaryStatus.StatusCode == "PE" && latestEntry.secondaryStatus.StatusCode == "SD") ? "Options Selected by Manager ":
+                                 (latestEntry.primaryStatus.StatusCode == "FD" && latestEntry.secondaryStatus.StatusCode == "FD") ? "Travel Admin Forwarded" :
+                                 (latestEntry.primaryStatus.StatusCode == "OG" && latestEntry.secondaryStatus.StatusCode == "OG") ? "Trip Ongoing" :
                                  (latestEntry.primaryStatus.StatusCode == "CL" && latestEntry.secondaryStatus.StatusCode == "CL") ? "Trip Completed" :
                                  (latestEntry.primaryStatus.StatusCode == "CD" && latestEntry.secondaryStatus.StatusCode == "CD") ? "Request Cancelled" :
-                                 (latestEntry.primaryStatus.StatusCode == "DD" && latestEntry.secondaryStatus.StatusCode == "PE" && empRole?.RoleName == "Manager") ? "Manager Denied" :
+                                 (latestEntry.primaryStatus.StatusCode == "DD" && latestEntry.secondaryStatus.StatusCode == "PE") ? "Manager Denied" :
                                  (latestEntry.primaryStatus.StatusCode == "DD" && latestEntry.secondaryStatus.StatusCode == "CD") ? "Resubmitted by Employee" :
                                  "Unknown"
                              )
