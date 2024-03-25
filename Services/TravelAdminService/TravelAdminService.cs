@@ -763,7 +763,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// </summary>
         /// <param name="monthName"></param>
         /// <returns></returns>
-        public async Task<byte[]> GenerateReportForMonth(string monthName)
+        public async Task<byte[]> GenerateReportForMonthAndYear(string monthName, int year)
         {
             try
             {
@@ -774,8 +774,7 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<TBL_STATUS> status = await _unitOfWork.StatusRepository.GetAllAsync();
 
-                //to compare approval date with passed in month
-                var filteredApprovals = approves.Where(a => a.date.Month == DateTime.ParseExact(monthName, "MMMM", CultureInfo.InvariantCulture).Month);
+                var filteredApprovals = approves.Where(a => a.date.Month == DateTime.ParseExact(monthName, "MMMM", CultureInfo.InvariantCulture).Month && a.date.Year == year);
 
                 var excelData = from approve in filteredApprovals
                                 join request in requests on approve.RequestId equals request.RequestId
@@ -830,6 +829,7 @@ namespace XtramileBackend.Services.TravelAdminService
                 return null; // or throw the exception
             }
         }
+
         public async Task<int?> GetSelectedTravelOptionFromEmployee(int reqId)
         {
             try
