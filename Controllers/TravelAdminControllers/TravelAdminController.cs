@@ -182,12 +182,12 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         //to genrate a report of request related details of the input month
-       [HttpGet("generateReport/{monthName}")]
-        public async Task<IActionResult> GenerateReportForMonth(string monthName)
+       [HttpGet("generateReport/{monthName}/{year}")]
+        public async Task<IActionResult> GenerateReportForMonth(string monthName,int year)
         {
             try
             {
-                var excelBytes = await _travelAdminService.GenerateReportForMonth( monthName);
+                var excelBytes = await _travelAdminService.GenerateReportForMonthAndYear( monthName,year);
 
                 if (excelBytes == null)
                     return NotFound();
