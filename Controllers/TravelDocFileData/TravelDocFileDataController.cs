@@ -128,5 +128,21 @@ namespace XtramileBackend.Controllers.TravelDocFileData
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while deleting travel document: {ex.Message}");
             }
         }
+
+        [HttpGet("validDocuments/{fileType}")]
+        public async Task<IActionResult> GetValidDocuments(string fileType)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetValidDocuments(fileType, httpContext);
+                return Ok(travelDocumentFiles);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
+            }
+        }
     }
 }

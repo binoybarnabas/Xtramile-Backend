@@ -13,6 +13,8 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         public Task<IEnumerable<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext);
         public Task<IEnumerable<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext);
         public Task DeleteTravelDocument(int FileId);
+        public Task<IEnumerable<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext);
+
 
     }
 }
