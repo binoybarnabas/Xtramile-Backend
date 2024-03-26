@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Specialized;
+using System.Net;
 using System.Net.Mail;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -9,9 +10,11 @@ namespace XtramileBackend.Utils
     public class MailService : IMailService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public MailService(IUnitOfWork unitOfWork)
+        private readonly INotificationService _notificationService;
+        public MailService(IUnitOfWork unitOfWork, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _notificationService = notificationService;
         }
 
         private class TravelAdminTeam
@@ -67,6 +70,13 @@ namespace XtramileBackend.Utils
                 mail.recipientEmail = employee.Email;
                 mail.emailBody = $"Dear {mail.recipientName},<br><br>Your request with code <b>{request.RequestCode}</b> has been submitted.<br><br>Thank you.<br>";
                 await SendMail(mail);
+                string notificationBody = $"Request with code {request.RequestCode} has been submitted.";
+                Notification notification = new Notification();
+                notification.NotificationBody = notificationBody;
+                notification.CreatedOn = DateTime.Now;
+                notification.RequestId = requestId;
+                notification.EmployeeId = employee.EmpId;
+                await _notificationService.AddNotification(notification);
             }
         }
 
@@ -142,6 +152,13 @@ namespace XtramileBackend.Utils
                 mail.managerName = manager.FirstName + " " + manager.LastName;
                 mail.emailBody = $"Dear {mail.recipientName},<br><br>Your request with code <b>{request.RequestCode}</b> has been Approved by {mail.managerName}.<br><br>Thank you.<br>";
                 await SendMail(mail);
+                string notificationBody = $"Request with code {request.RequestCode} has been Approved by {mail.managerName}";
+                Notification notification = new Notification();
+                notification.NotificationBody = notificationBody;
+                notification.CreatedOn = DateTime.Now;
+                notification.RequestId = requestId;
+                notification.EmployeeId = employee.EmpId;
+                await _notificationService.AddNotification(notification);
             }
         }
 
@@ -195,6 +212,13 @@ namespace XtramileBackend.Utils
                 mail.managerName = manager.FirstName + " " + manager.LastName;
                 mail.emailBody = $"Dear {mail.recipientName},<br><br>Your request with code <b>{request.RequestCode}</b> has been Rejected by {mail.managerName}.<br>The reason for the rejection is : <b>{reason.Description}</b>.<br><br>Thank you.<br>";
                 await SendMail(mail);
+                string notificationBody = $"Request with code {request.RequestCode} has been rejected by {mail.managerName}";
+                Notification notification = new Notification();
+                notification.NotificationBody = notificationBody;
+                notification.CreatedOn = DateTime.Now;
+                notification.RequestId = requestId;
+                notification.EmployeeId = employee.EmpId;
+                await _notificationService.AddNotification(notification);
             }
         }
 
