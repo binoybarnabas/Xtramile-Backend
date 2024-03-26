@@ -60,8 +60,7 @@ namespace XtramileBackend.Data
         public DbSet<TBL_TRAVEL_OPTION_MAPPING> TBL_TRAVEL_OPTION_MAPPING { get; set; } 
 
         public DbSet<TravelDocumentFileDataModel> TravelDocumentFileData {  get; set; }
-
-
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<TBL_USER> TBL_USER { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

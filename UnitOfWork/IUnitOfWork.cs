@@ -23,6 +23,7 @@ using XtramileBackend.Repositories.FileMetaDataRepository;
 using XtramileBackend.Repositories.TravelOptionRepository;
 using XtramileBackend.Repositories.TravelOptionMappingRepository;
 using XtramileBackend.Repositories.TravelDocumentFileData;
+using XtramileBackend.Repositories.NotificationRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -53,7 +54,7 @@ namespace XtramileBackend.UnitOfWork
         public ITravelOptionMappingRepository TravelOptionMappingRepository { get; }
         public ITravelDocumentFileDataRepository TravelDocumentFileDataRepository { get; }
 
-
+        public INotificationRepository NotificationRepository { get; }
 
         public int Complete();
         Task SaveChangesAsyn();
