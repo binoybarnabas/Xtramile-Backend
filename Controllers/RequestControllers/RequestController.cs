@@ -238,22 +238,6 @@ namespace XtramileBackend.Controllers.RequestControllers
                             //Adding files meta data
                             await _fileMetaDataServices.AddFileMetaDataAsync(fileMetaData);
 
-                            //Object for updating status of request
-                            var requestStatus = new TBL_REQ_APPROVE
-                            {
-
-                                RequestId = requestId,
-                                EmpId = int.Parse(request.CreatedBy),
-                                PrimaryStatusId = primaryStatusId,
-                                date = DateTime.Now,
-                                SecondaryStatusId = secondaryStatusId
-
-                            };
-
-
-                            //Updating Requesting Status
-                            await _requestStatusServices.AddRequestStatusAsync(requestStatus);
-
                         }
                         else
                         {     //FOR REFERENCE!  
@@ -265,7 +249,20 @@ namespace XtramileBackend.Controllers.RequestControllers
                     }
 
                 }
+                //Object for updating status of request
+                var requestStatus = new TBL_REQ_APPROVE
+                {
 
+                    RequestId = requestId,
+                    EmpId = int.Parse(request.CreatedBy),
+                    PrimaryStatusId = primaryStatusId,
+                    date = DateTime.Now,
+                    SecondaryStatusId = secondaryStatusId
+
+                };
+
+                //Updating Requesting Status
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
                 return Ok("Request submitted successfully:-");
             }
             catch (Exception ex)
