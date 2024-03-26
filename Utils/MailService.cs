@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Mail;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.NotificationService;
 using XtramileBackend.UnitOfWork;
 
 namespace XtramileBackend.Utils

@@ -59,6 +59,7 @@ using XtramileBackend.Repositories.TravelDocumentFileData;
 using XtramileBackend.Services.TravelDocumentFileData;
 using Microsoft.Extensions.FileProviders;
 using XtramileBackend.Repositories.NotificationRepository;
+using XtramileBackend.Services.NotificationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
