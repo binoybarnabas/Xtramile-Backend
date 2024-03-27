@@ -219,9 +219,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+string uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+
+// Check if the uploads directory exists. If not create it. 
+if (!Directory.Exists(uploadsPath))
+    Directory.CreateDirectory(uploadsPath);
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+    FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/Uploads"
 });
 

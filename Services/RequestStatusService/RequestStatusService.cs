@@ -88,6 +88,7 @@ namespace XtramileBackend.Services.RequestStatusService
 
                 if(requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 12)
                 {
+                    //mail to be sent to Employee on Travel Admin Approval
                     await _mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
                 }*/
             }
