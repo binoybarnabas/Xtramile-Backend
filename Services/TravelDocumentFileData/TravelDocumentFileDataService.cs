@@ -190,8 +190,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           //+1 is used to include the current Date in the subtraction below
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -233,7 +232,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -277,7 +276,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -345,7 +344,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value - DateTime.Now).Days + 1 : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 

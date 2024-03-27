@@ -149,5 +149,28 @@ namespace XtramileBackend.Services.AvailableOptionService
 
         }
 
+        public async Task DeleteTravelOptions(int[] FileIds)
+        {
+            try
+            {
+                for (int i = 0; i < FileIds.Length; i++)
+                {
+                    TBL_TRAVEL_OPTION travelOptionToBeDeleted = await _unitOfWork.TravelOptionRepository.GetByIdAsync(FileIds[i]);
+                    if (travelOptionToBeDeleted != null)
+                    {
+                        _unitOfWork.TravelOptionRepository.Delete(travelOptionToBeDeleted);
+                        await _unitOfWork.SaveChangesAsyn();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while deleting travel options : {ex.Message}");
+                throw; // Re-throw the exception to propagate ;
+            }
+
+        }
+
     }
 }
