@@ -190,7 +190,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -232,7 +232,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -265,7 +265,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
 
                 var travelDocuments = (from travelDocument in travelDocumentsData
                                        join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
-                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate <= DateTime.Now
+                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate < DateTime.Today
                                        select new TravelDocumentViewModel
                                        {
                                            UploadedBy = employee.FirstName + " " + employee.LastName,
@@ -276,7 +276,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
@@ -333,7 +333,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
 
                 var travelDocuments = (from travelDocument in travelDocumentsData
                                        join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
-                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate > DateTime.Now
+                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate >= DateTime.Today
                                        select new TravelDocumentViewModel
                                        {
                                            UploadedBy = employee.FirstName + " " + employee.LastName,
@@ -344,7 +344,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentSize = travelDocument.Size,
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
-                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (int)(travelDocument.ExpiryDate.Value.Date - DateTime.Now.Date).TotalDays : null
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
                                        }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
                                        .ToList();
 
