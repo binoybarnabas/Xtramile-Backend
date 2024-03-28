@@ -1,7 +1,6 @@
 ﻿using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XtramileBackend.Services.NotificationService
 {
@@ -26,7 +25,6 @@ namespace XtramileBackend.Services.NotificationService
                 Console.WriteLine($"An error occurred while adding an available option: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
-
         }
 
         public async Task<IEnumerable<Notifications>> GetNotifications(int employeeId) {
@@ -34,11 +32,13 @@ namespace XtramileBackend.Services.NotificationService
                 IEnumerable<Notification> notificationData = await _unitOfWork.NotificationRepository.GetAllAsync();
                 IEnumerable<Notifications> notifications = notificationData
                                                            .Where((data) => data.EmployeeId == employeeId)
+                                                           .OrderByDescending(data => data.CreatedOn)
                                                            .Select(data => new Notifications
                                                            {
+                                                               NotificationId = data.NotificationId,
                                                                Date = data.CreatedOn.ToString("dd-MM-yyyy"),
                                                                Message = data.NotificationBody.ToString(),
-                                                               Time = data.CreatedOn.ToString("HH:mm:ss tt")
+                                                               Time = data.CreatedOn.ToString("hh:mm tt")
                                                            }
                                                            );
                 return notifications;
