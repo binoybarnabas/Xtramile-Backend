@@ -17,18 +17,17 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
         }
 
         [HttpGet("ongoing")]
-        public async Task<IActionResult> GetOnGoingTravel([FromBody] int pageSize=10, int pageIndex=1)
+        public async Task<IActionResult> GetOnGoingTravel([FromQuery]int pageIndex=1, int pageSize=10)
         {
             try
             {
-                var onGoingTravelData = await _travelAdminService.OnGoingTravel(pageSize,pageIndex);
+                var onGoingTravelData = await _travelAdminService.OnGoingTravel(pageIndex, pageSize);
                 return Ok(onGoingTravelData);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting on going travel updates: {ex.Message}");
             }
-
         }
 
         [HttpGet("incomingrequests")]
@@ -233,6 +232,20 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpGet("Closed")]
+        public async Task<IActionResult> GetClosedTravel([FromQuery] int pageIndex=1, int pageSize=10)
+        {
+            try
+            {
+                var onClosedTravelData = await _travelAdminService.ClosedTravel(pageIndex,pageSize);
+                return Ok(onClosedTravelData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting on closed travel requests: {ex.Message}");
             }
         }
     }
