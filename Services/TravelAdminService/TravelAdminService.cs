@@ -28,7 +28,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// return a list of data which consists of ongoingTrips which contains information like requestId, Project code
         /// project name,first name and last name of the employee source city and destination city.
         /// </returns>
-        public async Task<OngoingTravelAdminPaged> OnGoingTravel(int pageSize, int pageIndex)
+        public async Task<OngoingTravelAdminPaged> OnGoingTravel(int pageIndex, int pageSize)
         {
 
             try
@@ -890,6 +890,63 @@ namespace XtramileBackend.Services.TravelAdminService
                 // Handle exception
                 Console.WriteLine("An error occured : " + ex.Message);
                 throw;
+            }
+        }
+        /// <summary>
+        /// To get the closed travel requests for travel admin  
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public async Task<ClosedTravelAdminPaged> ClosedTravel(int pageIndex,int pageSize)
+        {
+
+            try
+            {
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> requestStatusMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+
+                var latestStatusApprovals = requestStatusMappingData
+                                            .GroupBy(approval => approval.RequestId)
+                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                var closedData = (from employee in employeeData
+                                  join requestStatus in latestStatusApprovals on employee.EmpId equals requestStatus.EmpId
+                                  join request in requestData on requestStatus.RequestId equals request.RequestId
+                                  join project in projectData on request.ProjectId equals project.ProjectId
+                                  join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                  join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                  where primaryStatus.StatusCode == "CL"
+                                  select new ClosedTravelAdmin
+                                  {
+                                      requestId = request.RequestId,
+                                      ProjectCode = project.ProjectCode,
+                                      ProjectName = project.ProjectName,
+                                      Name = employee.FirstName + " " + employee.LastName,
+                                      SourceCity = request.SourceCity,
+                                      DestinationCity = request.DestinationCity,
+                                      Date = requestStatus.date.ToString("dd/MM/yyyy")
+                                  }).ToList();
+
+                int totalCount = closedData.Count();
+                var pagedOngoingData = closedData.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                return new ClosedTravelAdminPaged
+                {
+                    ClosedTravel = pagedOngoingData,
+                    TotalCount = totalCount,
+
+                };
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting on Going travel requests: {ex.Message}");
+                throw;
+
             }
         }
     }

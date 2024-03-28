@@ -4,7 +4,7 @@ namespace XtramileBackend.Services.TravelAdminService
 {
     public interface ITravelAdminService
     {
-        public Task<OngoingTravelAdminPaged> OnGoingTravel(int pageSize, int pageIndex);
+        public Task<OngoingTravelAdminPaged> OnGoingTravel(int pageIndex,int pageSize);
         public Task<RequestTableViewTravelAdminPaged> GetIncomingRequests(int pageIndex, int pageSize);
         public Task<OptionCard> GetSelectedOptionFromEmployee(int reqId);
         public Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string primaryStatusCode, string secondaryStatusCode, int pageSize,int pageIndex);
@@ -22,5 +22,6 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<byte[]> GenerateReportForMonthAndYear(string monthName,int year);
         public Task<int?> GetSelectedTravelOptionFromEmployee(int reqId);
         public Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId);
+        public Task<ClosedTravelAdminPaged> ClosedTravel(int pageIndex, int pageSize);
     }
 }

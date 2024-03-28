@@ -250,5 +250,20 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
 
         }
 
+        [HttpDelete("deleteTravelOptions")]
+        public async Task<IActionResult> DeleteTravelOptions(int[] fileIds)
+        {
+            try
+            {
+                await _availableOptionServices.DeleteTravelOptions(fileIds);
+                return Ok("Options Deleted Successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while deleting travel options : {ex.Message}");
+
+            }
+        }
+
     }
 }
