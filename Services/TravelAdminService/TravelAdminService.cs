@@ -236,13 +236,13 @@ namespace XtramileBackend.Services.TravelAdminService
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
                               ApprovalDate = latestApproval.date
-                          }).ToList();
+                          }).OrderByDescending(result => result.date)
+                            .ThenByDescending(result => result.RequestId)
+                            .ToList();
 
             var totalCount = result.Count();
             var pagedResult = result.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
             var totalPages= (int)Math.Ceiling(totalCount / (double)pageSize);
-
-
 
             return new RequestTableViewTravelAdminPaged
             {

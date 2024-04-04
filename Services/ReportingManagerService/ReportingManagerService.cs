@@ -336,7 +336,7 @@ namespace XtramileBackend.Services.ManagerService
                     join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
                     join status1 in statusData on statusApproval.SecondaryStatusId equals status1.StatusId
                     where employee.ReportsTo == managerId
-                    && (status.StatusCode == "FD" && status1.StatusCode == "PE") || (status.StatusCode == "PE" && status1.StatusCode == "WT")
+                    && (status.StatusCode == "FD" && status1.StatusCode == "PE")
                     select new EmployeeRequestDto
                     {
                         RequestId = request.RequestId,
@@ -879,6 +879,49 @@ namespace XtramileBackend.Services.ManagerService
                 Console.WriteLine("An error occured");
                 throw;
             }
+        }
+
+        public async Task<RequestTableViewTravelAdminPaged> PendingOptionSelectionRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageSize, int pageIndex)
+        {
+            IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+            IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+            IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+            IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+
+            var latestStatusApprovals = approvalData
+                .GroupBy(approval => approval.RequestId)
+                .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+            var result = (from latestApproval in latestStatusApprovals
+                          join requests in requestData on latestApproval.RequestId equals requests.RequestId
+                          join primaryStatus in statusData on latestApproval.PrimaryStatusId equals primaryStatus.StatusId
+                          join secondaryStatus in statusData on latestApproval.SecondaryStatusId equals secondaryStatus.StatusId
+                          join employee in employeeData on requests.CreatedBy equals employee.EmpId
+                          join project in projectData on requests.ProjectId equals project.ProjectId
+                          where ((primaryStatus.StatusCode == primaryStatusCode && secondaryStatus.StatusCode == secondaryStatusCode) && employee.ReportsTo == managerId)
+                          select new RequestTableViewTravelAdmin
+                          {
+                              RequestId = requests.RequestId,
+                              EmployeeName = employee.FirstName + " " + employee.LastName,
+                              ProjectCode = project.ProjectCode,
+                              CreatedOn = requests.CreatedOn,
+                              TravelTypeName = requests.TravelType,
+                              ApprovalDate = latestApproval.date
+                          }).OrderByDescending(result => result.date)
+                            .ThenByDescending(result => result.RequestId)
+                            .ToList();
+
+            var totalCount = result.Count();
+            var pagedResult = result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            return new RequestTableViewTravelAdminPaged
+            {
+                TravelRequest = pagedResult,
+                PageCount = totalCount,
+                TotalPages = totalPages,
+            };
         }
     }
 
