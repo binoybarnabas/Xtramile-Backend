@@ -46,5 +46,7 @@ namespace XtramileBackend.Services.ManagerService
 
         // to submit the selected option from avail opttions.
         public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
+        public Task<RequestTableViewTravelAdminPaged> PendingOptionSelectionRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageSize, int pageIndex);
+
     }
 }

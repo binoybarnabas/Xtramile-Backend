@@ -250,6 +250,23 @@ using Microsoft.AspNetCore.Authorization;
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating an option: {ex.Message}");
             }
         }
+
+        [HttpGet("travelRequests/waiting_or_selected/{managerId}/{primaryStatusCode}/{secondaryStatusCode}")]
+        public async Task<IActionResult> GetWaitingOrSelectedTravelRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageSize = 10, int pageIndex = 1)
+        {
+            try
+            {
+                RequestTableViewTravelAdminPaged requestData = await _reportingManagerService.PendingOptionSelectionRequests(managerId, primaryStatusCode, secondaryStatusCode, pageSize, pageIndex);
+                return Ok(requestData);
+            }
+            catch (Exception ex)
+            {
+                {
+                    // Handle or log the exception
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
+                }
+            }
+        }
     }
 }
 

@@ -10,5 +10,7 @@
         public string PriorityName { get; set; }
         public string StatusName { get; set; }
         public DateTime ApprovalDate { get; internal set; }
+        public DateTime date { get; set; }
+
     }
 }
