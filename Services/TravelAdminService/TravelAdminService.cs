@@ -949,6 +949,106 @@ namespace XtramileBackend.Services.TravelAdminService
 
             }
         }
+
+
+        /// <summary>
+        /// Retrieves the travel admin dashboard requests including incoming, waiting selected, ongoing, and closed requests.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<TravelAdminDashboardRequests> GetTravelAdminDashboardRequests()
+        {
+            try
+            {
+                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<TBL_REQ_APPROVE> requestStatusData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+
+                var latestStatusApprovals = requestStatusData
+                            .GroupBy(approval => approval.RequestId)
+                            .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                IEnumerable<ClosedTravelAdmin> incomingRequests = (from request in requestData
+                                                                   join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                                                   join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
+                                                                   join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                                                   join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                                                   where ((primaryStatus.StatusCode == "OP" && secondaryStatus.StatusCode == "PE") ||
+                                                                   (primaryStatus.StatusCode == "FD" && secondaryStatus.StatusCode == "PE"))
+                                                                   select new ClosedTravelAdmin
+                                                                   {
+                                                                       requestId = request.RequestId,
+                                                                       Name = employee.FirstName + " " + employee.LastName,
+                                                                       SourceCity = request.SourceCity,
+                                                                       DestinationCity = request.DestinationCity,
+                                                                       Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
+                                                                       StatusDate = requestStatus.date
+                                                                   }).OrderByDescending(incomingRequests => incomingRequests.StatusDate).Take(25).ToList();
+
+                IEnumerable<ClosedTravelAdmin> waitingSelectedRequests = (from request in requestData
+                                                                   join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                                                   join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
+                                                                   join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                                                   join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                                                   where ((primaryStatus.StatusCode == "PE" && secondaryStatus.StatusCode == "WT") ||
+                                                                   (primaryStatus.StatusCode == "PE" && secondaryStatus.StatusCode == "SD"))
+                                                                   select new ClosedTravelAdmin
+                                                                   {
+                                                                       requestId = request.RequestId,
+                                                                       Name = employee.FirstName + " " + employee.LastName,
+                                                                       SourceCity = request.SourceCity,
+                                                                       DestinationCity = request.DestinationCity,
+                                                                       Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
+                                                                       StatusDate = requestStatus.date
+                                                                   }).OrderByDescending(waitingSelectedRequests => waitingSelectedRequests.StatusDate).Take(25).ToList();
+
+                IEnumerable<ClosedTravelAdmin> ongoingRequests = (from request in requestData
+                                                                   join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                                                   join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
+                                                                   join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                                                   join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                                                   where (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG")
+                                                                   select new ClosedTravelAdmin
+                                                                   {
+                                                                       requestId = request.RequestId,
+                                                                       Name = employee.FirstName + " " + employee.LastName,
+                                                                       SourceCity = request.SourceCity,
+                                                                       DestinationCity = request.DestinationCity,
+                                                                       Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
+                                                                       StatusDate = requestStatus.date
+                                                                   }).OrderByDescending(ongoingRequests => ongoingRequests.StatusDate).Take(25).ToList();
+
+                IEnumerable<ClosedTravelAdmin> closedRequests = (from request in requestData
+                                                                  join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                                                  join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
+                                                                  join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                                                  join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                                                  where (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL")
+                                                                  select new ClosedTravelAdmin
+                                                                  {
+                                                                      requestId = request.RequestId,
+                                                                      Name = employee.FirstName + " " + employee.LastName,
+                                                                      SourceCity = request.SourceCity,
+                                                                      DestinationCity = request.DestinationCity,
+                                                                      Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
+                                                                      StatusDate = requestStatus.date
+                                                                  }).OrderByDescending(closedRequests => closedRequests.StatusDate).Take(25).ToList();
+
+                return new TravelAdminDashboardRequests
+                {
+                    IncomingRequests = incomingRequests,
+                    WaitingSelectedRequests = waitingSelectedRequests,
+                    OngoingRequests = ongoingRequests,
+                    ClosedRequests = closedRequests
+                };
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting dashboard requests: {ex.Message}");
+                throw;
+            }
+        }
     }
    
 }

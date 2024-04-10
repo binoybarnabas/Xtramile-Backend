@@ -9,5 +9,7 @@
         public string SourceCity { get; set; }
         public string DestinationCity { get; set; }
         public string Date {  get; set; }
+        public DateTime StatusDate { get; set; }
+        public string Status { get; set; }
     }
 }

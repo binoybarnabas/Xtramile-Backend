@@ -23,5 +23,7 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<int?> GetSelectedTravelOptionFromEmployee(int reqId);
         public Task<IEnumerable<CompletedTripsCard>> GetCompletedTrips(int empId);
         public Task<ClosedTravelAdminPaged> ClosedTravel(int pageIndex, int pageSize);
+        public Task<TravelAdminDashboardRequests> GetTravelAdminDashboardRequests();
+
     }
 }

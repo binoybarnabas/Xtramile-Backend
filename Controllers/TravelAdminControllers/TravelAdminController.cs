@@ -248,5 +248,19 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting on closed travel requests: {ex.Message}");
             }
         }
+
+        [HttpGet("dashboardRequests")]
+        public async Task<IActionResult> GetDashboardRequests()
+        {
+            try
+            {
+                TravelAdminDashboardRequests dashboardRequests = await _travelAdminService.GetTravelAdminDashboardRequests();
+                return Ok(dashboardRequests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting dashboard requests: {ex.Message}");
+            }
+        }
     }
 }
