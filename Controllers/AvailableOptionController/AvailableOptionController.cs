@@ -251,7 +251,7 @@ namespace XtramileBackend.Controllers.AvailableOptionControllers
         }
 
         [HttpDelete("deleteTravelOptions")]
-        public async Task<IActionResult> DeleteTravelOptions(int[] fileIds)
+        public async Task<IActionResult> DeleteTravelOptions([FromBody] int[] fileIds)
         {
             try
             {
