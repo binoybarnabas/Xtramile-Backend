@@ -8,7 +8,7 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
 {
     [Route("api/traveladmin")]
     [ApiController]
-    /*[Authorize("Manager")]*/
+    [Authorize("Manager")]
     public class TravelAdminController : ControllerBase
     {
         private readonly ITravelAdminService _travelAdminService;
@@ -246,6 +246,20 @@ namespace XtramileBackend.Controllers.TravelAdminControllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting on closed travel requests: {ex.Message}");
+            }
+        }
+
+        [HttpGet("dashboardRequests")]
+        public async Task<IActionResult> GetDashboardRequests()
+        {
+            try
+            {
+                TravelAdminDashboardRequests dashboardRequests = await _travelAdminService.GetTravelAdminDashboardRequests();
+                return Ok(dashboardRequests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting dashboard requests: {ex.Message}");
             }
         }
     }

@@ -10,6 +10,6 @@ namespace XtramileBackend.Models.EntityModels
 		public int EmpId { get; set; }
 		public int PrimaryStatusId { get; set; }
 		public DateTime date { get; set; }
-		public int? SecondaryStatusId { get; set; }
+		public int SecondaryStatusId { get; set; }
     }
 }
