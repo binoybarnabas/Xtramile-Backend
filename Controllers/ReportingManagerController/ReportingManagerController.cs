@@ -252,19 +252,17 @@ using Microsoft.AspNetCore.Authorization;
         }
 
         [HttpGet("travelRequests/waiting_or_selected/{managerId}/{primaryStatusCode}/{secondaryStatusCode}")]
-        public async Task<IActionResult> GetWaitingOrSelectedTravelRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageSize = 10, int pageIndex = 1)
+        public async Task<IActionResult> GetWaitingOrSelectedTravelRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageNumber, int itemsPerPage)
         {
             try
             {
-                RequestTableViewTravelAdminPaged requestData = await _reportingManagerService.PendingOptionSelectionRequests(managerId, primaryStatusCode, secondaryStatusCode, pageSize, pageIndex);
+                PageinatedResult<RequestTableViewTravelAdmin> requestData = await _reportingManagerService.PendingOptionSelectionRequests(managerId, primaryStatusCode, secondaryStatusCode, pageNumber, itemsPerPage);
                 return Ok(requestData);
             }
             catch (Exception ex)
             {
-                {
-                    // Handle or log the exception
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
-                }
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting options for request: {ex.Message}");
             }
         }
     }
