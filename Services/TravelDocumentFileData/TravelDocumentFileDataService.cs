@@ -210,7 +210,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         /// <param name="FileType">The type of travel document to filter by.</param>
         /// <param name="httpContext">The HttpContext containing the request information.</param>
         /// <returns>A collection of TravelDocumentViewModel objects representing the filtered travel documents.</returns>
-        public async Task<IEnumerable<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext)
+        public async Task<PageinatedResult<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -233,10 +233,17 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
                                            RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
-                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
-                                       .ToList();
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
 
-                return travelDocuments;
+                int totalCount = travelDocuments.Count();
+
+                var pagedTravelDocuments = travelDocuments.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+                return new PageinatedResult<TravelDocumentViewModel>
+                {
+                    Items = pagedTravelDocuments,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {
@@ -254,7 +261,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         /// <returns>
         /// A collection of TravelDocumentViewModel objects representing expired travel documents.
         /// </returns>
-        public async Task<IEnumerable<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext)
+        public async Task<PageinatedResult<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -277,10 +284,17 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
                                            RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
-                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
-                                       .ToList();
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
 
-                return travelDocuments;
+                int totalCount = travelDocuments.Count();
+
+                var pagedTravelDocuments = travelDocuments.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+                return new PageinatedResult<TravelDocumentViewModel>
+                {
+                    Items = pagedTravelDocuments,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {
@@ -322,7 +336,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         /// <returns>
         /// A collection of TravelDocumentViewModel objects representing valid travel documents.
         /// </returns>
-        public async Task<IEnumerable<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext)
+        public async Task<PageinatedResult<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -345,10 +359,17 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                                            DocumentType = travelDocument.TravelDocType,
                                            DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
                                            RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
-                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue) //to show docs with null expiry date
-                                       .ToList();
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
 
-                return travelDocuments;
+                int totalCount = travelDocuments.Count();
+
+                var pagedTravelDocuments = travelDocuments.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+                return new PageinatedResult<TravelDocumentViewModel>
+                {
+                    Items = pagedTravelDocuments,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {

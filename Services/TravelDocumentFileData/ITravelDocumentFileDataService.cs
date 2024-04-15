@@ -10,10 +10,10 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         public Task<TravelDocumentFileDataModel> GetTravelDocumentFileByIdAsync(int id);
         public Task<IEnumerable<TravelDocumentViewModel>> GetDocumentDetailOnEmployeeScreen(int employeeId, HttpContext httpContext);
         public Task<IEnumerable<TravelDocumentViewModel>> GetDocumentsOnTravelAdminScreen(HttpContext httpContext);
-        public Task<IEnumerable<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext);
-        public Task<IEnumerable<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext);
+        public Task<PageinatedResult<TravelDocumentViewModel>> GetFilteredDocumentsOnTAScreen(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage);
+        public Task<PageinatedResult<TravelDocumentViewModel>> GetExpiredDocuments(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage);
         public Task DeleteTravelDocument(int FileId);
-        public Task<IEnumerable<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext);
+        public Task<PageinatedResult<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage);
 
 
     }
