@@ -881,7 +881,7 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
-        public async Task<RequestTableViewTravelAdminPaged> PendingOptionSelectionRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageSize, int pageIndex)
+        public async Task<PageinatedResult<RequestTableViewTravelAdmin>> PendingOptionSelectionRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageNumber, int itemsPerPage)
         {
             IEnumerable<TBL_REQ_APPROVE> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -913,14 +913,13 @@ namespace XtramileBackend.Services.ManagerService
                             .ToList();
 
             var totalCount = result.Count();
-            var pagedResult = result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            return new RequestTableViewTravelAdminPaged
+            var pagedResult = result.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+            return new PageinatedResult<RequestTableViewTravelAdmin>
             {
-                TravelRequest = pagedResult,
-                PageCount = totalCount,
-                TotalPages = totalPages,
+                Items = pagedResult,
+                TotalCount = totalCount,
             };
         }
     }
