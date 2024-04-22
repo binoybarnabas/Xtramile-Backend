@@ -120,7 +120,7 @@ namespace XtramileBackend.Controllers.TravelDocFileData
             try
             {
                 await _travelDocumentFileDataService.DeleteTravelDocument(fileId);
-                return Ok("File Deleted Successfully");
+                return Ok(new { message = "File Deleted Successfully" });
             }
             catch (Exception ex)
             {
