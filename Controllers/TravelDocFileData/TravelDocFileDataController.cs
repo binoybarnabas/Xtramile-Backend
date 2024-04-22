@@ -83,12 +83,12 @@ namespace XtramileBackend.Controllers.TravelDocFileData
         }
 
         [HttpGet("traveldocuments/{fileType}")]
-        public async Task<IActionResult> GetTravelDocumentsFilteredByFileType(string fileType)
+        public async Task<IActionResult> GetTravelDocumentsFilteredByFileType(string fileType, int pageNumber, int itemsPerPage)
         {
             try
             {
                 var httpContext = HttpContext;
-                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetFilteredDocumentsOnTAScreen(fileType,httpContext);
+                PageinatedResult<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetFilteredDocumentsOnTAScreen(fileType, httpContext, pageNumber, itemsPerPage);
                 return Ok(travelDocumentFiles);
             }
             catch (Exception ex)
@@ -99,12 +99,12 @@ namespace XtramileBackend.Controllers.TravelDocFileData
         }
 
         [HttpGet("expiredDocuments/{fileType}")]
-        public async Task<IActionResult> GetExpiredDocuments(string fileType)
+        public async Task<IActionResult> GetExpiredDocuments(string fileType, int pageNumber, int itemsPerPage)
         {
             try
             {
                 var httpContext = HttpContext;
-                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetExpiredDocuments(fileType, httpContext);
+                PageinatedResult<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetExpiredDocuments(fileType, httpContext, pageNumber, itemsPerPage);
                 return Ok(travelDocumentFiles);
             }
             catch (Exception ex)
@@ -130,12 +130,12 @@ namespace XtramileBackend.Controllers.TravelDocFileData
         }
 
         [HttpGet("validDocuments/{fileType}")]
-        public async Task<IActionResult> GetValidDocuments(string fileType)
+        public async Task<IActionResult> GetValidDocuments(string fileType, int pageNumber, int itemsPerPage)
         {
             try
             {
                 var httpContext = HttpContext;
-                IEnumerable<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetValidDocuments(fileType, httpContext);
+                PageinatedResult<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetValidDocuments(fileType, httpContext, pageNumber, itemsPerPage);
                 return Ok(travelDocumentFiles);
             }
             catch (Exception ex)
