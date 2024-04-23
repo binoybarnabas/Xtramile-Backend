@@ -5,8 +5,8 @@ namespace XtramileBackend.Services.ReasonService
     public interface IReasonServices
 
     {
-        public Task<IEnumerable<TBL_REASON>> GetAllReasonsAsync();
-        public Task AddReasonAsync(TBL_REASON reason);
+        public Task<IEnumerable<Reason>> GetAllReasonsAsync();
+        public Task AddReasonAsync(Reason reason);
 
     }
 }

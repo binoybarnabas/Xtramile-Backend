@@ -6,8 +6,8 @@ namespace XtramileBackend.Services.RequestService
     public interface IRequestServices
 
     {
-        public Task<IEnumerable<TBL_REQUEST>> GetAllRequestAsync();
-        public Task AddRequestAsync(TBL_REQUEST request);
+        public Task<IEnumerable<Request>> GetAllRequestAsync();
+        public Task AddRequestAsync(Request request);
 
         public string GenerateRandomCode(int suffix);
 
@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.RequestService
         public Task<int> GetRequestIdByRequestCode(string requestCode);
 
 
-        public Task<TBL_REQUEST> GetRequestById (int id);
+        public Task<Request> GetRequestById (int id);
 
         public Task<string> GetReasonDescriptionByRequestId(int requestId);
 

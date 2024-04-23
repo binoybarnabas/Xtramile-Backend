@@ -5,8 +5,8 @@ namespace XtramileBackend.Services.StatusService
     public interface IStatusServices
 
     {
-        public Task<IEnumerable<TBL_STATUS>> GetAllStatusAsync();
-        public Task AddStatusAsync(TBL_STATUS status);
+        public Task<IEnumerable<Status>> GetAllStatusAsync();
+        public Task AddStatusAsync(Status status);
         public Task<int> GetStatusIdByCode(string statusCode);
         public Task<int> GetStatusIdByStatusCodeAsync(string statusCode);
 

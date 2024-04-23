@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.PerdiemRepository
 {
-    public interface IPerdiemRepository: IRepository<TBL_PER_DIEM>
+    public interface IPerdiemRepository: IRepository<PerDiem>
     {
 
     }

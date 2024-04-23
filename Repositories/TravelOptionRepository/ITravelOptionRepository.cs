@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.TravelOptionRepository
 {
-    public interface ITravelOptionRepository : IRepository<TBL_TRAVEL_OPTION>
+    public interface ITravelOptionRepository : IRepository<TravelOption>
     {
     }
 }

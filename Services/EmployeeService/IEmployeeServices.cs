@@ -7,11 +7,11 @@ namespace XtramileBackend.Services.EmployeeService
     public interface IEmployeeServices
     {
 
-        public Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync();
+        public Task<IEnumerable<Employee>> GetEmployeeAsync();
 
-        public Task SetEmployeeAsync(TBL_EMPLOYEE employee);
+        public Task SetEmployeeAsync(Employee employee);
 
-        public Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id);
+        public Task<Employee> GetEmployeeByIdAsync(int id);
 
         public Task<EmployeeInfo> GetEmployeeInfo(int id);
 
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<IEnumerable<EmployeeCurrentRequest>> getEmployeeCurrentTravel(int empId);
 
-        public Task<TBL_USER> updatePassword(string email, string newPassword);
+        public Task<User> updatePassword(string email, string newPassword);
 
         public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
         public Task<IEnumerable<DashboardEmployeeprogress>> GetEmployeeDashboardProgressAsync(int employeeId);
@@ -40,10 +40,10 @@ namespace XtramileBackend.Services.EmployeeService
 
         public Task<bool> EmployeeCancelRequest(int requestId, int empId);
 
-        public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
+        public Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption);
 
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode);
-        public Task<TBL_FILE_METADATA> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext context);
+        public Task<FileMetaData> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext context);
         public Task UpdateProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext);
 
 

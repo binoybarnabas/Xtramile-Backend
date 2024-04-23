@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.RequestRepository
 {
-    public interface IRequestRepository : IRepository<TBL_REQUEST>
+    public interface IRequestRepository : IRepository<Request>
     {
     }
 }

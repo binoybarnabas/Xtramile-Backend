@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.CountryRepository
 {
-    public interface ICountryRepository : IRepository<TBL_COUNTRY>
+    public interface ICountryRepository : IRepository<Country>
     {
 
     }

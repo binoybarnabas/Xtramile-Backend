@@ -14,7 +14,7 @@ namespace XtramileBackend.Services.FileMetaDataService
         }
 
 
-        public async Task AddFileMetaDataAsync(TBL_FILE_METADATA fileMetaData)
+        public async Task AddFileMetaDataAsync(FileMetaData fileMetaData)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace XtramileBackend.Services.FileMetaDataService
         {
             try
             {
-                IEnumerable<TBL_FILE_METADATA> fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+                IEnumerable<FileMetaData> fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
 
                 var fileId = (from item in fileMetaData
                                  where item.FileName == fileName
@@ -53,7 +53,7 @@ namespace XtramileBackend.Services.FileMetaDataService
             //EOF
          }
 
-            public async Task<IEnumerable<TBL_FILE_METADATA>> GetFileMetaDataAsync()
+            public async Task<IEnumerable<FileMetaData>> GetFileMetaDataAsync()
         {
             try
             {
@@ -70,7 +70,7 @@ namespace XtramileBackend.Services.FileMetaDataService
 
  
         //Get File Data RequestId and description
-        public async Task<TBL_FILE_METADATA?> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
+        public async Task<FileMetaData?> GetFilePathByRequestIdAndDescriptionAsync(int requestId, string description)
         {
             try
             {
@@ -111,11 +111,11 @@ namespace XtramileBackend.Services.FileMetaDataService
             }
         }
 
-        public async Task<TBL_FILE_METADATA> GetFileMetaDataById(int Fileid)
+        public async Task<FileMetaData> GetFileMetaDataById(int Fileid)
         {
             try
             {
-                TBL_FILE_METADATA fileData = await _unitOfWork.FileMetaDataRepository.GetByIdAsync(Fileid);
+                FileMetaData fileData = await _unitOfWork.FileMetaDataRepository.GetByIdAsync(Fileid);
                 return fileData;
             }
             catch (Exception ex)
@@ -127,7 +127,7 @@ namespace XtramileBackend.Services.FileMetaDataService
         }
 
         //Get Profile Picture Data based on EmployeeId
-        public async Task<TBL_FILE_METADATA?> GetProfilePictureData(int empId)
+        public async Task<FileMetaData?> GetProfilePictureData(int empId)
         {
             try
             {

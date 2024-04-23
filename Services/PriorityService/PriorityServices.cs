@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.PriorityService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_PRIORITY>> GetPrioritiesAsync()
+        public async Task<IEnumerable<Priority>> GetPrioritiesAsync()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.PriorityService
             }
         }
 
-        public async Task AddPriorityAsync(TBL_PRIORITY priority)
+        public async Task AddPriorityAsync(Priority priority)
         {
             try
             {

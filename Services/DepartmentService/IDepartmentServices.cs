@@ -4,7 +4,7 @@ namespace XtramileBackend.Services.DepartmentService
 {
     public interface IDepartmentServices
     {
-        public Task<IEnumerable<TBL_DEPARTMENT>> GetDepartmentAsync();
-        public Task SetDepartmentAsync(TBL_DEPARTMENT department);
+        public Task<IEnumerable<Department>> GetDepartmentAsync();
+        public Task SetDepartmentAsync(Department department);
     }
 }

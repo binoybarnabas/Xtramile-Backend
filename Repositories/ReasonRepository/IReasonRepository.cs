@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.ReasonRepository
 {
-    public interface IReasonRepository : IRepository<TBL_REASON>
+    public interface IReasonRepository : IRepository<Reason>
     {
     }
 }

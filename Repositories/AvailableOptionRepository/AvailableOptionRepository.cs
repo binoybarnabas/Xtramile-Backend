@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.AvailableOptionRepository
 {
-    public class AvailableOptionRepository : Repository<TBL_AVAIL_OPTION>, IAvailableOptionRepository
+    public class AvailableOptionRepository : Repository<AvailableOption>, IAvailableOptionRepository
     {
         public AvailableOptionRepository(AppDBContext context) : base(context)
         {

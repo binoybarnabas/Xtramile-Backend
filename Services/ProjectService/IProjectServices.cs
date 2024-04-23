@@ -7,8 +7,8 @@ namespace XtramileBackend.Services.ProjectService
     public interface IProjectServices
 
     {
-        public Task<IEnumerable<TBL_PROJECT>> GetAllProjectsAsync();
-        public Task AddProjectAsync(TBL_PROJECT project);
+        public Task<IEnumerable<Project>> GetAllProjectsAsync();
+        public Task AddProjectAsync(Project project);
         public Task<IEnumerable<object>> GetProjectIdAndCode();
 
         public Task<List<ProjectCodesViewModel>> GetProjectCodesByEmployeeId(int empId);

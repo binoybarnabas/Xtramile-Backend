@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.ExpenseService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_EXPENSE>> GetExpensesAsync()
+        public async Task<IEnumerable<Expense>> GetExpensesAsync()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace XtramileBackend.Services.ExpenseService
         }
 
 
-        public async Task AddExpenseAsync(TBL_EXPENSE expense)
+        public async Task AddExpenseAsync(Expense expense)
         {
             try
             {

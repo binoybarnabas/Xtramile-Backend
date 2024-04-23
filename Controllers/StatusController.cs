@@ -1,0 +1,71 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.StatusService;
+
+namespace XtramileBackend.Controllers
+{
+    [Route("api/status")]
+    [ApiController]
+    public class StatusController : ControllerBase
+    {
+        private readonly IStatusServices _statusServices;
+
+        public StatusController(IStatusServices statusServices)
+        {
+            _statusServices = statusServices;
+        }
+
+        [HttpGet("statuses")]
+        public async Task<IActionResult> GetAllStatusAsync()
+        {
+            try
+            {
+                IEnumerable<Status> status = await _statusServices.GetAllStatusAsync();
+                return Ok(status);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting status: {ex.Message}");
+            }
+        }
+
+        [HttpPost("add")]
+        public async Task<IActionResult> AddStatusAsync([FromBody] Status status)
+        {
+            try
+            {
+                await _statusServices.AddStatusAsync(status);
+                return Ok(status);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a status: {ex.Message}");
+            }
+        }
+        /// <summary>
+        /// Function to return the status Id based on status Code
+        /// </summary>
+        /// <param name="statusCode"></param>
+        /// <returns>statusId</returns>
+        [HttpGet("staustId/{statusCode}")]
+        public async Task<IActionResult> GetStatusIdByCode(string statusCode)
+        {
+            try
+            {
+                int statusId = await _statusServices.GetStatusIdByCode(statusCode);
+                return Ok(statusId);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a status: {ex.Message}");
+            }
+
+
+        }
+    }
+}

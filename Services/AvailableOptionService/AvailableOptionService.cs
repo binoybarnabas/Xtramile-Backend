@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
+using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 
 namespace XtramileBackend.Services.AvailableOptionService
 {
@@ -16,7 +17,7 @@ namespace XtramileBackend.Services.AvailableOptionService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_AVAIL_OPTION>> GetAvailableOptionsAsync()
+        public async Task<IEnumerable<AvailableOption>> GetAvailableOptionsAsync()
         {
             try
             {
@@ -31,7 +32,7 @@ namespace XtramileBackend.Services.AvailableOptionService
             }
         }
 
-        public async Task AddAvailableOptionAsync(TBL_AVAIL_OPTION availableOption)
+        public async Task AddAvailableOptionAsync(AvailableOption availableOption)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace XtramileBackend.Services.AvailableOptionService
         }
 
         //New Travel Option
-        public async Task<int> AddNewTravelOptionAsync(TBL_TRAVEL_OPTION travelOption)
+        public async Task<int> AddNewTravelOptionAsync(TravelOption travelOption)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace XtramileBackend.Services.AvailableOptionService
         {
             try
             {
-                TBL_TRAVEL_OPTION travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync(optionId);
+                TravelOption travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync(optionId);
                 if (travelOption != null)
                 {
                     // Update the fileId
@@ -96,7 +97,7 @@ namespace XtramileBackend.Services.AvailableOptionService
             }
         }
 
-        public async Task<IEnumerable<TBL_TRAVEL_OPTION>> GetTravelOptionsByRequestIdAsync(int reqId, bool travelOptiontext)
+        public async Task<IEnumerable<TravelOption>> GetTravelOptionsByRequestIdAsync(int reqId, bool travelOptiontext)
         {
             try
             {
@@ -127,11 +128,11 @@ namespace XtramileBackend.Services.AvailableOptionService
         /// </summary>
         /// <param name="availableOption"></param>
         /// <returns></returns>
-        public async Task<string> AddAvailableTextOptionAsync(AvailableOption availableOption)
+        public async Task<string> AddAvailableTextOptionAsync(AvailableOptionText availableOption)
         {
             try{
 
-                TBL_TRAVEL_OPTION availableTravelOption = new TBL_TRAVEL_OPTION();
+                TravelOption availableTravelOption = new TravelOption();
                 availableTravelOption.RequestId = availableOption.RequestId;
                 availableTravelOption.Description = availableOption.HtmlContent;
                 availableTravelOption.FileId = null;
@@ -155,7 +156,7 @@ namespace XtramileBackend.Services.AvailableOptionService
             {
                 for (int i = 0; i < FileIds.Length; i++)
                 {
-                    TBL_TRAVEL_OPTION travelOptionToBeDeleted = await _unitOfWork.TravelOptionRepository.GetByIdAsync(FileIds[i]);
+                    TravelOption travelOptionToBeDeleted = await _unitOfWork.TravelOptionRepository.GetByIdAsync(FileIds[i]);
                     if (travelOptionToBeDeleted != null)
                     {
                         _unitOfWork.TravelOptionRepository.Delete(travelOptionToBeDeleted);

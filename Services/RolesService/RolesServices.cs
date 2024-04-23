@@ -12,7 +12,7 @@ namespace XtramileBackend.Services.RolesService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_ROLES>> GetAllRolesAsync()
+        public async Task<IEnumerable<Roles>> GetAllRolesAsync()
         {
             try
             {
@@ -27,7 +27,7 @@ namespace XtramileBackend.Services.RolesService
             }
         }
 
-        public async Task AddRoleAsync(TBL_ROLES role)
+        public async Task AddRoleAsync(Roles role)
         {
             try
             {

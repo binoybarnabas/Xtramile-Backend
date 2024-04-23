@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.StatusService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public Task<IEnumerable<TBL_STATUS>> GetAllStatusAsync()
+        public Task<IEnumerable<Status>> GetAllStatusAsync()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.StatusService
             }
         }
 
-        public async Task AddStatusAsync(TBL_STATUS status)
+        public async Task AddStatusAsync(Status status)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace XtramileBackend.Services.StatusService
         /// <returns>Status ID</returns>
         public async Task<int> GetStatusIdByCode(string statusCode)
         {
-            IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+            IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
             int statusId = (from status in statusData
                             where status.StatusCode == statusCode
@@ -67,7 +67,7 @@ namespace XtramileBackend.Services.StatusService
         {
             try
             {
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
                 var statusId = (from item in statusData
                                 where item.StatusCode == statusCode
@@ -88,13 +88,13 @@ namespace XtramileBackend.Services.StatusService
             try
             {
 
-                IEnumerable<TBL_REQ_APPROVE> statusMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusMappingData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 var statusId = (from item in statusMappingData
                                 where item.RequestId == reqId
                                 select item.PrimaryStatusId).LastOrDefault();
 
-                TBL_STATUS statusData = await _unitOfWork.StatusRepository.GetByIdAsync(statusId);
+                Status statusData = await _unitOfWork.StatusRepository.GetByIdAsync(statusId);
 
                 return statusData.StatusName;
             }

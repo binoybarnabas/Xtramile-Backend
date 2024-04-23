@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.DepartmentRepository
 {
-    public interface IDepartmentRepository:IRepository<TBL_DEPARTMENT>
+    public interface IDepartmentRepository:IRepository<Department>
     {
     }
 }

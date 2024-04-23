@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.CategoryRepository
 {
-    public class CategoryRepository : Repository<TBL_CATEGORY>, ICategoryRepository
+    public class CategoryRepository : Repository<Category>, ICategoryRepository
     {
 
         public CategoryRepository(AppDBContext dbContext) : base(dbContext)

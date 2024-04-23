@@ -4,8 +4,8 @@ namespace XtramileBackend.Services.PerdiemService
 {
     public interface IPerdiemServices
     {
-        Task<IEnumerable<TBL_PER_DIEM>> GetPerdiemAsync();
-        Task AddPerdiemAsync(TBL_PER_DIEM perdiem);
+        Task<IEnumerable<PerDiem>> GetPerdiemAsync();
+        Task AddPerdiemAsync(PerDiem perdiem);
 
 
     }

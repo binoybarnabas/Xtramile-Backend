@@ -17,7 +17,7 @@ namespace XtramileBackend.Services.ProjectService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_PROJECT>> GetAllProjectsAsync()
+        public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
             try
             {
@@ -32,7 +32,7 @@ namespace XtramileBackend.Services.ProjectService
             }
         }
 
-        public async Task AddProjectAsync(TBL_PROJECT project)
+        public async Task AddProjectAsync(Project project)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace XtramileBackend.Services.ProjectService
         {
             try
             {
-                TBL_PROJECT projectData = await _unitOfWork.ProjectRepository.GetByIdAsync(projectId);
+                Project projectData = await _unitOfWork.ProjectRepository.GetByIdAsync(projectId);
                 return projectData.ProjectCode;
 
             }

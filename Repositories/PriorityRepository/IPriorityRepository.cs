@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.PriorityRepository
 {
-    public interface IPriorityRepository : IRepository<TBL_PRIORITY>
+    public interface IPriorityRepository : IRepository<Priority>
     {
     }
 }

@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.CategoryService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_CATEGORY>> GetCategoriesAsync()
+        public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.CategoryService
             }
         }
 
-        public async Task AddCategoryAsync(TBL_CATEGORY category)
+        public async Task AddCategoryAsync(Category category)
         {
             try
             {

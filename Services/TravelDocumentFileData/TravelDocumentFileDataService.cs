@@ -174,7 +174,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             try
             {
                 IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 
                 var urlRequest = httpContext.Request;
 
@@ -215,7 +215,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             try
             {
                 IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var urlRequest = httpContext.Request;
 
@@ -266,7 +266,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             try
             {
                 IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var urlRequest = httpContext.Request;
 
@@ -341,7 +341,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             try
             {
                 IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var urlRequest = httpContext.Request;
 

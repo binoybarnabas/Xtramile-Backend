@@ -12,7 +12,7 @@ namespace XtramileBackend.Services.FileTypeService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public Task<IEnumerable<TBL_FILE_TYPE>> GetFileTypesAsync()
+        public Task<IEnumerable<FileFormat>> GetFileTypesAsync()
         {
             try
             {
@@ -28,7 +28,7 @@ namespace XtramileBackend.Services.FileTypeService
 
         }
 
-        public async Task AddFileTypeAsync(TBL_FILE_TYPE files)
+        public async Task AddFileTypeAsync(FileFormat files)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace XtramileBackend.Services.FileTypeService
 
             try
             {
-                IEnumerable<TBL_FILE_TYPE> fileTypeData = await _unitOfWork.FileTypeRepository.GetAllAsync();
+                IEnumerable<FileFormat> fileTypeData = await _unitOfWork.FileTypeRepository.GetAllAsync();
 
                 var fileTypeId = (from item in fileTypeData
                                   where item.FileExtension == fileExtension
