@@ -1,0 +1,55 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.FileTypeService;
+
+namespace XtramileBackend.Controllers
+{
+    [Route("api/filetype")]
+    [ApiController]
+    public class FileTypeController : ControllerBase
+    {
+
+        private readonly IFileTypeServices _fileTypeServices;
+
+        public FileTypeController(IFileTypeServices fileTypeServices)
+        {
+
+            _fileTypeServices = fileTypeServices;
+        }
+
+        [HttpGet("filetypes")]
+        public async Task<IActionResult> GetFileTypesAsync()
+        {
+            try
+            {
+                IEnumerable<FileFormat> filetypes = await _fileTypeServices.GetFileTypesAsync();
+                return Ok(filetypes);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting file type: {ex.Message}");
+            }
+
+        }
+
+        [HttpPost("add")]
+        public async Task<IActionResult> AddFileTypeAsync([FromBody] FileFormat files)
+        {
+            try
+            {
+                await _fileTypeServices.AddFileTypeAsync(files);
+                return Ok(files);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a file type: {ex.Message}");
+            }
+
+
+        }
+
+    }
+}

@@ -26,8 +26,8 @@ namespace XtramileBackend.Services.FinanceDepartment
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var incomingRequestData = (from request in requests
                                            join employee in employees on request.CreatedBy equals employee.EmpId
@@ -63,8 +63,8 @@ namespace XtramileBackend.Services.FinanceDepartment
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> requests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var incomingRequestData = (from request in requests
                                            join employee in employees on request.CreatedBy equals employee.EmpId
@@ -114,8 +114,8 @@ namespace XtramileBackend.Services.FinanceDepartment
         {
             try
             {
-                IEnumerable<TBL_INVOICE> invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
-                IEnumerable<TBL_EXPENSE> expenses = await _unitOfWork.ExpenseRepository.GetAllAsync();
+                IEnumerable<Invoice> invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
+                IEnumerable<Expense> expenses = await _unitOfWork.ExpenseRepository.GetAllAsync();
 
                 var invoiceAttachments = (from invoice in invoices
                                           join expense in expenses
@@ -154,8 +154,8 @@ namespace XtramileBackend.Services.FinanceDepartment
         {
             try
             {
-                IEnumerable<TBL_EXPENSE> existingExpenseStatusList = await _unitOfWork.ExpenseRepository.GetAllAsync();
-                TBL_EXPENSE? existingExpense = (from expense in existingExpenseStatusList
+                IEnumerable<Expense> existingExpenseStatusList = await _unitOfWork.ExpenseRepository.GetAllAsync();
+                Expense? existingExpense = (from expense in existingExpenseStatusList
                                                 where expense.InvoiceId == InvoiceId
                                                 select expense).FirstOrDefault();
 
@@ -186,8 +186,8 @@ namespace XtramileBackend.Services.FinanceDepartment
         {
             try
             {
-                IEnumerable<TBL_INVOICE> invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
-                IEnumerable<TBL_EXPENSE> expenses = await _unitOfWork.ExpenseRepository.GetAllAsync();
+                IEnumerable<Invoice> invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
+                IEnumerable<Expense> expenses = await _unitOfWork.ExpenseRepository.GetAllAsync();
 
                 var invoiceAttachments = (from invoice in invoices
                                           join expense in expenses

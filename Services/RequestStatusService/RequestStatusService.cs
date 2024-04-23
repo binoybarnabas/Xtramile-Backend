@@ -20,7 +20,7 @@ namespace XtramileBackend.Services.RequestStatusService
             _mailService = mailService;
         }
 
-        public async Task<IEnumerable<TBL_REQ_APPROVE>> GetRequestStatusesAsync()
+        public async Task<IEnumerable<RequestApprove>> GetRequestStatusesAsync()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace XtramileBackend.Services.RequestStatusService
             }
         }
 
-        public async Task AddRequestStatusAsync(TBL_REQ_APPROVE requestStatus)
+        public async Task AddRequestStatusAsync(RequestApprove requestStatus)
         {
             try
             {
@@ -103,8 +103,8 @@ namespace XtramileBackend.Services.RequestStatusService
         {
             try
             {
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
                 var result = (from statusApproval in statusApprovalMap
                               join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId

@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.ProjectMappingService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_PROJECT_MAPPING>> GetProjectMappingsAsync()
+        public async Task<IEnumerable<ProjectEmployeeMap>> GetProjectMappingsAsync()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.ProjectMappingService
             }
         }
 
-        public async Task AddProjectMappingAsync(TBL_PROJECT_MAPPING projectMapping)
+        public async Task AddProjectMappingAsync(ProjectEmployeeMap projectMapping)
         {
             try
             {

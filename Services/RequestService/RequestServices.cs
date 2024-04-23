@@ -6,6 +6,7 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
+using Request = XtramileBackend.Models.EntityModels.Request;
 
 namespace XtramileBackend.Services.RequestService
 {
@@ -25,7 +26,7 @@ namespace XtramileBackend.Services.RequestService
         }
 
 
-        public Task<IEnumerable<TBL_REQUEST>> GetAllRequestAsync()
+        public Task<IEnumerable<Request>> GetAllRequestAsync()
         {
             try
             {
@@ -41,7 +42,7 @@ namespace XtramileBackend.Services.RequestService
 
         }
 
-        public async Task AddRequestAsync(TBL_REQUEST request)
+        public async Task AddRequestAsync(Request request)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace XtramileBackend.Services.RequestService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
 
                 var requestId = (from item in requestData
                                  where item.RequestCode == requestCode
@@ -91,11 +92,11 @@ namespace XtramileBackend.Services.RequestService
         }
 
 
-        public async Task<TBL_REQUEST> GetRequestById(int id)
+        public async Task<Request> GetRequestById(int id)
         {
             try
             {
-                TBL_REQUEST travelRequest = await _unitOfWork.RequestRepository.GetByIdAsync(id);
+                Request travelRequest = await _unitOfWork.RequestRepository.GetByIdAsync(id);
                 return travelRequest;
 
             }
@@ -116,8 +117,8 @@ namespace XtramileBackend.Services.RequestService
         {
             try
             {
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-                IEnumerable<TBL_REASON> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
+                Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                IEnumerable<Reason> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
 
                 string? reasonDescription = (from reason in reasonData
                                             where reason.ReasonId == request.ReasonId

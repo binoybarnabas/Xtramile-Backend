@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.ProjectMappingRepository
 {
-    public interface IProjectMappingRepository : IRepository<TBL_PROJECT_MAPPING>
+    public interface IProjectMappingRepository : IRepository<ProjectEmployeeMap>
     {
     }
 }

@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.FileTypeRepository
 {
-    public class FileTypeRepository : Repository<TBL_FILE_TYPE>, IFileTypeRepository
+    public class FileTypeRepository : Repository<FileFormat>, IFileTypeRepository
     {
 
         public FileTypeRepository(AppDBContext dbContext) : base(dbContext)

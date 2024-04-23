@@ -13,7 +13,7 @@ namespace XtramileBackend.Services.ReasonService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public Task<IEnumerable<TBL_REASON>> GetAllReasonsAsync()
+        public Task<IEnumerable<Reason>> GetAllReasonsAsync()
         {
             try
             {
@@ -29,7 +29,7 @@ namespace XtramileBackend.Services.ReasonService
 
         }
 
-        public async Task AddReasonAsync(TBL_REASON reason)
+        public async Task AddReasonAsync(Reason reason)
         {
             try
             {

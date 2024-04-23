@@ -32,7 +32,7 @@ namespace XtramileBackend.Services.ManagerService
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
 
         public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
-        public Task PostReasonForCancellation(TBL_REASON reason, int reqId);
+        public Task PostReasonForCancellation(Reason reason, int reqId);
 
          
         // forwarded travel requests
@@ -45,7 +45,7 @@ namespace XtramileBackend.Services.ManagerService
         public Task<Dictionary<string, int>> GetRequestsByMonth(int empId);
 
         // to submit the selected option from avail opttions.
-        public Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption);
+        public Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption);
         public Task<PageinatedResult<RequestTableViewTravelAdmin>> PendingOptionSelectionRequests(int managerId, string primaryStatusCode, string secondaryStatusCode, int pageNumber, int itemsPerPage);
 
     }

@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.InvoiceRepository
 {
-    public interface IInvoiceRepository : IRepository<TBL_INVOICE>
+    public interface IInvoiceRepository : IRepository<Invoice>
     {
     }
 }

@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.TravelTypeRepository
 {
-    public class TravelTypeRepository : Repository<TBL_TRAVEL_TYPE>, ITravelTypeRepository
+    public class TravelTypeRepository : Repository<TravelType>, ITravelTypeRepository
     {
         public TravelTypeRepository(AppDBContext dbContext) : base(dbContext)
         {

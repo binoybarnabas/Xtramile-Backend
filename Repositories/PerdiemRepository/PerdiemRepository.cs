@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.PerdiemRepository
 {
-    public class PerdiemRepository: Repository<TBL_PER_DIEM>, IPerdiemRepository
+    public class PerdiemRepository: Repository<PerDiem>, IPerdiemRepository
     {
         public PerdiemRepository(AppDBContext dbContext) : base(dbContext)
         {

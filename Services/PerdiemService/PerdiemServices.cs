@@ -13,7 +13,7 @@ namespace XtramileBackend.Services.PerdiemService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         }
 
-        public async Task<IEnumerable<TBL_PER_DIEM>> GetPerdiemAsync()
+        public async Task<IEnumerable<PerDiem>> GetPerdiemAsync()
         {
             try
             {
@@ -26,7 +26,7 @@ namespace XtramileBackend.Services.PerdiemService
             }
         }
 
-        public async Task AddPerdiemAsync(TBL_PER_DIEM perdiem)
+        public async Task AddPerdiemAsync(PerDiem perdiem)
         {
             try
             {

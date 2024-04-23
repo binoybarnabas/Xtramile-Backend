@@ -4,7 +4,7 @@ using XtramileBackend.Repositories.TravelTypeRepository;
 
 namespace XtramileBackend.Repositories.TravelOptionRepository
 {
-    public class TravelOptionRepository : Repository<TBL_TRAVEL_OPTION>, ITravelOptionRepository
+    public class TravelOptionRepository : Repository<TravelOption>, ITravelOptionRepository
     {
         public TravelOptionRepository(AppDBContext dbContext) : base(dbContext)
         {

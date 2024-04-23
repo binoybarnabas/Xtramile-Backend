@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.RoleRepository
 {
-    public interface IRoleRepository:IRepository<TBL_ROLES>
+    public interface IRoleRepository:IRepository<Roles>
     {
     }
 }

@@ -15,7 +15,7 @@ namespace XtramileBackend.Services.InvoiceService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_INVOICE>> GetInvoicesAsync()
+        public async Task<IEnumerable<Invoice>> GetInvoicesAsync()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace XtramileBackend.Services.InvoiceService
             }
         }
 
-        public async Task AddInvoiceAsync(TBL_INVOICE invoice)
+        public async Task AddInvoiceAsync(Invoice invoice)
         {
             try
             {

@@ -11,7 +11,7 @@ namespace XtramileBackend.Services.CountryService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         }
 
-        public async Task<IEnumerable<TBL_COUNTRY>> GetCountriesAsync()
+        public async Task<IEnumerable<Country>> GetCountriesAsync()
         {
             try
             {
@@ -24,7 +24,7 @@ namespace XtramileBackend.Services.CountryService
             }
         }
 
-        public async Task AddCountryAsync(TBL_COUNTRY country)
+        public async Task AddCountryAsync(Country country)
         {
             try
             {

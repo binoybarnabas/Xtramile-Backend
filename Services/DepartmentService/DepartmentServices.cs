@@ -16,7 +16,7 @@ namespace XtramileBackend.Services.DepartmentService
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<IEnumerable<TBL_DEPARTMENT>> GetDepartmentAsync()
+        public async Task<IEnumerable<Department>> GetDepartmentAsync()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace XtramileBackend.Services.DepartmentService
             }
         }
 
-        public async Task SetDepartmentAsync(TBL_DEPARTMENT department)
+        public async Task SetDepartmentAsync(Department department)
         {
             try
             {

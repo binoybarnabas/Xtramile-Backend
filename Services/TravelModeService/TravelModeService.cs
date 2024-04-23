@@ -12,7 +12,7 @@ namespace XtramileBackend.Services.TravelModeService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<TBL_TRAVEL_MODE>> GetTravelModeAsync()
+        public async Task<IEnumerable<TravelMode>> GetTravelModeAsync()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace XtramileBackend.Services.TravelModeService
         {
             try
             {
-                TBL_TRAVEL_MODE travelModeData = await _unitOfWork.TravelModeRepository.GetByIdAsync(id);
+                TravelMode travelModeData = await _unitOfWork.TravelModeRepository.GetByIdAsync(id);
                 return travelModeData.ModeName;
 
             }
@@ -43,7 +43,7 @@ namespace XtramileBackend.Services.TravelModeService
             }
         }
 
-        public async Task SetTravelModeAsync(TBL_TRAVEL_MODE travelMode)
+        public async Task SetTravelModeAsync(TravelMode travelMode)
         {
             try
             {

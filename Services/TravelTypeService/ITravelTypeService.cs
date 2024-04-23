@@ -4,8 +4,8 @@ namespace XtramileBackend.Services.TravelTypeService
 {
     public interface ITravelTypeService
     {
-        public Task<IEnumerable<TBL_TRAVEL_TYPE>> GetTravelTypeAsync();
+        public Task<IEnumerable<TravelType>> GetTravelTypeAsync();
 
-        public Task SetTravelTypeAsync(TBL_TRAVEL_TYPE travelType);
+        public Task SetTravelTypeAsync(TravelType travelType);
     }
 }

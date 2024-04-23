@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.CategoryRepository
 {
-    public interface ICategoryRepository : IRepository<TBL_CATEGORY>
+    public interface ICategoryRepository : IRepository<Category>
     {
     }
 }

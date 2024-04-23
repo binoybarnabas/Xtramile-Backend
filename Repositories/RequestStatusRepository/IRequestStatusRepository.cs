@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.RequestStatusRepository
 {
-    public interface IRequestStatusRepository : IRepository<TBL_REQ_APPROVE>
+    public interface IRequestStatusRepository : IRepository<RequestApprove>
     {
     }
 }

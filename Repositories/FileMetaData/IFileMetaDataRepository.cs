@@ -4,8 +4,8 @@ namespace XtramileBackend.Repositories.FileMetaDataRepository
 {
     public interface IFileMetaDataRepository
     {
-        Task AddAsync(TBL_FILE_METADATA fileMetaData);
-        Task<IEnumerable<TBL_FILE_METADATA>> GetAllAsync();
-        Task<TBL_FILE_METADATA> GetByIdAsync(int FileId);
+        Task AddAsync(FileMetaData fileMetaData);
+        Task<IEnumerable<FileMetaData>> GetAllAsync();
+        Task<FileMetaData> GetByIdAsync(int FileId);
     }
 }

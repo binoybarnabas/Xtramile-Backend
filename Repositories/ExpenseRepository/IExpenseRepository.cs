@@ -2,7 +2,7 @@
 
 namespace XtramileBackend.Repositories.ExpenseRepository
 {
-    public interface IExpenseRepository : IRepository<TBL_EXPENSE>
+    public interface IExpenseRepository : IRepository<Expense>
     {
     }
 }

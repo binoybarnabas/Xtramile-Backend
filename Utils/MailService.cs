@@ -30,11 +30,11 @@ namespace XtramileBackend.Utils
         /// <returns>A collection of objects containing the name and email of each travel admin team member.</returns>
         private async Task<IEnumerable<TravelAdminTeam>> GetTravelAdminTeamAsync()
         {
-            IEnumerable<TBL_EMPLOYEE> travelAdminData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-            IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-            IEnumerable<TBL_ROLES> rolesData = await _unitOfWork.RoleRepository.GetAllAsync();
-            IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-            IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+            IEnumerable<Employee> travelAdminData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            IEnumerable<ProjectEmployeeMap> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+            IEnumerable<Roles> rolesData = await _unitOfWork.RoleRepository.GetAllAsync();
+            IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+            IEnumerable<Department> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
             // Query to get travel admin details
             var travelAdminTeam = (from travelAdmin in travelAdminData
@@ -62,8 +62,8 @@ namespace XtramileBackend.Utils
             Mail mail = new Mail();
 
             //Get necessary information
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
 
             if (employee != null)
             {
@@ -91,9 +91,9 @@ namespace XtramileBackend.Utils
             Mail mail = new Mail();
 
             //Get necessary information
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-            TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
 
             if (manager != null)
             {
@@ -118,8 +118,8 @@ namespace XtramileBackend.Utils
                 Mail mail = new Mail();
 
                 //Get necessary information
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-                TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+                Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
 
                 if (travelAdmin != null)
                 {
@@ -142,9 +142,9 @@ namespace XtramileBackend.Utils
             Mail mail = new Mail();
 
             //Get necessary information
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-            TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
 
             if (employee != null)
             {
@@ -176,9 +176,9 @@ namespace XtramileBackend.Utils
                 Mail mail = new Mail();
 
                 //Get necessary information
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-                TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-                TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+                Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+                Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
 
                 if (travelAdmin != null)
                 {
@@ -201,10 +201,10 @@ namespace XtramileBackend.Utils
             Mail mail = new Mail();
 
             //Get necessary information
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-            TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
-            TBL_REASON reason = await _unitOfWork.ReasonRepository.GetByIdAsync(request.ReasonId ?? -1);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+            Reason reason = await _unitOfWork.ReasonRepository.GetByIdAsync(request.ReasonId ?? -1);
 
             if (employee != null)
             {
@@ -236,10 +236,10 @@ namespace XtramileBackend.Utils
                 Mail mail = new Mail();
 
                 //Get necessary information
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-                TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-                TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
-                TBL_REASON reason = await _unitOfWork.ReasonRepository.GetByIdAsync(request.ReasonId ?? -1);
+                Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+                Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+                Reason reason = await _unitOfWork.ReasonRepository.GetByIdAsync(request.ReasonId ?? -1);
 
                 if (travelAdmin != null)
                 {
@@ -261,9 +261,9 @@ namespace XtramileBackend.Utils
         {
             Mail mail = new Mail();
 
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
-            TBL_EMPLOYEE manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
 
             if (manager != null)
             {
@@ -287,7 +287,7 @@ namespace XtramileBackend.Utils
                 Mail mail = new Mail();
 
                 //Get necessary information
-                TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
 
                 if (travelAdmin != null)
                 {
@@ -308,8 +308,8 @@ namespace XtramileBackend.Utils
         {
             Mail mail = new Mail();
 
-            TBL_REQUEST request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
 
             if(employee!= null)
             {

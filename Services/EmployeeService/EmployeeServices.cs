@@ -10,6 +10,8 @@ using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
+using Request = XtramileBackend.Models.EntityModels.Request;
 
 namespace XtramileBackend.Services.EmployeeService
 {
@@ -36,7 +38,7 @@ namespace XtramileBackend.Services.EmployeeService
 
 
 
-        public async Task<IEnumerable<TBL_EMPLOYEE>> GetEmployeeAsync()
+        public async Task<IEnumerable<Employee>> GetEmployeeAsync()
         {
             try
             {
@@ -55,10 +57,10 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectEmployeeMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<Department> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<ProjectEmployeeMap> projectEmployeeMap = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
 
                 //get the data of the employee
@@ -94,7 +96,7 @@ namespace XtramileBackend.Services.EmployeeService
 
 
 
-        public async Task SetEmployeeAsync(TBL_EMPLOYEE employee)
+        public async Task SetEmployeeAsync(Employee employee)
         {
             try
             {
@@ -110,11 +112,11 @@ namespace XtramileBackend.Services.EmployeeService
             }
         }
 
-        public async Task<TBL_EMPLOYEE> GetEmployeeByIdAsync(int id)
+        public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
             try
             {
-                TBL_EMPLOYEE employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
+                Employee employeeData = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
                 return employeeData;
             }
             catch (Exception ex)
@@ -137,12 +139,12 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 // Fetching data from repositories
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<ProjectEmployeeMap> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<Project> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<Department> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
-                TBL_FILE_METADATA? profilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
+                FileMetaData? profilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
                 string? filePath = profilePictureData != null ? profilePictureData.FilePath : null;
                 string? fileName = profilePictureData != null ? profilePictureData.FileName : null;
                 var urlRequest = httpContext.Request;
@@ -201,7 +203,7 @@ namespace XtramileBackend.Services.EmployeeService
         public async Task UpdateEmployeeDetailsAsync(int employeeId, ProfileEdit profileEdit)
         {
             // Retrieving the employee from the repository
-            TBL_EMPLOYEE employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
 
             // Checking if the employee is found
             if (employee != null)
@@ -247,10 +249,10 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 // Fetch data from repositories
-                IEnumerable<TBL_AVAIL_OPTION> availableOptions = await _unitOfWork.AvailableOptionRepository.GetAllAsync();
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_COUNTRY> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
+                IEnumerable<AvailableOption> availableOptions = await _unitOfWork.AvailableOptionRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<Country> countryData = await _unitOfWork.CountryRepository.GetAllAsync();
 
                 // Perform the join and projection
                 var result = (from option in availableOptions
@@ -310,12 +312,12 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalMap
                     .GroupBy(approval => approval.RequestId)
@@ -376,11 +378,11 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<ProjectEmployeeMap> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
                 .GroupBy(approval => approval.RequestId)
@@ -455,12 +457,12 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 // Fetching data from repositories
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Project> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<Request> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<ProjectEmployeeMap> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 // Querying for ongoing request details
                 var result = (
@@ -517,10 +519,10 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 // Fetching data from repositories
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 // Querying for ongoing request details
                 var result = (
@@ -573,11 +575,11 @@ namespace XtramileBackend.Services.EmployeeService
             try
             {
                 // Fetching data from repositories
-                IEnumerable<TBL_EMPLOYEE> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_REQUEST> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_ROLES> employeeRoles = await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Roles> employeeRoles = await _unitOfWork.RoleRepository.GetAllAsync();
 
                 // Querying for dashboard details
                 var result = (
@@ -640,14 +642,14 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_ROLES> roleData = await _unitOfWork.RoleRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT_MAPPING> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_DEPARTMENT> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<Roles> roleData = await _unitOfWork.RoleRepository.GetAllAsync();
+                IEnumerable<ProjectEmployeeMap> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<Department> departmentData = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
                 var currentRequest = (from request in requestData
                                       join
@@ -695,7 +697,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <param name="email">The email of the user whose password is to be updated.</param>
         /// <param name="newPassword">The new password to set for the user.</param>
         /// <returns>The updated user entity if the password was updated successfully, or null if no user was found.</returns>
-        public async Task<TBL_USER> updatePassword(string email, string newPassword)
+        public async Task<User> updatePassword(string email, string newPassword)
         {
             try
             {
@@ -722,9 +724,9 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> reqApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 var travelRequest = (
                     from request in requestData
@@ -760,8 +762,8 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestsData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> requestApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Request> requestsData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<RequestApprove> requestApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
                 var completedTrips = (from request in requestsData
                                      join requestApproval in requestApprovalData on request.RequestId equals requestApproval.RequestId
@@ -807,7 +809,7 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                TBL_REQUEST existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+                Request existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
 
                 if (existingRequestData != null)
                 {
@@ -816,7 +818,7 @@ namespace XtramileBackend.Services.EmployeeService
 
                     var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
 
-                    TBL_REQ_APPROVE approve = new TBL_REQ_APPROVE();
+                    RequestApprove approve = new RequestApprove();
 
                     approve.RequestId = requestId;
 
@@ -851,7 +853,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="travelOption"></param>
         /// <returns></returns>
-        public async Task SubmitSelectedTravelOptionAsync(TBL_TRAVEL_OPTION_MAPPING travelOption)
+        public async Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption)
         {
             Console.WriteLine(travelOption);
             try
@@ -877,12 +879,12 @@ namespace XtramileBackend.Services.EmployeeService
         {
             try
             {
-                IEnumerable<TBL_REQUEST> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<TBL_REQ_APPROVE> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<TBL_STATUS> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<TBL_PROJECT> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
-                IEnumerable<TBL_TRAVEL_MODE> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
-                IEnumerable<TBL_EMPLOYEE> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Models.EntityModels.Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<RequestApprove> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalMap
                     .GroupBy(approval => approval.RequestId)
@@ -936,7 +938,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <param name="employeeId">The ID of the employee whose profile picture is being added.</param>
         /// <param name="httpContext">The HttpContext containing the HTTP request information.</param>
         /// <returns>Returns the metadata of the added profile picture.</returns>
-        public async Task<TBL_FILE_METADATA> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext)
+        public async Task<FileMetaData> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext)
         {
             try
             {
@@ -975,7 +977,7 @@ namespace XtramileBackend.Services.EmployeeService
                     }
                 }
 
-                TBL_FILE_METADATA FileData = new TBL_FILE_METADATA
+                FileMetaData FileData = new FileMetaData
                 {
                     FileName = fileName,
                     Description = "Profile Picture",
@@ -1005,7 +1007,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// <returns></returns>
         public async Task UpdateProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext)
         {
-            TBL_FILE_METADATA? existingProfilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
+            FileMetaData? existingProfilePictureData = await _fileMetaDataService.GetProfilePictureData(employeeId);
             if(existingProfilePictureData != null)
             {
                 string uploadsDirectory = "Uploads/Profiles/ProfilePicture";

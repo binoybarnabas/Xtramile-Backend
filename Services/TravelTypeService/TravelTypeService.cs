@@ -12,7 +12,7 @@ namespace XtramileBackend.Services.TravelTypeService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<TBL_TRAVEL_TYPE>> GetTravelTypeAsync()
+        public async Task<IEnumerable<TravelType>> GetTravelTypeAsync()
         {
             try
             {
@@ -27,7 +27,7 @@ namespace XtramileBackend.Services.TravelTypeService
             }
         }
 
-        public async Task SetTravelTypeAsync(TBL_TRAVEL_TYPE travelType)
+        public async Task SetTravelTypeAsync(TravelType travelType)
         {
             try
             {

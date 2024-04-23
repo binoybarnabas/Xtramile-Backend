@@ -3,7 +3,7 @@ using XtramileBackend.Models.EntityModels;
 
 namespace XtramileBackend.Repositories.InvoiceRepository
 {
-    public class InvoiceRepository : Repository<TBL_INVOICE>, IInvoiceRepository
+    public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
     {
         public InvoiceRepository(AppDBContext context) : base(context)
         {
