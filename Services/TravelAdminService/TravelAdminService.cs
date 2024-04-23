@@ -211,7 +211,7 @@ namespace XtramileBackend.Services.TravelAdminService
         /// </summary>
         /// <param name="statusCode">The status code to filter the requests.</param>
         /// <returns>A collection of RequestTableViewTravelAdmin representing the last row of each unique request ID with the specified status.</returns>
-        public async Task<RequestTableViewTravelAdminPaged> GetTravelRequests(string primaryStatusCode, string secondaryStatusCode,int pageSize, int pageIndex)
+        public async Task<PageinatedResult<RequestTableViewTravelAdmin>> GetTravelRequests(string primaryStatusCode, string secondaryStatusCode, int pageNumber, int itemsPerPage)
         {
             IEnumerable<RequestApprove> approvalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
             IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
@@ -243,14 +243,12 @@ namespace XtramileBackend.Services.TravelAdminService
                             .ToList();
 
             var totalCount = result.Count();
-            var pagedResult = result.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
-            var totalPages= (int)Math.Ceiling(totalCount / (double)pageSize);
+            var pagedResult = result.Skip((pageNumber - 1)* itemsPerPage).Take(itemsPerPage).ToList();
 
-            return new RequestTableViewTravelAdminPaged
+            return new PageinatedResult<RequestTableViewTravelAdmin>
             {
-                TravelRequest= pagedResult,
-                PageCount= totalCount,
-                TotalPages= totalPages,
+                Items = pagedResult,
+                TotalCount = totalCount
             } ;
         }
 

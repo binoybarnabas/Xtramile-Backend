@@ -1,10 +1,11 @@
 ﻿using System.Collections.Specialized;
-using System.Net;
-using System.Net.Mail;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.NotificationService;
 using XtramileBackend.UnitOfWork;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace XtramileBackend.Utils
 {
@@ -320,7 +321,7 @@ namespace XtramileBackend.Utils
             }
         }
 
-        private async Task SendMail(Mail mailInfo)
+                private async Task SendMail(Mail mailInfo)
         {
             try
             {
@@ -334,19 +335,21 @@ namespace XtramileBackend.Utils
                     return;
                 }
 
-                MailMessage mail = new MailMessage(senderEmail, recipientEmail);
+                MimeMessage mail = new MimeMessage();
+                mail.From.Add(new MailboxAddress("Xtramile Travel Team", senderEmail));
+                mail.To.Add(new MailboxAddress(recipientEmail, recipientEmail));
                 mail.Subject = "Travel Request Status";
-                mail.Body = mailInfo.emailBody;
-                mail.IsBodyHtml = true;
+                var builder = new BodyBuilder();
+                builder.HtmlBody = mailInfo.emailBody;
+                mail.Body = builder.ToMessageBody();
 
-                using (SmtpClient smtpClient = new SmtpClient("smtp.office365.com", 587))
+                using (var client = new SmtpClient())
                 {
-                    smtpClient.UseDefaultCredentials = false;
-                    smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
-                    smtpClient.EnableSsl = true;
-
-                    await smtpClient.SendMailAsync(mail); // Await SendMailAsync method
-
+                    client.CheckCertificateRevocation = false;
+                    await client.ConnectAsync("smtp.office365.com", 587, SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(senderEmail, senderPassword);
+                    await client.SendAsync(mail);
+                    await client.DisconnectAsync(true);
                     Console.WriteLine("Email sent successfully!");
                 }
             }
@@ -355,6 +358,7 @@ namespace XtramileBackend.Utils
                 Console.WriteLine($"Failed to send email: {ex.Message}");
             }
         }
+
 
         private static string GetSenderEmail()
         {
