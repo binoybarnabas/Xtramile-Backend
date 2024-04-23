@@ -60,11 +60,11 @@ namespace XtramileBackend.Controllers
             }
         }
         [HttpGet("requestsView/{primaryStatusCode}/{secondaryStatusCode}")]
-        public async Task<IActionResult> viewTravelRequestByCode(string primaryStatusCode, string secondaryStatusCode, int pageSize = 10, int pageIndex = 1)
+        public async Task<IActionResult> viewTravelRequestByCode(string primaryStatusCode, string secondaryStatusCode, int pageNumber, int itemsPerPage)
         {
             try
             {
-                RequestTableViewTravelAdminPaged requestData = await _travelAdminService.GetTravelRequests(primaryStatusCode, secondaryStatusCode, pageSize, pageIndex);
+                PageinatedResult<RequestTableViewTravelAdmin> requestData = await _travelAdminService.GetTravelRequests(primaryStatusCode, secondaryStatusCode, pageNumber, itemsPerPage);
                 return Ok(requestData);
             }
             catch (Exception ex)
