@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Org.BouncyCastle.Ocsp;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.AvailableOptionService;
 using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.RequestService;
+using XtramileBackend.Services.RequestStatusService;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 using TravelOption = XtramileBackend.Models.EntityModels.TravelOption;
 
@@ -23,20 +27,14 @@ namespace XtramileBackend.Controllers
     {
         private readonly IAvailableOptionServices _availableOptionServices;
 
-        private readonly IFileTypeServices _fileTypeServices;
-
         private readonly IFileMetaDataService _fileMetaDataServices;
-
-        private readonly IRequestServices _requestServices;
-
-
-        public AvailableOptionController(IRequestServices requestServices, IAvailableOptionServices availableOptionServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices)
+        
+        public AvailableOptionController(IAvailableOptionServices availableOptionServices, IFileMetaDataService fileMetaDataServices)
         {
             _availableOptionServices = availableOptionServices;
-            _fileTypeServices = fileTypeServices;
+            
             _fileMetaDataServices = fileMetaDataServices;
-            _requestServices = requestServices;
-
+            
         }
 
         [HttpGet("traveloptions")]
@@ -69,127 +67,18 @@ namespace XtramileBackend.Controllers
             }
         }
 
-
-        //Add New Travel Option - Files Not Received from front end
         [HttpPost("addoption")]
-        public async Task<IActionResult> AddTravelOptionAsync([FromForm] TravelOptionViewModel travelOption)
+        public async Task<IActionResult> AddTravelAvailableOption([FromForm] TravelOptionAPI travelOption)
         {
-            /* Console.WriteLine("FormDatas" + travelOption.RequestId);
-             Console.WriteLine("FormDatas" + travelOption.GetType);
-             Console.WriteLine("FormDatas" + travelOption.OptionFile.Name);*/
-            try
-            {
-                //Handling text data of travel request
-                var tblTravelOption = new TravelOption
-                {
-                    RequestId = int.Parse(travelOption.RequestId),
-                    Description = travelOption.Description,
-
-                };
-
-                /*                await _availableOptionServices.AddNewTravelOptionAsync(tblTravelOption);
-                */
-                Console.WriteLine(HttpContext.Request.Form.Files.Count);
-
-                int optionId = await _availableOptionServices.AddNewTravelOptionAsync(tblTravelOption);
-                // Now you can access the optionId
-
-                // Check if files are attached and handle them
-                if (HttpContext.Request.Form.Files != null && HttpContext.Request.Form.Files.Count > 0)
-                {
-                    foreach (var file in HttpContext.Request.Form.Files)
-                    {
-                        string randomCode = _requestServices.GenerateRandomCode(int.Parse(travelOption.RequestId));
-
-                        // Renaming the file using REQCODE
-                        var fileName = $"{randomCode}{file.FileName}";
-
-                        // Define the target folder
-                        var targetFolder = "Uploads/RequestFiles/TravelOptions";
-                        if (!Directory.Exists(targetFolder))
-                        {
-                            // Create directory
-                            try
-                            {
-                                Directory.CreateDirectory(targetFolder);
-                                Console.WriteLine("Directory created successfully.");
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error creating directory: {ex.Message}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Directory already exists.");
-                        }
-
-
-                        /*                        var filePath = Path.Combine(targetFolder, fileName);
-                        */
-                        var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
-
-                        using (var stream = System.IO.File.Create(filePath))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
-
-                        // Get Extension of received file
-                        string fileExtension = Path.GetExtension(filePath);
-
-                        // Get file type id based on the file extension of received file
-                        int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
-
-                        // To save the file meta data in TBL_FILE_METADATA
-                        var fileMetaData = new FileMetaData
-                        {
-                            RequestId = int.Parse(travelOption.RequestId),
-                            FileName = fileName,
-                            FilePath = targetFolder,
-                            Description = file.Name, // Assuming file.Name is appropriate for description
-                            FileTypeId = fileTypeId,
-                            CreatedOn = DateTime.Now,
-                            CreatedBy = 1,
-                        };
-
-                        // Adding files meta data
-                        await _fileMetaDataServices.AddFileMetaDataAsync(fileMetaData);
-
-                        int fileId = await _fileMetaDataServices.GetFileIdByFileNameAsync(fileName);
-
-                        await _availableOptionServices.UpdateFileIdOfOptionAsync(fileId, optionId);
-
-                    }
-
-                }
-
+            try {
+                var httpContext = HttpContext;
+                await _availableOptionServices.AddTravelAvailableOption(travelOption, httpContext);
                 return Ok("Option Added successfully:-");
             }
-            catch (Exception ex)
-            {
-                // Log and handle any exceptions
-                Console.WriteLine($"Error processing request: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an available option: {ex.Message}");
             }
-        }
-
-        //add new option in the form of text
-        [HttpPost("addtextoption")]
-        public async Task<IActionResult> AddTextsAsTravelAvailableOption([FromBody] AvailableOptionText availableOption)
-        {
-
-            try
-            {
-                string response = await _availableOptionServices.AddAvailableTextOptionAsync(availableOption);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
-
-            }
-
+           
         }
 
 

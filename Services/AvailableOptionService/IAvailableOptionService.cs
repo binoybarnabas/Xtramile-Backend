@@ -13,7 +13,7 @@ namespace XtramileBackend.Services.AvailableOptionService
         public Task<IEnumerable<TravelOption>> GetTravelOptionsByRequestIdAsync(int reqId,bool travelOption);
         public Task<string> AddAvailableTextOptionAsync(AvailableOptionText availableOption);
         public Task DeleteTravelOptions(int[] FileIds);
-
+        public Task AddTravelAvailableOption(TravelOptionAPI travelOption, HttpContext httpContext);
 
     }
 }
