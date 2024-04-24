@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace XtramileBackend.Models.EntityModels
 {
-    [Table("TBL_TRAVEL_OPTION")]
+    [Table("TBL_TRAVEL_OPTIONS")]
     public class TravelOption
     {
         [Key]

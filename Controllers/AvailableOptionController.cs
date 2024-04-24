@@ -11,6 +11,7 @@ using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.RequestService;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
+using TravelOption = XtramileBackend.Models.EntityModels.TravelOption;
 
 namespace XtramileBackend.Controllers
 {
@@ -172,6 +173,24 @@ namespace XtramileBackend.Controllers
             }
         }
 
+        //add new option in the form of text
+        [HttpPost("addtextoption")]
+        public async Task<IActionResult> AddTextsAsTravelAvailableOption([FromBody] AvailableOptionText availableOption)
+        {
+
+            try
+            {
+                string response = await _availableOptionServices.AddAvailableTextOptionAsync(availableOption);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
+
+            }
+
+        }
 
 
         //Get Travel Options By Req ID
@@ -214,26 +233,6 @@ namespace XtramileBackend.Controllers
                 // Handle or log the exception
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting available options: {ex.Message}");
             }
-        }
-
-
-        //add new option in the form of text
-        [HttpPost("addtextoption")]
-        public async Task<IActionResult> AddTextsAsTravelAvailableOption([FromBody] AvailableOptionText availableOption)
-        {
-
-            try
-            {
-                string response = await _availableOptionServices.AddAvailableTextOptionAsync(availableOption);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding available options as texts: {ex.Message}");
-
-            }
-
         }
 
         [HttpGet("gettextoptions/${requestId}")]
