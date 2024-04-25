@@ -225,8 +225,8 @@ namespace XtramileBackend.Controllers
                             var fileMetaData = new FileMetaData
                             {
                                 RequestId = requestId,
-                                FileName = targetFolder,
-                                FilePath = filePath,
+                                FileName = fileName,
+                                FilePath = targetFolder,
                                 Description = keyName,
                                 FileTypeId = fileTypeId,
                                 CreatedOn = DateTime.Now,
