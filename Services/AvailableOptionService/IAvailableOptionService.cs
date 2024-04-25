@@ -14,6 +14,8 @@ namespace XtramileBackend.Services.AvailableOptionService
         public Task<string> AddAvailableTextOptionAsync(AvailableOptionText availableOption);
         public Task DeleteTravelOptions(int[] FileIds);
         public Task AddTravelAvailableOption(TravelOptionAPI travelOption, HttpContext httpContext);
+        public Task UpdateTravelOptionSelected(TravelOptionMap travelOption);
+
 
     }
 }

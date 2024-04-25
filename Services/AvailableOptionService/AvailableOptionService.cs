@@ -309,5 +309,27 @@ namespace XtramileBackend.Services.AvailableOptionService
 
         }
 
+        public async Task UpdateTravelOptionSelected(TravelOptionMap travelOption)
+        {
+            try
+            {
+                IEnumerable<TravelOptionMap> travelOptionsData = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+                TravelOptionMap? existingTravelOption = travelOptionsData.FirstOrDefault(eto => eto.RequestId == travelOption.RequestId);
+
+                if (existingTravelOption != null)
+                {
+                    existingTravelOption.EmpId = travelOption.EmpId;
+                    existingTravelOption.OptionId = travelOption.OptionId;
+
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and handle any exceptions
+                Console.WriteLine($"Error Updating Option Mapping: {ex.Message}");
+            }
+        }
+
     }
 }

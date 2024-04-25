@@ -157,5 +157,19 @@ namespace XtramileBackend.Controllers
             }
         }
 
+        [HttpPatch("updateSelectedTravelOption")]
+        public async Task<IActionResult> UpdateSelectedTravelOption(TravelOptionMap travelOption)
+        {
+            try
+            {
+                await _availableOptionServices.UpdateTravelOptionSelected(travelOption);
+                return Ok("Updated Successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating travel options : {ex.Message}");
+            }
+        }
+
     }
 }
