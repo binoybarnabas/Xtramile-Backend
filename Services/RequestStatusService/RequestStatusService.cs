@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 
@@ -13,11 +14,13 @@ namespace XtramileBackend.Services.RequestStatusService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMailService _mailService;
+        private readonly IStatusServices _statusServices;
 
-        public RequestStatusServices(IUnitOfWork unitOfWork, IMailService mailService)
+        public RequestStatusServices(IUnitOfWork unitOfWork, IMailService mailService, IStatusServices statusServices)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mailService = mailService;
+            _statusServices = statusServices;
         }
 
         public async Task<IEnumerable<RequestApprove>> GetRequestStatusesAsync()
@@ -104,16 +107,12 @@ namespace XtramileBackend.Services.RequestStatusService
             try
             {
                 IEnumerable<RequestApprove> statusApprovalMap = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
 
-                var result = (from statusApproval in statusApprovalMap
-                              join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                              where statusApproval.RequestId == requestId
-                              select new PendingRequetsViewEmployee
-                              {
-                                  statusName = status.StatusName
-                              }).LastOrDefault();
-                return result?.statusName ?? "undefined";
+                RequestApprove? requestStatus = statusApprovalMap.LastOrDefault(rs => rs.RequestId == requestId);
+
+                string statusName = requestStatus != null ? _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId) : "";
+
+                return statusName;
             }
             catch (Exception ex)
             {
