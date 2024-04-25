@@ -916,12 +916,12 @@ namespace XtramileBackend.Services.TravelAdminService
                                             .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var closedData = (from employee in employeeData
-                                  join requestStatus in latestStatusApprovals on employee.EmpId equals requestStatus.EmpId
-                                  join request in requestData on requestStatus.RequestId equals request.RequestId
+                                  join request in requestData on employee.EmpId equals request.CreatedBy
+                                  join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
                                   join project in projectData on request.ProjectId equals project.ProjectId
                                   join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
                                   join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
-                                  where primaryStatus.StatusCode == "CL"
+                                  where primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "CL"
                                   select new ClosedTravelAdmin
                                   {
                                       requestId = request.RequestId,

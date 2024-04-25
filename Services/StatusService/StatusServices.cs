@@ -126,6 +126,8 @@ namespace XtramileBackend.Services.StatusService
                 return "Denied";
             else if (primaryStatusId == 1 && secondaryStatusId == 6)
                 return "Resubmitted";
+            else if (primaryStatusId == 3 && secondaryStatusId == 3)
+                return "Closed";
             else
                 return " ";            
         }

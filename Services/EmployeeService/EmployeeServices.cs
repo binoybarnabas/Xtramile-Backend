@@ -395,7 +395,9 @@ namespace XtramileBackend.Services.EmployeeService
                               join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
                               join project in projectData on projectMapping.ProjectId equals project.ProjectId
                               where request.CreatedBy == empId
-                               && (primarystatus.StatusCode == "CL" || primarystatus.StatusCode == "CD" || primarystatus.StatusCode == "DD")
+                               && ((primarystatus.StatusCode == "CL" && secondarystatus.StatusCode == "CL") || 
+                               (primarystatus.StatusCode == "CD" && secondarystatus.StatusCode == "CD")|| 
+                               (primarystatus.StatusCode == "DD" && secondarystatus.StatusCode == "PE"))
                               select new EmployeeViewReq
                               {
                                   RequestId = request.RequestId,
@@ -403,7 +405,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   ProjectName = project.ProjectName,
                                   TravelType = request.TravelType,
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
-                                  Status = "Closed"
+                                  Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),   
 
                               }).ToList();
 
@@ -765,8 +767,12 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<Request> requestsData = await _unitOfWork.RequestRepository.GetAllAsync();
                 IEnumerable<RequestApprove> requestApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var latestStatusApprovals = requestApprovalData
+                                            .GroupBy(approval => approval.RequestId)
+                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
+
                 var completedTrips = (from request in requestsData
-                                     join requestApproval in requestApprovalData on request.RequestId equals requestApproval.RequestId
+                                     join requestApproval in latestStatusApprovals on request.RequestId equals requestApproval.RequestId
                                      where (request.CreatedBy == empId && (requestApproval.PrimaryStatusId == 3 && requestApproval.SecondaryStatusId == 3))
                                      group new { request, requestApproval } by new { request.SourceCity, request.DestinationCity } into groupedRequests
                                      select new CompletedTripsCard 
