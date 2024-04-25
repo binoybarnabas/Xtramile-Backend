@@ -8,7 +8,7 @@ namespace XtramileBackend.Controllers
 {
     [Route("api/traveladmin")]
     [ApiController]
-    [Authorize("Manager")]
+    //[Authorize("Manager")]
     public class TravelAdminController : ControllerBase
     {
         private readonly ITravelAdminService _travelAdminService;

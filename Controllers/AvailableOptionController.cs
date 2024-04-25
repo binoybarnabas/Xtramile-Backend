@@ -72,6 +72,7 @@ namespace XtramileBackend.Controllers
         {
             try {
                 var httpContext = HttpContext;
+                Console.WriteLine(httpContext);
                 await _availableOptionServices.AddTravelAvailableOption(travelOption, httpContext);
                 return Ok("Option Added successfully:-");
             }

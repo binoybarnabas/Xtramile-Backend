@@ -10,7 +10,7 @@ namespace XtramileBackend.Models.EntityModels
         public int NotificationId { get; set; }
         public int EmployeeId { get; set; }
         public int RequestId { get; set; }
-        public string NotificationBody { get; set; }
+        public string? NotificationBody { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

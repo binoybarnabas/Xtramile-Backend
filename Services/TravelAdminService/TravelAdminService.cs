@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using OfficeOpenXml;
 using System;
 using System.Globalization;
@@ -9,6 +10,7 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 using Request = XtramileBackend.Models.EntityModels.Request;
 
@@ -963,6 +965,7 @@ namespace XtramileBackend.Services.TravelAdminService
                 IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<RequestApprove> requestStatusData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<Notification> notificationData = await _unitOfWork.NotificationRepository.GetAllAsync();
 
                 var latestStatusApprovals = requestStatusData
                             .GroupBy(approval => approval.RequestId)
@@ -1034,12 +1037,25 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                       StatusDate = requestStatus.date
                                                                   }).OrderByDescending(closedRequests => closedRequests.StatusDate).Take(25).ToList();
 
+                IEnumerable<Notifications> travelAdminNotification = notificationData
+                    .GroupBy(data => data.RequestId)
+                    .Select(g => new Notifications
+                    {
+                    NotificationId = g.OrderByDescending(n => n.CreatedOn).FirstOrDefault().NotificationId,
+                    Date = g.OrderByDescending(n => n.CreatedOn).FirstOrDefault().CreatedOn.ToString("dd-MM-yyyy"),
+                    Message = g.OrderByDescending(n => n.CreatedOn).FirstOrDefault().NotificationBody?.ToString() ?? string.Empty,
+                    Time = g.OrderByDescending(n => n.CreatedOn).FirstOrDefault().CreatedOn.ToString("hh:mm tt"),
+                    RequestId = g.OrderByDescending(n => n.CreatedOn).FirstOrDefault().RequestId.ToString()
+                    })
+                    .ToList();
+
                 return new TravelAdminDashboardRequests
                 {
                     IncomingRequests = incomingRequests,
                     WaitingSelectedRequests = waitingSelectedRequests,
                     OngoingRequests = ongoingRequests,
-                    ClosedRequests = closedRequests
+                    ClosedRequests = closedRequests,
+                    Notifications = travelAdminNotification
                 };
 
             }

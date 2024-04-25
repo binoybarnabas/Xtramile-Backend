@@ -1,4 +1,6 @@
-﻿namespace XtramileBackend.Models.APIModels
+﻿using XtramileBackend.Models.EntityModels;
+
+namespace XtramileBackend.Models.APIModels
 {
     public class TravelAdminDashboardRequests
     {
@@ -7,5 +9,6 @@
         public IEnumerable<ClosedTravelAdmin> WaitingSelectedRequests { get; set; }
         public IEnumerable<ClosedTravelAdmin> OngoingRequests { get; set; }
         public IEnumerable<ClosedTravelAdmin> ClosedRequests { get; set; }
+        public IEnumerable<Notifications> Notifications { get; set; }
     }
 }
