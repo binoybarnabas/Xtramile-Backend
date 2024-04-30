@@ -9,5 +9,6 @@
         public DateTime? EndDate { get; set; }
         public string Reason { get; set; }
         public string StatusName { get; set; }
+        public DateTime date { get; set; }
     }
 }

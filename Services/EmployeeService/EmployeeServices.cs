@@ -454,7 +454,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="employeeId">The ID of the employee.</param>
         /// <returns>A collection of ongoing request details for the employee.</returns>
-        public async Task<IEnumerable<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId)
+        public async Task<PageinatedResult<EmployeeOngoingRequest>> GetEmployeeOngoingRequestDetails(int employeeId, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -476,8 +476,6 @@ namespace XtramileBackend.Services.EmployeeService
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where request.CreatedBy == employeeId
-                        && request.PerdiemId != null
-                        && reqApproval.PrimaryStatusId == 5
                         && primaryStatus.StatusCode == "OG"
                         && secondaryStatus.StatusCode == "OG"
                     select new EmployeeOngoingRequest
@@ -488,20 +486,21 @@ namespace XtramileBackend.Services.EmployeeService
                         StartDate = request.DepartureDate,
                         EndDate = request.ReturnDate,
                         Reason = request.TripPurpose,
-                        StatusName = primaryStatus.StatusName
+                        StatusName = _statusServices.GetStatusName(primaryStatus.StatusId,secondaryStatus.StatusId),
+                        date = reqApproval.date
                     }
-                );
+                ).OrderByDescending(result => result.date)
+                .ThenByDescending(result => result.RequestId)
+                .ToList();
 
-                // Checking if the result is not null and returning
-                if (result != null && result.Any()) // Check if there are any results
+                var totalCount = result.Count;
+                var pagedResult = result.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+                return new PageinatedResult<EmployeeOngoingRequest>
                 {
-                    return result.ToList(); // If there are results, return the list
-                }
-                else
-                {
-                    // Throwing exception if no employees are found or no matching requests
-                    throw new FileNotFoundException($"No employees found with Employee ID {employeeId} with the specified criteria.");
-                }
+                    Items = pagedResult,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {

@@ -8,5 +8,7 @@
         public string Name { get; set; }
         public string SourceCity { get; set; }
         public string DestinationCity { get; set; }
+        public DateTime date { get; set; }
+
     }
 }
