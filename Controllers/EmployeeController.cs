@@ -193,12 +193,12 @@ namespace XtramileBackend.Controllers
         /// <param name="employeeId">The ID of the employee.</param>
         /// <returns>An IActionResult indicating success or failure of the get operation.</returns>
         [HttpGet("ongoing/request/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeOngoingRequest(int employeeId)
+        public async Task<IActionResult> GetEmployeeOngoingRequest(int employeeId, int pageNumber, int itemsPerPage)
         {
             try
             {
                 // Call the service method to retrieve ongoing request details for the specified employee
-                IEnumerable<EmployeeOngoingRequest> employeeOngoingData = await _employeeService.GetEmployeeOngoingRequestDetails(employeeId);
+                PageinatedResult<EmployeeOngoingRequest> employeeOngoingData = await _employeeService.GetEmployeeOngoingRequestDetails(employeeId, pageNumber, itemsPerPage);
 
                 // Return a 200 OK response with the retrieved ongoing request details
                 return Ok(employeeOngoingData);
