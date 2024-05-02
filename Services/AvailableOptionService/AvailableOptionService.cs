@@ -196,15 +196,18 @@ namespace XtramileBackend.Services.AvailableOptionService
             {
                 //Handling text data of travel request
                 List<int> optionIds = new List<int>();
-                foreach (string description in travelOption.Description)
+                if(travelOption.Description != null)
                 {
-                    var tblTravelOption = new TravelOption
+                    foreach (string description in travelOption.Description)
                     {
-                        RequestId = travelOption.RequestId,
-                        Description = description,
-                    };
-                    int optionId = await AddNewTravelOptionAsync(tblTravelOption);
-                    optionIds.Add(optionId);
+                        var tblTravelOption = new TravelOption
+                        {
+                            RequestId = travelOption.RequestId,
+                            Description = description,
+                        };
+                        int optionId = await AddNewTravelOptionAsync(tblTravelOption);
+                        optionIds.Add(optionId);
+                    }
                 }
 
                 // option descrption index corresponding to a file
