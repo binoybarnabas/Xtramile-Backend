@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Org.BouncyCastle.Ocsp;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.UnitOfWork;
 
@@ -148,7 +149,23 @@ namespace XtramileBackend.Services.FileMetaDataService
             }
         }
 
+        public async Task<int> GetFileIdByRequestIdAndTravelAuthFile(int requestId)
+        {
+            try
+            {
+                var fileMetaData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
 
+                int fileid = (from item in fileMetaData
+                                where item.RequestId == requestId && (item.Description.CompareTo("travelAuthorizationEmailCapture") == 0)
+                                select item.FileId).FirstOrDefault();
 
+                return fileid;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting file id: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

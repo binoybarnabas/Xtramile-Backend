@@ -19,6 +19,8 @@ namespace XtramileBackend.Services.RequestService
 
         public Task<string> GetReasonDescriptionByRequestId(int requestId);
 
+        public Task UpdateRequestDetails(TravelRequestViewModel requestData, HttpContext httpContext);
+
     }
 }
 

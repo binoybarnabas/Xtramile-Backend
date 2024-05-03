@@ -17,6 +17,8 @@ namespace XtramileBackend.Services.FileMetaDataService
 
         public Task<FileMetaData> GetFileMetaDataById(int fileId);
         public Task<FileMetaData?> GetProfilePictureData(int empId);
+        public Task<int> GetFileIdByRequestIdAndTravelAuthFile(int requestId);
+
 
 
 
