@@ -315,8 +315,8 @@ namespace XtramileBackend.Controllers
                 string? travelAuthFilePath = TravelAuthMailFileData?.FilePath;
                 string? travelAuthFileName = TravelAuthMailFileData?.FileName;
 
-                var passportFileUrl = passportFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{passportFilePath}/{Uri.EscapeDataString(passportFileName)}" : "404_file_not_found";
-                var travelAuthMailFileUrl = travelAuthFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{travelAuthFilePath}/{Uri.EscapeDataString(travelAuthFileName)}" : "file_not_found";
+                var passportFileUrl = passportFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{passportFilePath}/{Uri.EscapeDataString(passportFileName)}" : null;
+                var travelAuthMailFileUrl = travelAuthFilePath != null ? $"{urlRequest.Scheme}://{urlRequest.Host}/{travelAuthFilePath}/{Uri.EscapeDataString(travelAuthFileName)}" : null;
 
                 //string encodedPassportUrl = HttpUtility.UrlEncode(passportFileUrl);
                 //string encodedTravelAuthMailUrl = HttpUtility.UrlEncode(travelAuthMailFileUrl);
@@ -352,7 +352,7 @@ namespace XtramileBackend.Controllers
                     /*                    PassportFileUrl = passportFileUrl,
                     */
                     TravelAuthMailFileUrl = travelAuthMailFileUrl,
-                    RequestId = reqId
+                    RequestId = reqId,
                 };
 
 
@@ -377,6 +377,21 @@ namespace XtramileBackend.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting reason description: {ex.Message}");
+            }
+        }
+
+        [HttpPut("resubmitRequest/{requestId}")]
+        public async Task<IActionResult> ResubmitRequestDetails(TravelRequestViewModel requestData)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                await _requestServices.UpdateRequestDetails(requestData, httpContext);
+                return Ok("Request Updated Successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating request details: {ex.Message}");
             }
         }
 

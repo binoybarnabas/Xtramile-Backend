@@ -94,7 +94,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                     filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
                     string fileExtension = Path.GetExtension(filePath);
                     fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
-                    using (var stream = System.IO.File.Create(filePath))
+                    using (var stream = File.Create(filePath))
                     {
                         await file.CopyToAsync(stream);
                     }
@@ -378,5 +378,6 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                 throw; // Re-throw the exception to propagate it
             }
         }
+
     }
 }
