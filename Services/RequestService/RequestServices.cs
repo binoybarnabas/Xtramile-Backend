@@ -4,6 +4,7 @@ using Microsoft.Extensions.Primitives;
 using System.Dynamic;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using Request = XtramileBackend.Models.EntityModels.Request;
@@ -15,12 +16,12 @@ namespace XtramileBackend.Services.RequestService
 
         private readonly IUnitOfWork _unitOfWork;
         private Random random;
+        private readonly IFileMetaDataService _fileMetaDataService;
 
-        public RequestServices(IUnitOfWork unitOfWork)
+        public RequestServices(IUnitOfWork unitOfWork, IFileMetaDataService fileMetaDataService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-
-
+            _fileMetaDataService = fileMetaDataService;
             // Initialize Random with a unique seed (e.g., based on the current time)
             random = new Random(Guid.NewGuid().GetHashCode());
         }
@@ -134,5 +135,78 @@ namespace XtramileBackend.Services.RequestService
             }
         }
 
+        public async Task UpdateRequestDetails(TravelRequestViewModel requestData, HttpContext httpContext)
+        {
+            try
+            {
+                Request existingRequest = await _unitOfWork.RequestRepository.GetByIdAsync(requestData.RequestId);
+                int fileId = await _fileMetaDataService.GetFileIdByRequestIdAndTravelAuthFile(requestData.RequestId);
+                FileMetaData existingfileData = await _unitOfWork.FileMetaDataRepository.GetByIdAsync(fileId);
+                string fileName = "";
+                string targetFolder = "Uploads/RequestFiles/TravelAuthorizationEmails";
+
+
+                if (httpContext.Request.Form.Files != null)
+                {
+                    var file = httpContext.Request.Form.Files[0];
+                    fileName = $"{requestData.RequestCode}{file.FileName}";
+                    var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
+                    using (var stream = File.Create(filePath))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                }
+
+                if (existingRequest != null)
+                {
+                    existingRequest.RequestId = requestData.RequestId;
+                    existingRequest.DepartureDate = DateTime.Parse(requestData.DepartureDate);
+                    existingRequest.ReturnDate = requestData.ReturnDate != null ? DateTime.Parse(requestData.ReturnDate) : null;
+                    existingRequest.TravelType = requestData.TravelType;
+                    existingRequest.PerdiemId = null;
+                    existingRequest.CreatedBy = existingRequest.CreatedBy;
+                    existingRequest.CreatedOn = existingRequest.CreatedOn;
+                    existingRequest.ModifiedBy = int.Parse(requestData.CreatedBy);
+                    existingRequest.ModifiedOn = DateTime.Now;
+                    existingRequest.SourceCity = requestData.SourceCity;
+                    existingRequest.SourceState = null;
+                    existingRequest.SourceCountry = requestData.SourceCountry;
+                    existingRequest.DestinationCity = requestData.DestinationCity;
+                    existingRequest.DestinationState = null;
+                    existingRequest.DestinationCountry = requestData.DestinationCountry;
+                    existingRequest.CabRequired = requestData.CabRequired;
+                    existingRequest.AccommodationRequired = requestData.AccommodationRequired;
+                    existingRequest.SourceCityZipCode = null;
+                    existingRequest.DestinationCityZipCode = null;
+                    existingRequest.TripPurpose = requestData.TripPurpose;
+                    existingRequest.PrefDepartureTime = requestData.PrefDepartureTime;
+                    existingRequest.PriorityId = null;
+                    existingRequest.RequestCode = requestData.RequestCode;
+                    existingRequest.AdditionalComments = null;
+                    existingRequest.ReasonId = null;
+                    existingRequest.ProjectId = int.Parse(requestData.ProjectId);
+                    existingRequest.TripType = requestData.TripType;
+                    existingRequest.TravelModeId = int.Parse(requestData.TravelModeId);
+                    existingRequest.PrefPickUpTime = requestData.PrefPickUpTime;
+
+                    if(existingfileData != null)
+                    {
+                        var filePath = Path.Combine(targetFolder, existingfileData.FileName).Replace("\\", "/");
+                        File.Delete(filePath);
+                        existingfileData.FileName = fileName;
+                        existingfileData.ModifiedBy = int.Parse(requestData.CreatedBy);
+                        existingfileData.ModifiedOn = DateTime.Now;
+                    }
+
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request details: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
     }
 }
