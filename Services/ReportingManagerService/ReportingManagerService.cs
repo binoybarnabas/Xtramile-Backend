@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,12 +22,14 @@ namespace XtramileBackend.Services.ManagerService
     {
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IRequestStatusServices _requestStatusServices;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService(IUnitOfWork unitOfWork)
+        public ReportingManagerService(IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices)
         {
             _unitOfWork = unitOfWork;
+            _requestStatusServices = requestStatusServices;
         }
 
         /// <summary>
@@ -676,7 +679,7 @@ namespace XtramileBackend.Services.ManagerService
 
                 approve.date = DateTime.Now;
 
-                await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+                await _requestStatusServices.AddRequestStatusAsync(approve);
 
                 //once the status is updated the new priority and status needs to be set is request status mapping
                 // and delete the older priority and status. here it is OP for open requests
@@ -730,7 +733,7 @@ namespace XtramileBackend.Services.ManagerService
 
                     approve.date = DateTime.Now;
 
-                    await _unitOfWork.RequestStatusRepository.AddAsync(approve);
+                    await _requestStatusServices.AddRequestStatusAsync(approve);
 
                     _unitOfWork.Complete();
 

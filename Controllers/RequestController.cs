@@ -248,21 +248,7 @@ namespace XtramileBackend.Controllers
                     }
 
                 }
-                //Object for updating status of request
-                var requestStatus = new RequestApprove
-                {
-
-                    RequestId = requestId,
-                    EmpId = int.Parse(request.CreatedBy),
-                    PrimaryStatusId = primaryStatusId,
-                    date = DateTime.Now,
-                    SecondaryStatusId = secondaryStatusId
-
-                };
-
-                //Updating Requesting Status
-                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
-                return Ok("Request submitted successfully:-");
+                return Ok(tblRequest.RequestId);
             }
             catch (Exception ex)
             {
