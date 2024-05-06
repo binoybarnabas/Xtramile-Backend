@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -138,6 +139,22 @@ namespace XtramileBackend.Controllers
                 var httpContext = HttpContext;
                 PageinatedResult<TravelDocumentViewModel> travelDocumentFiles = await _travelDocumentFileDataService.GetValidDocuments(fileType, httpContext, pageNumber, itemsPerPage);
                 return Ok(travelDocumentFiles);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
+            }
+        }
+
+        [HttpGet("relevantDocuments/{requestId}")]
+        public async Task<IActionResult> GetAllRelevatDocument(int requestId)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                RelevantDocument relevantDocuments = await _travelDocumentFileDataService.GetAllRelevantDocuments(requestId, httpContext);
+                return Ok(relevantDocuments);
             }
             catch (Exception ex)
             {

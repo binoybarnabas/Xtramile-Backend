@@ -12,5 +12,6 @@
         public string DocumentSize { get; set; }
         public string DocumentURL { get; set; }
         public int? RemainingDays { get; set; }
+        public string Filename { get; set; }
     }
 }
