@@ -530,9 +530,10 @@ namespace XtramileBackend.Services.EmployeeService
                     from reqApproval in reqApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
+                    join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where request.CreatedBy == employeeId
-                        && reqApproval.PrimaryStatusId == 5
                         && primaryStatus.StatusCode == "OG"
+                        && secondaryStatus.StatusCode == "OG"
                     select new DashboardUpcomingTrip
                     {
                         StartDate = request.DepartureDate,
