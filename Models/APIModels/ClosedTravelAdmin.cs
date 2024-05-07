@@ -11,5 +11,6 @@
         public string Date {  get; set; }
         public DateTime StatusDate { get; set; }
         public string Status { get; set; }
+        public string RequestCode { get; set; }
     }
 }

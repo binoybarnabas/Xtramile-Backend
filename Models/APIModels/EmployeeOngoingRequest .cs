@@ -10,5 +10,6 @@
         public string Reason { get; set; }
         public string StatusName { get; set; }
         public DateTime date { get; set; }
+        public string RequestCode { get; set; }
     }
 }
