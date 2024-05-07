@@ -325,14 +325,20 @@ namespace XtramileBackend.Controllers
                     RequestCode = request.RequestCode,
                     TravelModeId = TravelMode,
                     PrimaryStatus = Status,
-                    TravelAuthMailFileUrl = travelAuthMailFileUrl,
-                    RequestId = reqId,
+                    AccommodationRequired=request.AccommodationRequired,
                     ProjectId = request.ProjectId.ToString(),
                     TripType = request.TripType,
                     TripPurpose = request.TripPurpose,
                     CabRequired = request.CabRequired,
                     TravelType = request.TravelType,
                     PrefDepartureTime = request.PrefDepartureTime,
+                    PrefPickUpTime = request.PrefPickUpTime,
+                    //PassportFileUrl = HttpUtility.UrlEncode(passportFileUrl),
+                    //TravelAuthMailFileUrl = HttpUtility.UrlEncode(passportFileUrl)
+                    /*                    PassportFileUrl = passportFileUrl,
+                    */
+                    TravelAuthMailFileUrl = travelAuthMailFileUrl,
+                    RequestId = reqId,
                 };
 
 
