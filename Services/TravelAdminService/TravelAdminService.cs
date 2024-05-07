@@ -61,7 +61,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                       Name = employee.FirstName+ " "+employee.LastName,
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity,
-                                      date = requestStatus.date
+                                      date = requestStatus.date,
+                                      requestCode = request.RequestCode
                                   })
                                   .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
                                   .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
@@ -127,7 +128,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                             CreatedOn = request.CreatedOn,
                                             TravelTypeName = request.TravelType,
                                             PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                            StatusName = _statusServices.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId)
+                                            StatusName = _statusServices.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId),
+                                            RequestCode = request.RequestCode
                                         }).OrderByDescending(incomingRequests => incomingRequests.RequestId).ToList();
 
 
@@ -242,7 +244,8 @@ namespace XtramileBackend.Services.TravelAdminService
                               ProjectCode = project.ProjectCode,
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
-                              ApprovalDate = latestApproval.date
+                              ApprovalDate = latestApproval.date,
+                              RequestCode = requests.RequestCode
                           }).OrderByDescending(result => result.date)
                             .ThenByDescending(result => result.RequestId)
                             .ToList();
@@ -408,7 +411,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                        StatusName = status.StatusName
+                                        StatusName = status.StatusName,
+                                        RequestCode = request.RequestCode
                                     }).ToList();
             return incomingRequests;
         }
@@ -450,7 +454,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                        StatusName = status.StatusName
+                                        StatusName = status.StatusName,
+                                        RequestCode = request.RequestCode
                                     }).ToList();
             return incomingRequests;
         }
@@ -492,7 +497,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                        StatusName = status.StatusName
+                                        StatusName = status.StatusName,
+                                        RequestCode = request.RequestCode
                                     }).ToList();
             return incomingRequests;
         }
@@ -532,7 +538,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                         CreatedOn = request.CreatedOn,
                                         TravelTypeName = request.TravelType,
                                         PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
-                                        StatusName = status.StatusName
+                                        StatusName = status.StatusName,
+                                        RequestCode = request.RequestCode
                                     }).ToList();
             return incomingRequests;
         }
@@ -933,7 +940,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                       Name = employee.FirstName + " " + employee.LastName,
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity,
-                                      Date = requestStatus.date.ToString("dd/MM/yyyy")
+                                      Date = requestStatus.date.ToString("dd/MM/yyyy"),
+                                      RequestCode = request.RequestCode
                                   }).ToList();
 
                 int totalCount = closedData.Count();
@@ -988,7 +996,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                        SourceCity = request.SourceCity,
                                                                        DestinationCity = request.DestinationCity,
                                                                        Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
-                                                                       StatusDate = requestStatus.date
+                                                                       StatusDate = requestStatus.date,
+                                                                       RequestCode = request.RequestCode
                                                                    }).OrderByDescending(incomingRequests => incomingRequests.StatusDate).Take(25).ToList();
 
                 IEnumerable<ClosedTravelAdmin> waitingSelectedRequests = (from request in requestData
@@ -1005,7 +1014,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                        SourceCity = request.SourceCity,
                                                                        DestinationCity = request.DestinationCity,
                                                                        Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
-                                                                       StatusDate = requestStatus.date
+                                                                       StatusDate = requestStatus.date,
+                                                                       RequestCode = request.RequestCode
                                                                    }).OrderByDescending(waitingSelectedRequests => waitingSelectedRequests.StatusDate).Take(25).ToList();
 
                 IEnumerable<ClosedTravelAdmin> ongoingRequests = (from request in requestData
@@ -1021,7 +1031,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                        SourceCity = request.SourceCity,
                                                                        DestinationCity = request.DestinationCity,
                                                                        Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
-                                                                       StatusDate = requestStatus.date
+                                                                       StatusDate = requestStatus.date,
+                                                                       RequestCode = request.RequestCode
                                                                    }).OrderByDescending(ongoingRequests => ongoingRequests.StatusDate).Take(25).ToList();
 
                 IEnumerable<ClosedTravelAdmin> closedRequests = (from request in requestData
@@ -1037,7 +1048,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                       SourceCity = request.SourceCity,
                                                                       DestinationCity = request.DestinationCity,
                                                                       Status = _statusServices.GetStatusName(requestStatus.PrimaryStatusId, requestStatus.SecondaryStatusId),
-                                                                      StatusDate = requestStatus.date
+                                                                      StatusDate = requestStatus.date,
+                                                                      RequestCode = request.RequestCode
                                                                   }).OrderByDescending(closedRequests => closedRequests.StatusDate).Take(25).ToList();
 
                 IEnumerable<Notifications> travelAdminNotification = notificationData

@@ -67,7 +67,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = "Open"
+                      Status = "Open",
+                      RequestCode = request.RequestCode
                   }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -118,7 +119,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
+                      Status = status.StatusName,
+                      RequestCode = request.RequestCode
                   }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -175,7 +177,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
+                      Status = status.StatusName,
+                      RequestCode = request.RequestCode
                   }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -232,7 +235,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
+                      Status = status.StatusName,
+                      RequestCode = request.RequestCode
                   }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -289,7 +293,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
+                      Status = status.StatusName,
+                      RequestCode = request.RequestCode
                   }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -350,7 +355,8 @@ namespace XtramileBackend.Services.ManagerService
                         Date = request.CreatedOn,
                         Mode = null,
                         Status = status.StatusName,
-                        StatusDate = statusApproval.date
+                        StatusDate = statusApproval.date,
+                        RequestCode = request.RequestCode
                     })
                     .OrderByDescending(result => result.StatusDate  ) // Add ordering based on the recent status change of a request
                     .ThenByDescending(result => result.RequestId) // Add existing ordering by requestId
@@ -413,7 +419,8 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         Date = request.CreatedOn,
                         Mode = null,
-                        Status = status.StatusName
+                        Status = status.StatusName,
+                        RequestCode = request.RequestCode
                     }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -474,7 +481,8 @@ namespace XtramileBackend.Services.ManagerService
                       ProjectCode = project.ProjectCode,
                       Date = request.CreatedOn,
                       Mode = null,
-                      Status = status.StatusName
+                      Status = status.StatusName,
+                      RequestCode = request.RequestCode
                   }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -538,7 +546,8 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         CreatedOn = request.CreatedOn,
                         TravelTypeName = request.TravelType,
-                        StatusName = primaryStatus.StatusName
+                        StatusName = primaryStatus.StatusName,
+                        RequestCode = request.RequestCode
                     }
                 );
 
@@ -911,7 +920,8 @@ namespace XtramileBackend.Services.ManagerService
                               ProjectCode = project.ProjectCode,
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
-                              ApprovalDate = latestApproval.date
+                              ApprovalDate = latestApproval.date,
+                              RequestCode = requests.RequestCode
                           }).OrderByDescending(result => result.date)
                             .ThenByDescending(result => result.RequestId)
                             .ToList();

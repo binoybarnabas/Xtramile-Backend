@@ -17,6 +17,7 @@ namespace XtramileBackend.Models.APIModels
 		public string? Status { get; set; }
 
 		public DateTime StatusDate { get; set; }
+		public string RequestCode { get; set; }
     }
 
 }

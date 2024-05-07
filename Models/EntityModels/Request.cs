@@ -9,7 +9,7 @@ namespace XtramileBackend.Models.EntityModels
         [Key]
         public int RequestId { get; set; }
 
-        public string? RequestCode { get; set; }
+        public string RequestCode { get; set; }
 
         public int ProjectId { get; set; }
 

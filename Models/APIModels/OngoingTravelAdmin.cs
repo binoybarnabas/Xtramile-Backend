@@ -9,6 +9,7 @@
         public string SourceCity { get; set; }
         public string DestinationCity { get; set; }
         public DateTime date { get; set; }
+        public string requestCode { get; set; }
 
     }
 }

@@ -405,7 +405,8 @@ namespace XtramileBackend.Services.EmployeeService
                                   ProjectName = project.ProjectName,
                                   TravelType = request.TravelType,
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
-                                  Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),   
+                                  Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
+                                  RequestCode = request.RequestCode
 
                               }).ToList();
 
@@ -462,7 +463,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<Employee> employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
                 IEnumerable<Project> projects = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<Request> travelRequests = await _unitOfWork.RequestRepository.GetAllAsync();
-                IEnumerable<ProjectEmployeeMap> projectMappings = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
                 IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<RequestApprove> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
@@ -471,8 +471,7 @@ namespace XtramileBackend.Services.EmployeeService
                     from reqApproval in reqApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
                     join employee in employees on request.CreatedBy equals employee.EmpId
-                    join projectMapping in projectMappings on employee.EmpId equals projectMapping.EmpId
-                    join project in projects on projectMapping.ProjectId equals project.ProjectId
+                    join project in projects on request.ProjectId equals project.ProjectId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where request.CreatedBy == employeeId
@@ -487,7 +486,8 @@ namespace XtramileBackend.Services.EmployeeService
                         EndDate = request.ReturnDate,
                         Reason = request.TripPurpose,
                         StatusName = _statusServices.GetStatusName(primaryStatus.StatusId,secondaryStatus.StatusId),
-                        date = reqApproval.date
+                        date = reqApproval.date,
+                        RequestCode = request.RequestCode
                     }
                 ).OrderByDescending(result => result.date)
                 .ThenByDescending(result => result.RequestId)

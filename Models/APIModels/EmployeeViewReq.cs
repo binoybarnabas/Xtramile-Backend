@@ -8,5 +8,6 @@ namespace XtramileBackend.Models.APIModels
        public string TravelType { get; set; }
        public DateOnly ClosedDate { get; set; }
        public string Status { get; set;}
+       public string RequestCode {  get; set; } 
     }
 }
