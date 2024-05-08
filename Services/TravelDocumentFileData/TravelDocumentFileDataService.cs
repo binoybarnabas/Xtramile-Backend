@@ -448,5 +448,80 @@ namespace XtramileBackend.Services.TravelDocumentFileData
             }
         }
 
+        public async Task<IEnumerable<TravelDocumentViewModel>> GetTravelDocumentByEmployeeName(string fileType, string employeeName, int filterId, HttpContext httpContext)
+        {
+            try
+            {
+                IEnumerable<TravelDocumentFileDataModel> travelDocumentsData = await _unitOfWork.TravelDocumentFileDataRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+
+                var urlRequest = httpContext.Request;
+
+                var alltravelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       where travelDocument.TravelDocType == fileType &&
+                                       (employee.FirstName + " " + employee.LastName).ToLower().Contains(employeeName.ToLower())
+                                       select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
+
+                var validtravelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate >= DateTime.Today &&
+                                       (employee.FirstName + " " + employee.LastName).ToLower().Contains(employeeName.ToLower())
+                                            select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
+
+                var expiredtravelDocuments = (from travelDocument in travelDocumentsData
+                                       join employee in employeeData on travelDocument.UploadedBy equals employee.EmpId
+                                       where travelDocument.TravelDocType == fileType && travelDocument.ExpiryDate < DateTime.Today &&
+                                       (employee.FirstName + " " + employee.LastName).ToLower().Contains(employeeName.ToLower())
+                                              select new TravelDocumentViewModel
+                                       {
+                                           UploadedBy = employee.FirstName + " " + employee.LastName,
+                                           IdentificationNumber = travelDocument.DocId,
+                                           UploadedDate = travelDocument.UploadedDate,
+                                           ExpiryDate = travelDocument.ExpiryDate,
+                                           Country = travelDocument.Country,
+                                           DocumentSize = travelDocument.Size,
+                                           DocumentType = travelDocument.TravelDocType,
+                                           DocumentURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{travelDocument.FilePath}/{Uri.EscapeDataString(travelDocument.FileName)}",
+                                           RemainingDays = travelDocument.ExpiryDate.HasValue ? (travelDocument.ExpiryDate.Value.Date - DateTime.Today).Days : null
+                                       }).OrderBy(travelDocuments => travelDocuments.RemainingDays.HasValue ? (travelDocuments.RemainingDays) : int.MaxValue); //to show docs with null expiry date
+
+                if (filterId == 0)
+                    return expiredtravelDocuments;
+                else if (filterId == 1)
+                    return validtravelDocuments;
+                else
+                    return alltravelDocuments;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting the travel documents : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
     }
 }

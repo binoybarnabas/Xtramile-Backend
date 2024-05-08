@@ -162,5 +162,21 @@ namespace XtramileBackend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
             }
         }
+
+        [HttpGet("{fileType}/searchbyEmployee/{employeeName}")]
+        public async Task<IActionResult> GetDocumentsByEmployeeName(string fileType, string employeeName, int filterId)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                IEnumerable<TravelDocumentViewModel> filteredDocuments = await _travelDocumentFileDataService.GetTravelDocumentByEmployeeName(fileType, employeeName, filterId, httpContext);
+                return Ok(filteredDocuments);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting travel documents: {ex.Message}");
+            }
+        }
     }
 }
