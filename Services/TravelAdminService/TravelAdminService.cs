@@ -1053,6 +1053,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                                                   }).OrderByDescending(closedRequests => closedRequests.StatusDate).Take(25).ToList();
 
                 IEnumerable<Notifications> travelAdminNotification = notificationData
+                    .OrderByDescending(data => data.CreatedOn)
                     .GroupBy(data => data.RequestId)
                     .Select(g => new Notifications
                     {
