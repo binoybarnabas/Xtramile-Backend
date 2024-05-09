@@ -15,5 +15,7 @@ namespace XtramileBackend.Services.TravelDocumentFileData
         public Task DeleteTravelDocument(int FileId);
         public Task<PageinatedResult<TravelDocumentViewModel>> GetValidDocuments(string fileType, HttpContext httpContext, int pageNumber, int itemsPerPage);
         public Task<RelevantDocument> GetAllRelevantDocuments(int requestId, HttpContext httpContext);
+        public Task<IEnumerable<TravelDocumentViewModel>> GetTravelDocumentByEmployeeName(string filetype, string employeeName, int filterId, HttpContext httpContext);
+
     }
 }
