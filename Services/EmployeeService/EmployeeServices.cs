@@ -539,6 +539,7 @@ namespace XtramileBackend.Services.EmployeeService
                     where request.CreatedBy == employeeId
                         && primaryStatus.StatusCode == "OG"
                         && secondaryStatus.StatusCode == "OG"
+                        && request.DepartureDate >= DateTime.Now
                     select new DashboardUpcomingTrip
                     {
                         StartDate = request.DepartureDate,
