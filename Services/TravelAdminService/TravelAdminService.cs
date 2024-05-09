@@ -10,6 +10,7 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
+using Xunit.Sdk;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 using Request = XtramileBackend.Models.EntityModels.Request;
@@ -1080,6 +1081,70 @@ namespace XtramileBackend.Services.TravelAdminService
                 Console.WriteLine($"An error occurred while getting dashboard requests: {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// to get the number of internation trips, domestic trips, travellers and projects of completed trips
+        /// </summary>
+        /// <returns></returns>
+        public async Task<TADashboardCountComponent> GetTADashboardCountComponent()
+        {
+            try
+            {
+                IEnumerable<Request> requestData = await _unitOfWork.RequestRepository.GetAllAsync();
+                IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
+                IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
+                IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+                IEnumerable<RequestApprove> requestStatusData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+
+                var latestStatusApprovals = requestStatusData
+                                            .GroupBy(approval => approval.RequestId)
+                                            .Select(group => group.OrderByDescending(approval => approval.date).First());
+
+                var internationalTrips = (from request in requestData
+                                          join requestMapping in latestStatusApprovals on request.RequestId equals requestMapping.RequestId
+                                          join primaryStatus in statusData on requestMapping.PrimaryStatusId equals primaryStatus.StatusId
+                                          join secondaryStatus in statusData on requestMapping.SecondaryStatusId equals secondaryStatus.StatusId
+                                          where (primaryStatus.StatusId == 3 && secondaryStatus.StatusId == 3) && (request.TravelType.CompareTo("International") == 0)
+                                          select request).ToList();
+
+                var domesticTrips = (from request in requestData
+                                     join requestMapping in latestStatusApprovals on request.RequestId equals requestMapping.RequestId
+                                     join primaryStatus in statusData on requestMapping.PrimaryStatusId equals primaryStatus.StatusId
+                                     join secondaryStatus in statusData on requestMapping.SecondaryStatusId equals secondaryStatus.StatusId
+                                     where (primaryStatus.StatusId == 3 && secondaryStatus.StatusId == 3) && (request.TravelType.CompareTo("Domestic") == 0)
+                                     select request).ToList();
+
+                var travellers = (from request in requestData
+                                  join employee in employeeData on request.CreatedBy equals employee.EmpId
+                                  join requestMapping in latestStatusApprovals on request.RequestId equals requestMapping.RequestId
+                                  join primaryStatus in statusData on requestMapping.PrimaryStatusId equals primaryStatus.StatusId
+                                  join secondaryStatus in statusData on requestMapping.SecondaryStatusId equals secondaryStatus.StatusId
+                                  where primaryStatus.StatusId == 3 && secondaryStatus.StatusId == 3
+                                  select employee).Distinct().ToList();
+
+                var projects = (from request in requestData
+                                join project in projectData on request.ProjectId equals project.ProjectId
+                                join requestMapping in latestStatusApprovals on request.RequestId equals requestMapping.RequestId
+                                join primaryStatus in statusData on requestMapping.PrimaryStatusId equals primaryStatus.StatusId
+                                join secondaryStatus in statusData on requestMapping.SecondaryStatusId equals secondaryStatus.StatusId
+                                where primaryStatus.StatusId == 3 && secondaryStatus.StatusId == 3
+                                select project).Distinct().ToList();
+
+                return new TADashboardCountComponent
+                {
+                    InternationalTrips = internationalTrips.Count(),
+                    DomesticTrips = domesticTrips.Count(),
+                    NumberofTravellers = travellers.Count(),
+                    NumberofProjects = projects.Count(),
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting the counts: {ex.Message}");
+                throw;
+            }
+
         }
     }
    

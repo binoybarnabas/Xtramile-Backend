@@ -390,7 +390,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<RequestApprove> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<ProjectEmployeeMap> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
                 .GroupBy(approval => approval.RequestId)
@@ -400,8 +399,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
-                              join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
-                              join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                              join project in projectData on request.ProjectId equals project.ProjectId
                               where request.CreatedBy == empId
                                && ((primarystatus.StatusCode == "CL" && secondarystatus.StatusCode == "CL") || 
                                (primarystatus.StatusCode == "CD" && secondarystatus.StatusCode == "CD")|| 
@@ -415,8 +413,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
                                   Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
                                   RequestCode = request.RequestCode
-
-                              }).ToList();
+                              }).OrderByDescending(result => result.ClosedDate).ToList();
 
                 int totalCount = result.Count();
                 int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);

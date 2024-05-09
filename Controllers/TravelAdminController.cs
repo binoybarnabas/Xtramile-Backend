@@ -263,5 +263,20 @@ namespace XtramileBackend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting dashboard requests: {ex.Message}");
             }
         }
+
+        [HttpGet("dashboardCount")]
+        public async Task<IActionResult> GetTADashboardCountComponent()
+        {
+            try
+            {
+                TADashboardCountComponent counts = await _travelAdminService.GetTADashboardCountComponent();
+                return Ok(counts);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"An error occured while getting the counts: {ex.Message}");
+            }
+
+        }
     }
 }
