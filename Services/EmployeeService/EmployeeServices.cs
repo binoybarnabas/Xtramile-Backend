@@ -308,7 +308,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="empId">The employee ID for which to fetch pending requests.</param>
         /// <returns>An asynchronous task returning a collection of PendingRequetsViewEmployee objects.</returns>
-        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId)
+        public async Task<PageinatedResult<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -357,7 +357,15 @@ namespace XtramileBackend.Services.EmployeeService
                                .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
                                .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
                                .ToList();
-                return results;
+
+                int totalCount = results.Count();
+                var paginatedResult = results.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage);
+
+                return new PageinatedResult<PendingRequetsViewEmployee>
+                {
+                    Items = paginatedResult,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {
