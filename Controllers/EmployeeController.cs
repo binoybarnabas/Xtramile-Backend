@@ -78,11 +78,11 @@ namespace XtramileBackend.Controllers
         }
 
         [HttpGet("viewpendingrequest/{empId}")]
-        public async Task<IActionResult> GetPendingRequestsByEmpId(int empId)
+        public async Task<IActionResult> GetPendingRequestsByEmpId(int empId, int pageNumber, int itemsPerPage)
         {
             try
             {
-                IEnumerable<PendingRequetsViewEmployee> pendingRequestData = await _employeeService.GetPendingRequestsByEmpId(empId);
+                PageinatedResult<PendingRequetsViewEmployee> pendingRequestData = await _employeeService.GetPendingRequestsByEmpId(empId, pageNumber, itemsPerPage);
                 return Ok(pendingRequestData);
             }
             catch (Exception ex)

@@ -308,7 +308,7 @@ namespace XtramileBackend.Services.EmployeeService
         /// </summary>
         /// <param name="empId">The employee ID for which to fetch pending requests.</param>
         /// <returns>An asynchronous task returning a collection of PendingRequetsViewEmployee objects.</returns>
-        public async Task<IEnumerable<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId)
+        public async Task<PageinatedResult<PendingRequetsViewEmployee>> GetPendingRequestsByEmpId(int empId, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -357,7 +357,15 @@ namespace XtramileBackend.Services.EmployeeService
                                .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
                                .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
                                .ToList();
-                return results;
+
+                int totalCount = results.Count();
+                var paginatedResult = results.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage);
+
+                return new PageinatedResult<PendingRequetsViewEmployee>
+                {
+                    Items = paginatedResult,
+                    TotalCount = totalCount,
+                };
             }
             catch (Exception ex)
             {
@@ -382,7 +390,6 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
                 IEnumerable<RequestApprove> statusApprovalData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
                 IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
-                IEnumerable<ProjectEmployeeMap> projectMappingData = await _unitOfWork.ProjectMappingRepository.GetAllAsync();
 
                 var latestStatusApprovals = statusApprovalData
                 .GroupBy(approval => approval.RequestId)
@@ -392,8 +399,7 @@ namespace XtramileBackend.Services.EmployeeService
                               join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                               join primarystatus in statusData on statusApproval.PrimaryStatusId equals primarystatus.StatusId
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
-                              join projectMapping in projectMappingData on request.CreatedBy equals projectMapping.EmpId
-                              join project in projectData on projectMapping.ProjectId equals project.ProjectId
+                              join project in projectData on request.ProjectId equals project.ProjectId
                               where request.CreatedBy == empId
                                && ((primarystatus.StatusCode == "CL" && secondarystatus.StatusCode == "CL") || 
                                (primarystatus.StatusCode == "CD" && secondarystatus.StatusCode == "CD")|| 
@@ -407,8 +413,7 @@ namespace XtramileBackend.Services.EmployeeService
                                   ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
                                   Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
                                   RequestCode = request.RequestCode
-
-                              }).ToList();
+                              }).OrderByDescending(result => result.ClosedDate).ToList();
 
                 int totalCount = result.Count();
                 int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
