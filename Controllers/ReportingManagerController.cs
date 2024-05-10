@@ -74,12 +74,12 @@ namespace XtramileBackend.Controllers
         /// or 500 Internal Server Error response in case of an exception.
         /// </returns>
         [HttpGet("travel/request/ongoing/{managerId}")]
-        public async Task<IActionResult> GetManagerOngoingTravelRequest(int managerId)
+        public async Task<IActionResult> GetManagerOngoingTravelRequest(int managerId, int pageNumber, int itemsPerPage)
         {
             try
             {
                 // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
-                IEnumerable<ManagerOngoingTravelRequest> ongoingTravelRequestData = await _reportingManagerService.GetManagerOngoingTravelRequestDetails(managerId);
+                PageinatedResult<ManagerOngoingTravelRequest> ongoingTravelRequestData = await _reportingManagerService.GetManagerOngoingTravelRequestDetails(managerId, pageNumber, itemsPerPage);
 
                 // Return a 200 OK response with the retrieved ongoing travel request details
                 return Ok(ongoingTravelRequestData);

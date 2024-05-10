@@ -511,7 +511,7 @@ namespace XtramileBackend.Services.ManagerService
         /// including information such as Request ID, Employee Name, Employee Email, Project Code, Created On,
         /// Travel Type Name, Priority Name, and Status Name.
         /// </returns>
-        public async Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId)
+        public async Task<PageinatedResult<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId, int pageNumber, int itemsPerPage)
         {
             try
             {
@@ -547,11 +547,21 @@ namespace XtramileBackend.Services.ManagerService
                         CreatedOn = request.CreatedOn,
                         TravelTypeName = request.TravelType,
                         StatusName = primaryStatus.StatusName,
-                        RequestCode = request.RequestCode
+                        RequestCode = request.RequestCode,
+                        date = reqApproval.date
                     }
-                );
+                ).OrderByDescending(result => result.date).ThenByDescending(result => result.RequestId).ToList();
 
-                    return result.ToList();
+                int totalCount = result.Count();
+
+                var pagedResult = result.Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage);
+
+                return new PageinatedResult<ManagerOngoingTravelRequest>
+                {
+                    Items = pagedResult,
+                    TotalCount = totalCount,
+                };
+
             }
             catch (Exception ex)
             {

@@ -21,7 +21,7 @@ namespace XtramileBackend.Services.ManagerService
         public Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId,string employeeName, int offset, int pageSize);
 
         //ongoing requests
-        public Task<IEnumerable<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId);
+        public Task<PageinatedResult<ManagerOngoingTravelRequest>> GetManagerOngoingTravelRequestDetails(int managerId, int pageNumber, int itemsPerPage);
 
         //closed travel requets
         public Task<PagedEmployeeRequestDto> GetEmployeeRequestsClosedAsync(int managerId, int offset, int pageSize);
