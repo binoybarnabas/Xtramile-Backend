@@ -321,7 +321,24 @@ namespace XtramileBackend.Utils
             }
         }
 
-                private async Task SendMail(Mail mailInfo)
+        public async Task SendToManagerOnSelectedOptionUpdation(int requestId)
+        {
+            Mail mail = new Mail();
+
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+            Employee manager = await _unitOfWork.EmployeeRepository.GetByIdAsync(employee.ReportsTo ?? -1);
+
+            if(manager != null)
+            {
+                mail.recipientName = manager.FirstName + " " + manager.LastName;
+                mail.recipientEmail = manager.Email;
+                mail.emailBody = $"Dear {mail.recipientName},<br><br>The travel options selected for the request with code <b>{request.RequestCode} has been changed due to unavailability of the previous option.</b><br>Please check the new selected option.<br><br>Thank you.<br>";
+                await SendMail(mail);
+            }
+        }
+
+        private async Task SendMail(Mail mailInfo)
         {
             try
             {

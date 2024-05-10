@@ -12,5 +12,7 @@
         Task SendToReportingManagerOnOptionSent(int requestId);
         Task SendToTrvaelAdminTeamOnOptionSelection(int requestId);
         Task SendToEmployeeOnTravelAdminApproval(int requestId);
+        Task SendToManagerOnSelectedOptionUpdation(int requestId);
+
     }
 }

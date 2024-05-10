@@ -8,6 +8,7 @@ using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.UnitOfWork;
+using XtramileBackend.Utils;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 
 namespace XtramileBackend.Services.AvailableOptionService
@@ -19,13 +20,15 @@ namespace XtramileBackend.Services.AvailableOptionService
         private readonly IRequestServices _requestServices;
         private readonly IFileTypeServices _fileTypeServices;
         private readonly IFileMetaDataService _fileMetaDataServices;
-        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices)
+        private readonly IMailService _mailService;
+        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IMailService mailService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _requestStatusService = requestStatusServices;
             _requestServices = requestServices;
             _fileTypeServices = fileTypeServices;
             _fileMetaDataServices = fileMetaDataServices;
+            _mailService = mailService;
         }
 
         public async Task<IEnumerable<AvailableOption>> GetAvailableOptionsAsync()
@@ -325,6 +328,8 @@ namespace XtramileBackend.Services.AvailableOptionService
                     existingTravelOption.OptionId = travelOption.OptionId;
 
                     await _unitOfWork.SaveChangesAsyn();
+
+                    await _mailService.SendToManagerOnSelectedOptionUpdation(travelOption.RequestId);
                 }
             }
             catch (Exception ex)

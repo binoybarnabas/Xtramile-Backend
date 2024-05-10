@@ -11,5 +11,6 @@
         public string PriorityName { get; set; }
         public string StatusName { get; set; }
         public string RequestCode { get; set; }
+        public DateTime date { get; set; }
     }
 }
