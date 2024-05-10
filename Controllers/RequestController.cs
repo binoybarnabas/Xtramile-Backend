@@ -248,7 +248,19 @@ namespace XtramileBackend.Controllers
                     }
 
                 }
-                return Ok(tblRequest.RequestId);
+
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestId,
+                    EmpId = empId,
+                    PrimaryStatusId = primaryStatusId,
+                    date = DateTime.Now,
+                    SecondaryStatusId = secondaryStatusId
+                };
+
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+
+                return Ok(tblRequest);
             }
             catch (Exception ex)
             {

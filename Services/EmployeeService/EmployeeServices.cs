@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using System.Security.Cryptography;
+using System.Text;
 using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
@@ -713,7 +715,7 @@ namespace XtramileBackend.Services.EmployeeService
                 if (user != null)
                 {
                     // Update the user's password
-                    user.Password = newPassword;
+                    user.Password = HashPassword(newPassword);
 
                     // Save the changes to the database
                     await _dbContext.SaveChangesAsync();
@@ -1041,6 +1043,17 @@ namespace XtramileBackend.Services.EmployeeService
                 existingProfilePictureData.ModifiedBy = employeeId;
                 existingProfilePictureData.ModifiedOn = DateTime.Now;
                 _unitOfWork.Complete();
+            }
+        }
+
+        private string HashPassword(string password)
+        {
+            // In a production environment, use a secure password hashing library (e.g., BCrypt)
+            // For simplicity, we'll use a basic hashing method here for demonstration purposes
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
             }
         }
     }
