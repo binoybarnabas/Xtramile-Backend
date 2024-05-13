@@ -20,15 +20,15 @@ namespace XtramileBackend.Services.AvailableOptionService
         private readonly IRequestServices _requestServices;
         private readonly IFileTypeServices _fileTypeServices;
         private readonly IFileMetaDataService _fileMetaDataServices;
-        private readonly IMailService _mailService;
-        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IMailService mailService)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IServiceScopeFactory serviceScopeFactory)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _requestStatusService = requestStatusServices;
             _requestServices = requestServices;
             _fileTypeServices = fileTypeServices;
             _fileMetaDataServices = fileMetaDataServices;
-            _mailService = mailService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task<IEnumerable<AvailableOption>> GetAvailableOptionsAsync()
@@ -329,7 +329,15 @@ namespace XtramileBackend.Services.AvailableOptionService
 
                     await _unitOfWork.SaveChangesAsyn();
 
-                    await _mailService.SendToManagerOnSelectedOptionUpdation(travelOption.RequestId);
+                    _ = Task.Run(async () =>
+                    {
+                        using (var scope = _serviceScopeFactory.CreateScope())
+                        {
+                            var mailService = scope.ServiceProvider.GetService<MailService>();
+                            if (mailService != null)
+                                await mailService.SendToManagerOnSelectedOptionUpdation(travelOption.RequestId);
+                        }
+                    });
                 }
             }
             catch (Exception ex)

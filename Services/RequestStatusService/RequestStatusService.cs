@@ -13,14 +13,14 @@ namespace XtramileBackend.Services.RequestStatusService
     public class RequestStatusServices : IRequestStatusServices
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMailService _mailService;
         private readonly IStatusServices _statusServices;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public RequestStatusServices(IUnitOfWork unitOfWork, IMailService mailService, IStatusServices statusServices)
+        public RequestStatusServices(IUnitOfWork unitOfWork, IStatusServices statusServices, IServiceScopeFactory serviceScopeFactory)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _mailService = mailService;
             _statusServices = statusServices;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task<IEnumerable<RequestApprove>> GetRequestStatusesAsync()
@@ -28,7 +28,6 @@ namespace XtramileBackend.Services.RequestStatusService
             try
             {
                 var requestStatusData = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                await _mailService.SendToManagersOnSubmit(1069);
                 return requestStatusData;
             }
             catch (Exception ex)
@@ -47,53 +46,63 @@ namespace XtramileBackend.Services.RequestStatusService
                 await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
                 _unitOfWork.Complete();
 
-                if (requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
+                _ = Task.Run(async () =>
                 {
-                    //mail to be sent to employee on reuqest submit
-                    await _mailService.SendToEmployeeOnSubmit(requestStatus.RequestId);
+                    using(var scope = _serviceScopeFactory.CreateScope())
+                    {
+                        var mailService = scope.ServiceProvider.GetService<IMailService>();
+                        if(mailService != null)
+                        {
+                            if (requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
+                            {
+                                //mail to be sent to employee on reuqest submit
+                                await mailService.SendToEmployeeOnSubmit(requestStatus.RequestId);
 
-                    //mail to be sent to reporting manager on request submit
-                    await _mailService.SendToManagersOnSubmit(requestStatus.RequestId);
+                                //mail to be sent to reporting manager on request submit
+                                await mailService.SendToManagersOnSubmit(requestStatus.RequestId);
 
-                    //mail to be sent to the travelAdminTeam on request submit
-                    await _mailService.SendToTravelAdminTeamOnSubmit(requestStatus.RequestId);
-                }
+                                //mail to be sent to the travelAdminTeam on request submit
+                                await mailService.SendToTravelAdminTeamOnSubmit(requestStatus.RequestId);
+                            }
 
-                if (requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 2)
-                {
-                    //send mail to employee on manager approval
-                    await _mailService.SendToEmployeeOnManagerApproval(requestStatus.RequestId);
+                            if (requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 2)
+                            {
+                                //send mail to employee on manager approval
+                                await mailService.SendToEmployeeOnManagerApproval(requestStatus.RequestId);
 
-                    //send mail to travel admin team on manager approval
-                    await _mailService.SendToTravelAdminTeamOnManagerApproval(requestStatus.RequestId);
-                }
+                                //send mail to travel admin team on manager approval
+                                await mailService.SendToTravelAdminTeamOnManagerApproval(requestStatus.RequestId);
+                            }
 
-                if (requestStatus.PrimaryStatusId == 6 && requestStatus.SecondaryStatusId == 2)
-                {
-                    //mail to be sent to Employee on request denial by manager
-                    await _mailService.SendToEmployeeOnManagerDenial(requestStatus.RequestId);
+                            if (requestStatus.PrimaryStatusId == 6 && requestStatus.SecondaryStatusId == 2)
+                            {
+                                //mail to be sent to Employee on request denial by manager
+                                await mailService.SendToEmployeeOnManagerDenial(requestStatus.RequestId);
 
-                    //mail to be sent to travel admin team on request denial by a manager
-                    await _mailService.SendToTravelAdminTeamOnManagerDenial(requestStatus.RequestId);
-                }
+                                //mail to be sent to travel admin team on request denial by a manager
+                                await mailService.SendToTravelAdminTeamOnManagerDenial(requestStatus.RequestId);
+                            }
 
-                if (requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 10)
-                {
-                    //mail to be sent to reporting manager on option sent
-                    await _mailService.SendToReportingManagerOnOptionSent(requestStatus.RequestId);
-                }
+                            if (requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 10)
+                            {
+                                //mail to be sent to reporting manager on option sent
+                                await mailService.SendToReportingManagerOnOptionSent(requestStatus.RequestId);
+                            }
 
-                if (requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 11)
-                {
-                    //mail to be sent to travel admin once the manager has picked the travel option
-                    await _mailService.SendToTrvaelAdminTeamOnOptionSelection(requestStatus.RequestId);
-                }
+                            if (requestStatus.PrimaryStatusId == 2 && requestStatus.SecondaryStatusId == 11)
+                            {
+                                //mail to be sent to travel admin once the manager has picked the travel option
+                                await mailService.SendToTrvaelAdminTeamOnOptionSelection(requestStatus.RequestId);
+                            }
 
-                if (requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 12)
-                {
-                    //mail to be sent to Employee on Travel Admin Approval
-                    await _mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
-                }
+                            if (requestStatus.PrimaryStatusId == 12 && requestStatus.SecondaryStatusId == 12)
+                            {
+                                //mail to be sent to Employee on Travel Admin Approval
+                                await mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
+                            }
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {
