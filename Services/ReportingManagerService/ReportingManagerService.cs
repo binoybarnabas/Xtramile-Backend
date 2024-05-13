@@ -417,10 +417,13 @@ namespace XtramileBackend.Services.ManagerService
                         EmployeeName = employee.FirstName + " " + employee.LastName,
                         Email = employee.Email,
                         ProjectCode = project.ProjectCode,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
                         Date = request.CreatedOn,
                         Mode = null,
-                        Status = status.StatusName,
-                        RequestCode = request.RequestCode
+                        RequestCode = request.RequestCode,
+                        StatusDate = statusApproval.date
+                        
                     }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -931,8 +934,12 @@ namespace XtramileBackend.Services.ManagerService
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
                               ApprovalDate = latestApproval.date,
-                              RequestCode = requests.RequestCode
-                          }).OrderByDescending(result => result.date)
+                              RequestCode = requests.RequestCode,
+                              From = requests.SourceCity,
+                              To = requests.DestinationCity,
+                              DepartureDate = requests.DepartureDate,
+                              TravelType = requests.TravelType
+                          }).OrderByDescending(result => result.ApprovalDate)
                             .ThenByDescending(result => result.RequestId)
                             .ToList();
 
