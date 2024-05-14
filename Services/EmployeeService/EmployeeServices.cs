@@ -9,6 +9,7 @@ using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -25,17 +26,19 @@ namespace XtramileBackend.Services.EmployeeService
         private readonly IStatusServices _statusServices;
         private readonly IFileMetaDataService _fileMetaDataService;
         private readonly IFileTypeServices _fileTypeServices;
+        private readonly IRequestStatusServices _requestStatusServices;
 
 
         public EmployeeServices(IUnitOfWork unitOfWork, AppDBContext dbContext, IStatusServices statusServices, 
-            IFileMetaDataService fileMetaDataService,
-            IFileTypeServices fileTypeServices)
+            IFileMetaDataService fileMetaDataService, IFileTypeServices fileTypeServices,
+            IRequestStatusServices requestStatusServices)
         {
             _unitOfWork = unitOfWork;
             _dbContext = dbContext;
             _statusServices = statusServices;
             _fileMetaDataService = fileMetaDataService;
             _fileTypeServices = fileTypeServices;
+            _requestStatusServices = requestStatusServices;
         }
 
 
@@ -403,19 +406,20 @@ namespace XtramileBackend.Services.EmployeeService
                               join secondarystatus in statusData on statusApproval.SecondaryStatusId equals secondarystatus.StatusId
                               join project in projectData on request.ProjectId equals project.ProjectId
                               where request.CreatedBy == empId
-                               && ((primarystatus.StatusCode == "CL" && secondarystatus.StatusCode == "CL") || 
-                               (primarystatus.StatusCode == "CD" && secondarystatus.StatusCode == "CD")|| 
+                               && ((primarystatus.StatusCode == "CL" && secondarystatus.StatusCode == "CL") ||
+                               (primarystatus.StatusCode == "CD" && secondarystatus.StatusCode == "CD") ||
                                (primarystatus.StatusCode == "DD" && secondarystatus.StatusCode == "PE"))
                               select new EmployeeViewReq
                               {
                                   RequestId = request.RequestId,
                                   ProjectCode = project.ProjectCode,
-                                  ProjectName = project.ProjectName,
-                                  TravelType = request.TravelType,
-                                  ClosedDate = new DateOnly(statusApproval.date.Year, statusApproval.date.Month, statusApproval.date.Day),
+                                  From = request.SourceCity,
+                                  To = request.DestinationCity,
+                                  RequestedOn = request.CreatedOn,
+                                  ClosedOn = statusApproval.date,
                                   Status = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
                                   RequestCode = request.RequestCode
-                              }).OrderByDescending(result => result.ClosedDate).ToList();
+                              }).OrderByDescending(result => result.ClosedOn).ToList();
 
                 int totalCount = result.Count();
                 int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);

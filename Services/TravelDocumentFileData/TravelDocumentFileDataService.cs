@@ -320,6 +320,8 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                 TravelDocumentFileDataModel travelDocument = await _unitOfWork.TravelDocumentFileDataRepository.GetByIdAsync(FileId);
                 if(travelDocument != null)
                 {
+                    string filePath = travelDocument.FilePath + "/" + travelDocument.FileName;
+                    File.Delete(filePath);
                     _unitOfWork.TravelDocumentFileDataRepository.Delete(travelDocument);
                     await _unitOfWork.SaveChangesAsyn();
                 }

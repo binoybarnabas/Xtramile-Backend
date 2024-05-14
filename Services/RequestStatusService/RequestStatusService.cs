@@ -48,10 +48,10 @@ namespace XtramileBackend.Services.RequestStatusService
 
                 _ = Task.Run(async () =>
                 {
-                    using(var scope = _serviceScopeFactory.CreateScope())
+                    using (var scope = _serviceScopeFactory.CreateScope())
                     {
                         var mailService = scope.ServiceProvider.GetService<IMailService>();
-                        if(mailService != null)
+                        if (mailService != null)
                         {
                             if (requestStatus.PrimaryStatusId == 1 && requestStatus.SecondaryStatusId == 2)
                             {
@@ -129,6 +129,15 @@ namespace XtramileBackend.Services.RequestStatusService
                 Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
+        }
+
+        public DateTime GetDateByStatus(IEnumerable<RequestApprove> requestStatusData,int requestId, int primaryStatusId, int secondaryStatusId)
+        {
+            RequestApprove? requestStatus = requestStatusData.FirstOrDefault(rs => ((rs.RequestId == requestId) && (rs.PrimaryStatusId == primaryStatusId) && (rs.SecondaryStatusId == secondaryStatusId)));
+
+            DateTime date = requestStatus != null ? requestStatus.date : DateTime.MinValue;
+
+            return date;
         }
     }
 }
