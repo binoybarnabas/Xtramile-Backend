@@ -92,7 +92,7 @@ namespace XtramileBackend.Services.FileMetaDataService
             }
         }
 
-        //Get FIle Path by file id
+        //Get File Path by file id
         public async Task<string> GetFilePathByFileIdAsync(int fileId)
         {
             try
