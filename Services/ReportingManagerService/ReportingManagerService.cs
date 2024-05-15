@@ -9,6 +9,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -23,13 +24,15 @@ namespace XtramileBackend.Services.ManagerService
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRequestStatusServices _requestStatusServices;
+        private readonly IStatusServices _statusService;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService(IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices)
+        public ReportingManagerService(IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IStatusServices statusServices)
         {
             _unitOfWork = unitOfWork;
             _requestStatusServices = requestStatusServices;
+            _statusService = statusServices;
         }
 
         /// <summary>
@@ -898,6 +901,19 @@ namespace XtramileBackend.Services.ManagerService
             try
             {
                 await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
+
+                //fetch status code from enum
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = travelOption.RequestId,
+                    PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("PE"),
+                    SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("SD"),
+                    date = DateTime.Now,
+                    EmpId = travelOption.EmpId
+                };
+
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+
                 _unitOfWork.Complete();
             }
             catch (Exception ex)
