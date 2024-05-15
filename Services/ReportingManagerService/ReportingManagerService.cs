@@ -891,7 +891,7 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-        /// Submission of a travel option from the employee among a list of travel request
+        /// Submission of a travel option from the manager among a list of travel request
         /// </summary>
         /// <param name="travelOption"></param>
         /// <returns></returns>

@@ -7,6 +7,7 @@ using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
@@ -21,10 +22,13 @@ namespace XtramileBackend.Services.AvailableOptionService
         private readonly IFileTypeServices _fileTypeServices;
         private readonly IFileMetaDataService _fileMetaDataServices;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IServiceScopeFactory serviceScopeFactory)
+        private readonly IStatusServices _statusService;
+
+        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IStatusServices statusServices,IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IServiceScopeFactory serviceScopeFactory)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _requestStatusService = requestStatusServices;
+            _statusService = statusServices;
             _requestServices = requestServices;
             _fileTypeServices = fileTypeServices;
             _fileMetaDataServices = fileMetaDataServices;
@@ -349,6 +353,7 @@ namespace XtramileBackend.Services.AvailableOptionService
 
 
         //Get Selected Travel Options Details By Request Id
+        //Author : Muhammed Suhail
         //Ongoing Process - Need Further Steps
         public async Task<TravelOptionViewModel> GetSelectedTravelOptionDetailsByRequestIdAsync(int requestId)
         {
@@ -387,6 +392,60 @@ namespace XtramileBackend.Services.AvailableOptionService
 
             }
         }
+
+
+        //Needs Review
+        //Confirm Selected Travel Option
+        // Update Status to TA Approved(Option Confirmed)
+
+        public async Task ConfirmSelectedTravelOptionAsync(TravelOptionMap confirmedTravelOption)
+        {
+            try
+            {
+                IEnumerable<TravelOptionMap> travelOptionsData = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+                TravelOptionMap? existingTravelOption = travelOptionsData.FirstOrDefault(eto => eto.RequestId == confirmedTravelOption.RequestId);
+
+                if (existingTravelOption != null)
+                {
+                    existingTravelOption.EmpId = confirmedTravelOption.EmpId;
+                    existingTravelOption.OptionId = confirmedTravelOption.OptionId;
+
+                    //update req status
+                    //fetch status code from enum
+                    RequestApprove requestStatus = new RequestApprove
+                    {
+                        RequestId = confirmedTravelOption.RequestId,
+                        PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("OG"),
+                        SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("OG"),
+                        date = DateTime.Now,
+                        EmpId = confirmedTravelOption.EmpId
+                    };
+
+                    await _requestStatusService.AddRequestStatusAsync(requestStatus);
+
+                    await _unitOfWork.SaveChangesAsyn();
+
+                    _unitOfWork.Complete();
+
+
+                    _ = Task.Run(async () =>
+                    {
+                        using (var scope = _serviceScopeFactory.CreateScope())
+                        {
+                            var mailService = scope.ServiceProvider.GetService<MailService>();
+                            if (mailService != null)
+                                await mailService.SendToManagerOnSelectedOptionUpdation(confirmedTravelOption.RequestId);
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and handle any exceptions
+                Console.WriteLine($"Error Updating Option Mapping: {ex.Message}");
+            }
+        }
+
 
     }
 }
