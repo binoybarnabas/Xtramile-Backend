@@ -43,9 +43,28 @@ namespace XtramileBackend.Services.RequestStatusService
             try
             {
                 requestStatus.date = DateTime.Now;
-                await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
-                _unitOfWork.Complete();
+                //Remove all previous records with that requestId and the add the incoming requestStatus mapping to the table
+                if (requestStatus.PrimaryStatusId == 3 && requestStatus.SecondaryStatusId == 3)
+                {
+                    IEnumerable<RequestApprove> requestStatuses = await _unitOfWork.RequestStatusRepository.GetAllAsync();
+                    IEnumerable<RequestApprove> recordsToDelet = requestStatuses.Where(rs => rs.RequestId == requestStatus.RequestId);
+                    foreach (RequestApprove record in  recordsToDelet)
+                    {
+                        _unitOfWork.RequestStatusRepository.Delete(record);
+                        await _unitOfWork.SaveChangesAsyn();
+                    }  
+                    
+                    await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
+                    _unitOfWork.Complete();
+                }
+                else
+                {
+                    await _unitOfWork.RequestStatusRepository.AddAsync(requestStatus);
+                    _unitOfWork.Complete();
+                }
 
+
+                //To run email service as a separate Taks
                 _ = Task.Run(async () =>
                 {
                     using (var scope = _serviceScopeFactory.CreateScope())
@@ -129,15 +148,6 @@ namespace XtramileBackend.Services.RequestStatusService
                 Console.WriteLine($"An error occurred while getting pending requests: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
-        }
-
-        public DateTime GetDateByStatus(IEnumerable<RequestApprove> requestStatusData,int requestId, int primaryStatusId, int secondaryStatusId)
-        {
-            RequestApprove? requestStatus = requestStatusData.FirstOrDefault(rs => ((rs.RequestId == requestId) && (rs.PrimaryStatusId == primaryStatusId) && (rs.SecondaryStatusId == secondaryStatusId)));
-
-            DateTime date = requestStatus != null ? requestStatus.date : DateTime.MinValue;
-
-            return date;
         }
     }
 }
