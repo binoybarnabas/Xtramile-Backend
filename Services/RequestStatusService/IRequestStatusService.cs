@@ -8,7 +8,5 @@ namespace XtramileBackend.Services.RequestStatusService
         public Task<IEnumerable<RequestApprove>> GetRequestStatusesAsync();
         public Task AddRequestStatusAsync(RequestApprove requestStatus);
         public Task<string> GetRequestStatusNameAsync(int requestId);
-        public DateTime GetDateByStatus(IEnumerable<RequestApprove> requestStatusData, int requestId, int primaryStatusId, int secondaryStatusId);
-
     }
 }

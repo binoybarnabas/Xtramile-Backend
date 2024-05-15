@@ -897,7 +897,6 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns></returns>
         public async Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption)
         {
-            Console.WriteLine(travelOption);
             try
             {
                 await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
