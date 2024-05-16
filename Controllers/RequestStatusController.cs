@@ -49,6 +49,7 @@ namespace XtramileBackend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding a request status: {ex.Message}");
             }
         }
+
         [HttpGet("name/{requestId}")]
         public async Task<IActionResult> GetStatusNameAsync(int requestId)
         {

@@ -40,7 +40,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace XtramileBackend.Services.ManagerService
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join primaryStatus in statusData on statusApproval.PrimaryStatusId equals primaryStatus.StatusId
                   join secondaryStatus in statusData on statusApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                  where primaryStatus.StatusId == 1 && secondaryStatus.StatusId == 2
+                  where primaryStatus.StatusCode == statusCode
                   select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
@@ -92,7 +92,7 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId, string date,int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId,string statusCode, string date,int offset, int pageSize)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
 
                   select new EmployeeRequestDto
                   {
@@ -208,7 +208,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId,string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -228,7 +228,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                   orderby employee.FirstName, employee.LastName
                   select new EmployeeRequestDto
                   {
@@ -265,7 +265,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId,string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -285,7 +285,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                   orderby request.CreatedOn descending
 
                   select new EmployeeRequestDto
@@ -457,7 +457,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns>
         /// A list of Request data of a particular employee which contains information like Request Id, Employee name, Email, project code, date and status
         /// </returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string statusCode, string employeeName, int offset, int pageSize)
         {
             try
             {
@@ -477,7 +477,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                    && (employee.FirstName + " " + employee.LastName).Contains(employeeName)
                   select new EmployeeRequestDto
                   {
