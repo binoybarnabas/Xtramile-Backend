@@ -191,7 +191,7 @@ namespace XtramileBackend.Controllers
             }
         }
 
-        //Confirm Selected Travel Option
+        //Confirm Selected Travel Option - by TA
         [HttpPatch("confirm-selected-travel-option")]
         public async Task<IActionResult> ConfirmSelectedTravelOptionAsync (TravelOptionMap travelOption)
         {
