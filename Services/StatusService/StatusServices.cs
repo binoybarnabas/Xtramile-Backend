@@ -116,7 +116,9 @@ namespace XtramileBackend.Services.StatusService
                 return "Waiting";
             else if (primaryStatusId == 2 && secondaryStatusId == 11)
                 return "Selected";
-            else if (primaryStatusId == 12 && secondaryStatusId == 12)
+            else if (primaryStatusId == 4 && secondaryStatusId == 7)
+                return "Approved by TA";
+            else if (primaryStatusId == 4 && secondaryStatusId == 8)
                 return "Approved by TA";
             else if (primaryStatusId == 5 && secondaryStatusId == 5)
                 return "Ongoing";

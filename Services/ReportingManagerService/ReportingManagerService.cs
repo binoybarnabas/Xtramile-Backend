@@ -71,7 +71,9 @@ namespace XtramileBackend.Services.ManagerService
                       Date = request.CreatedOn,
                       Mode = null,
                       Status = "Open",
-                      RequestCode = request.RequestCode
+                      RequestCode = request.RequestCode,
+                      From = request.SourceCity,
+                      To = request.DestinationCity,
                   }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -359,7 +361,10 @@ namespace XtramileBackend.Services.ManagerService
                         Mode = null,
                         Status = status.StatusName,
                         StatusDate = statusApproval.date,
-                        RequestCode = request.RequestCode
+                        RequestCode = request.RequestCode,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
+                        DepartureDate = request.DepartureDate
                     })
                     .OrderByDescending(result => result.StatusDate  ) // Add ordering based on the recent status change of a request
                     .ThenByDescending(result => result.RequestId) // Add existing ordering by requestId
@@ -541,9 +546,8 @@ namespace XtramileBackend.Services.ManagerService
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    where employee.ReportsTo == managerId
-                        && primaryStatus.StatusCode == "OG"
-                        && secondaryStatus.StatusCode == "OG"
+                    where employee.ReportsTo == managerId && ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
+                    (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
                     select new ManagerOngoingTravelRequest
                     {
                         RequestId = request.RequestId,
@@ -554,7 +558,11 @@ namespace XtramileBackend.Services.ManagerService
                         TravelTypeName = request.TravelType,
                         StatusName = primaryStatus.StatusName,
                         RequestCode = request.RequestCode,
-                        date = reqApproval.date
+                        date = reqApproval.date,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
+                        TicketStatus = secondaryStatus.StatusCode == "NST" ? "Not Attached" : "Attached",
+                        DepartureDate = request.DepartureDate
                     }
                 ).OrderByDescending(result => result.date).ThenByDescending(result => result.RequestId).ToList();
 
