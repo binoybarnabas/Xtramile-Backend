@@ -362,23 +362,23 @@ namespace XtramileBackend.Services.AvailableOptionService
 
                 IEnumerable<TravelOptionMap> selectedOptionsList = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
 
-                var selectedTravelOptionId = selectedOptionsList.FirstOrDefault(options => options.RequestId == requestId)?.OptionId;
+                var selectedTravelOptionId = selectedOptionsList.FirstOrDefault(options => options.RequestId == requestId).OptionId;
 
-                TravelOption travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync((int)selectedTravelOptionId);
+/*                TravelOption travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync((int)selectedTravelOptionId);
         
               
                 var selectedTravelOptionFileId = travelOption?.FileId;
-                var selectedTravelOptionDescription = travelOption?.Description;
+                var selectedTravelOptionDescription = travelOption?.Description; */
 
                 TravelOptionViewModel selectedTravelOptionDetails = new TravelOptionViewModel
                 {
-                       RequestId =  requestId.ToString(),
-                       Description = selectedTravelOptionDescription,
-                       OptionId = (int)selectedTravelOptionId,
+                       //RequestId =  requestId.ToString(),
+                       //Description = selectedTravelOptionDescription,
+                       OptionId = (int)selectedTravelOptionId
                 };
 
                
-                 var selectedTravelOptionFileURL = _fileMetaDataServices.GetFilePathByFileIdAsync((int)selectedTravelOptionFileId);
+                 //var selectedTravelOptionFileURL = _fileMetaDataServices.GetFilePathByFileIdAsync((int)selectedTravelOptionFileId);
 
    
                 return selectedTravelOptionDetails;
