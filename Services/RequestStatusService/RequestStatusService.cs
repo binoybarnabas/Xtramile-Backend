@@ -7,6 +7,7 @@ using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
+using Request = XtramileBackend.Models.EntityModels.Request;
 
 namespace XtramileBackend.Services.RequestStatusService
 {
@@ -47,7 +48,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 if (requestStatus.PrimaryStatusId == 3 && requestStatus.SecondaryStatusId == 3)
                 {
                     IEnumerable<RequestApprove> requestStatuses = await _unitOfWork.RequestStatusRepository.GetAllAsync();
-                    IEnumerable<RequestApprove> recordsToDelet = requestStatuses.Where(rs => rs.RequestId == requestStatus.RequestId);
+                    IEnumerable<RequestApprove> recordsToDelet = requestStatuses.Where(rs => rs.RequestId == requestStatus.RequestId).ToList();
                     foreach (RequestApprove record in  recordsToDelet)
                     {
                         _unitOfWork.RequestStatusRepository.Delete(record);
@@ -64,7 +65,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 }
 
 
-                //To run email service as a separate Taks
+/*                //To run email service as a separate Taks
                 _ = Task.Run(async () =>
                 {
                     using (var scope = _serviceScopeFactory.CreateScope())
@@ -121,7 +122,7 @@ namespace XtramileBackend.Services.RequestStatusService
                             }
                         }
                     }
-                });
+                });*/
             }
             catch (Exception ex)
             {

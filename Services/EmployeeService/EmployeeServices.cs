@@ -354,7 +354,8 @@ namespace XtramileBackend.Services.EmployeeService
                                    travelMode = travelMode.ModeName,
                                    statusName = _statusServices.GetStatusName(primarystatus.StatusId, secondarystatus.StatusId),
                                    statusModifiedBy = employee.FirstName + " " + employee.LastName,
-                                   date = statusApproval.date
+                                   date = statusApproval.date,
+                                   RequestedOn = request.CreatedOn
                                    /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
                                    *//*                                   dateOfTravel = request.DepartureDate
                                    */
@@ -477,17 +478,20 @@ namespace XtramileBackend.Services.EmployeeService
                 IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
                 IEnumerable<RequestApprove> reqApprovals = await _unitOfWork.RequestStatusRepository.GetAllAsync();
 
+                var latestStatusApprovals = reqApprovals
+                .GroupBy(approval => approval.RequestId)
+                .Select(group => group.OrderByDescending(approval => approval.date).First());
+
                 // Querying for ongoing request details
                 var result = (
-                    from reqApproval in reqApprovals
+                    from reqApproval in latestStatusApprovals
                     join request in travelRequests on reqApproval.RequestId equals request.RequestId
                     join employee in employees on request.CreatedBy equals employee.EmpId
                     join project in projects on request.ProjectId equals project.ProjectId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    where request.CreatedBy == employeeId
-                        && primaryStatus.StatusCode == "OG"
-                        && secondaryStatus.StatusCode == "OG"
+                    where request.CreatedBy == employeeId && ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
+                    (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
                     select new EmployeeOngoingRequest
                     {
                         RequestId = request.RequestId,
@@ -496,9 +500,11 @@ namespace XtramileBackend.Services.EmployeeService
                         StartDate = request.DepartureDate,
                         EndDate = request.ReturnDate,
                         Reason = request.TripPurpose,
-                        StatusName = _statusServices.GetStatusName(primaryStatus.StatusId,secondaryStatus.StatusId),
+                        StatusName = primaryStatus.StatusName,
                         date = reqApproval.date,
-                        RequestCode = request.RequestCode
+                        RequestCode = request.RequestCode,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
                     }
                 ).OrderByDescending(result => result.date)
                 .ThenByDescending(result => result.RequestId)

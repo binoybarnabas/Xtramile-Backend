@@ -9,5 +9,7 @@
         public int UploadedBy { get; set; }
         public string DocId { get; set; }
         public string Size { get; set; }
+        public DateTime? IssueDate { get; set; }
+        public string? Category { get; set; }
     }
 }
