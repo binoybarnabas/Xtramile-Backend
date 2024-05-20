@@ -10,6 +10,13 @@
         public string DestinationCity { get; set; }
         public DateTime date { get; set; }
         public string requestCode { get; set; }
+        public DateTime DepartureDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
+        public string TicketStatus { get; set; }
+        public string TripStatus { get; set; }
+        public string PickUpRequested { get; set; }
 
     }
 }

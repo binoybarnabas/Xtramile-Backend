@@ -333,7 +333,7 @@ namespace XtramileBackend.Services.AvailableOptionService
 
                     await _unitOfWork.SaveChangesAsyn();
 
-                    _ = Task.Run(async () =>
+/*                    _ = Task.Run(async () =>
                     {
                         using (var scope = _serviceScopeFactory.CreateScope())
                         {
@@ -341,7 +341,7 @@ namespace XtramileBackend.Services.AvailableOptionService
                             if (mailService != null)
                                 await mailService.SendToManagerOnSelectedOptionUpdation(travelOption.RequestId);
                         }
-                    });
+                    });*/
                 }
             }
             catch (Exception ex)
@@ -415,9 +415,8 @@ namespace XtramileBackend.Services.AvailableOptionService
                     RequestApprove requestStatus = new RequestApprove
                     {
                         RequestId = confirmedTravelOption.RequestId,
-                        PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("OG"),
-                        SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("OG"),
-                        date = DateTime.Now,
+                        PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("AP"),
+                        SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("NST"),
                         EmpId = confirmedTravelOption.EmpId
                     };
 
@@ -428,7 +427,7 @@ namespace XtramileBackend.Services.AvailableOptionService
                     _unitOfWork.Complete();
 
 
-                    _ = Task.Run(async () =>
+/*                    _ = Task.Run(async () =>
                     {
                         using (var scope = _serviceScopeFactory.CreateScope())
                         {
@@ -436,7 +435,7 @@ namespace XtramileBackend.Services.AvailableOptionService
                             if (mailService != null)
                                 await mailService.SendToManagerOnSelectedOptionUpdation(confirmedTravelOption.RequestId);
                         }
-                    });
+                    });*/
                 }
             }
             catch (Exception ex)
