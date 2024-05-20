@@ -48,23 +48,32 @@ namespace XtramileBackend.Services.TravelAdminService
                                             .GroupBy(approval => approval.RequestId)
                                             .Select(group => group.OrderByDescending(approval => approval.date).First());
 
-                var onGoingData = ( from employee in employeeData
-                                    join request in requestData on employee.EmpId equals request.CreatedBy
-                                    join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId                                  join project in projectData on request.ProjectId equals project.ProjectId
-                                  join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
-                                  join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
-                                  where primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"
-                                  select new OngoingTravelAdmin
-                                  {
-                                      requestId = request.RequestId,
-                                      ProjectCode = project.ProjectCode,
-                                      ProjectName = project.ProjectName,
-                                      Name = employee.FirstName+ " "+employee.LastName,
-                                      SourceCity = request.SourceCity,
-                                      DestinationCity = request.DestinationCity,
-                                      date = requestStatus.date,
-                                      requestCode = request.RequestCode
-                                  })
+                var onGoingData = (from employee in employeeData
+                                   join request in requestData on employee.EmpId equals request.CreatedBy
+                                   join requestStatus in latestStatusApprovals on request.RequestId equals requestStatus.RequestId
+                                   join project in projectData on request.ProjectId equals project.ProjectId
+                                   join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
+                                   join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
+                                   where ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
+                                   (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
+                                   select new OngoingTravelAdmin
+                                   {
+                                       requestId = request.RequestId,
+                                       ProjectCode = project.ProjectCode,
+                                       ProjectName = project.ProjectName,
+                                       Name = employee.FirstName + " " + employee.LastName,
+                                       SourceCity = request.SourceCity,
+                                       DestinationCity = request.DestinationCity,
+                                       date = requestStatus.date,
+                                       requestCode = request.RequestCode,
+                                       From = request.SourceCity,
+                                       To = request.DestinationCity,
+                                       DepartureDate = request.DepartureDate,
+                                       ReturnDate = request.ReturnDate,
+                                       TripStatus = primaryStatus.StatusName,
+                                       TicketStatus = secondaryStatus.StatusCode == "NST" ? "Not Attached" : "Attached",
+                                       PickUpRequested = request.CabRequired
+                                   })
                                   .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
                                   .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
                                   .ToList();

@@ -28,6 +28,7 @@ namespace XtramileBackend.Models.APIModels
         public string? DestinationState { get; set; }
         public string SourceCountry { get; set; }
         public string DestinationCountry { get; set; }
+
         // Additional Information Section
         public string CabRequired { get; set; }
         public string AccommodationRequired { get; set; }
@@ -36,16 +37,11 @@ namespace XtramileBackend.Models.APIModels
         public IFormFile? PassportAttachment { get; set; }
         public IFormFile? IdCardAttachment { get; set; }
         public string? AdditionalComments { get; set; }
-
-
-
         public string RequestCode { get; set; }
-
         public string TripType { get; set; }
-
         public string TravelMode { get; set; }
-
         public string PrefPickUpTime { get; set; }
-
+        public string? TicketStatus { get; set; }
+             
     }
 }

@@ -610,7 +610,9 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<Department> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
 
-
+                var latestStatusApprovals = reqApprovals
+                    .GroupBy(approval => approval.RequestId)
+                    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
@@ -618,6 +620,7 @@ namespace XtramileBackend.Services.ManagerService
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
                                              join travelMode in travelModeData on travelRequest.TravelModeId equals travelMode.ModeId
+                                             join requestStatus in latestStatusApprovals on travelRequest.RequestId equals requestStatus.RequestId
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
@@ -647,22 +650,17 @@ namespace XtramileBackend.Services.ManagerService
                                                  AccommodationRequired = travelRequest.AccommodationRequired,
                                                  PrefDepartureTime = travelRequest.PrefDepartureTime,
                                                  CreatedBy = travelRequest.CreatedBy,
-                                                 /*TravelAuthorizationEmailCapture =
-                                                 PassportAttachment =
-                                                 IdCardAttachment = */
                                                  AdditionalComments = travelRequest.AdditionalComments,
-
                                                  TripType = travelRequest.TripType,
-
                                                  PrefPickUpTime = travelRequest.PrefPickUpTime,
-
-                                                 TravelMode = travelMode.ModeName
-
-                                                 
+                                                 TravelMode = travelMode.ModeName,
+                                                 TicketStatus = requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 8 ? "Not Attached" :
+                                                 ((requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 7) ||
+                                                 (requestStatus.PrimaryStatusId == 5 && requestStatus.SecondaryStatusId == 5)) ? "Attached" : ""
                                              }
-                                             );
+                                             ).FirstOrDefault() ;
 
-                return employeeRequestDetail.FirstOrDefault();
+                return employeeRequestDetail;
 
             }
             catch (Exception ex)
