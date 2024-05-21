@@ -74,6 +74,7 @@ namespace XtramileBackend.Services.ManagerService
                       RequestCode = request.RequestCode,
                       From = request.SourceCity,
                       To = request.DestinationCity,
+                      DepartureDate = request.DepartureDate
                   }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();

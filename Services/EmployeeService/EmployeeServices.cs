@@ -337,6 +337,8 @@ namespace XtramileBackend.Services.EmployeeService
                                join employee in employeeData on statusApproval.EmpId equals employee.EmpId
                                where request.CreatedBy == empId &&
                                ((primarystatus.StatusId != 5 && secondarystatus.StatusId != 5) && //ongoing requests
+                                (primarystatus.StatusId != 4 && secondarystatus.StatusId != 7) && //approved by TA ticket sent
+                                (primarystatus.StatusId != 5 && secondarystatus.StatusId != 8) && //approved by TA ticket not sent
                                 (primarystatus.StatusId != 3 && secondarystatus.StatusId != 3) && //closed requests
                                 (primarystatus.StatusId != 9 && secondarystatus.StatusId != 9)) //cancelled requests
                                select new PendingRequetsViewEmployee
@@ -356,9 +358,6 @@ namespace XtramileBackend.Services.EmployeeService
                                    statusModifiedBy = employee.FirstName + " " + employee.LastName,
                                    date = statusApproval.date,
                                    RequestedOn = request.CreatedOn
-                                   /*                                   destination = request.DestinationCity + ", " +request.DestinationCountry,
-                                   *//*                                   dateOfTravel = request.DepartureDate
-                                   */
                                })
                                .OrderByDescending(result => result.date) // Add ordering based on the recent status change of a request
                                .ThenByDescending(result => result.requestId) // Add existing ordering by requestId
@@ -977,16 +976,11 @@ namespace XtramileBackend.Services.EmployeeService
                     try
                     {
                         Directory.CreateDirectory(uploadsDirectory);
-                        Console.WriteLine("Directory created successfully.");
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error creating directory: {ex.Message}");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Directory already exists.");
                 }
 
                 if (httpContext.Request.Form.Files != null)
@@ -1035,15 +1029,26 @@ namespace XtramileBackend.Services.EmployeeService
             if(existingProfilePictureData != null)
             {
                 string uploadsDirectory = "Uploads/Profiles/ProfilePicture";
+                if (!Directory.Exists(uploadsDirectory))
+                {
+                    // Create directory
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsDirectory);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating directory: {ex.Message}");
+                    }
+                }
                 string fileName = $"{profilePicture.FileName}";
-                string filePath = "";
                 string existingFilePath = $"{uploadsDirectory}/{existingProfilePictureData.FileName}";
                 if(File.Exists(existingFilePath))
                     File.Delete(existingFilePath);
                 if (httpContext.Request.Form.Files != null)
                 {
                     var file = httpContext.Request.Form.Files[0];
-                    filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
+                    string filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
                     using (var stream = File.Create(filePath))
                     {
                         await file.CopyToAsync(stream);
