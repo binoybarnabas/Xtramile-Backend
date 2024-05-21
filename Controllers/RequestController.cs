@@ -195,16 +195,11 @@ namespace XtramileBackend.Controllers
                                 try
                                 {
                                     Directory.CreateDirectory(targetFolder);
-                                    Console.WriteLine("Directory created successfully.");
                                 }
                                 catch (Exception ex)
                                 {
                                     Console.WriteLine($"Error creating directory: {ex.Message}");
                                 }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Directory already exists.");
                             }
                             // var filePath = Path.Combine(targetFolder, fileName);
                             var filePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
