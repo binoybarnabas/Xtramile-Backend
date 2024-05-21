@@ -139,7 +139,9 @@ namespace XtramileBackend.Services.TravelAdminService
                                             TravelTypeName = request.TravelType,
                                             PriorityName = priorityItem?.PriorityName ?? "Null",// Using ?. to handle null in case of no priority
                                             StatusName = _statusServices.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId),
-                                            RequestCode = request.RequestCode
+                                            RequestCode = request.RequestCode,
+                                            From = request.SourceCity,
+                                            To = request.DestinationCity
                                         }).OrderByDescending(incomingRequests => incomingRequests.RequestId).ToList();
 
 
@@ -235,6 +237,8 @@ namespace XtramileBackend.Services.TravelAdminService
             IEnumerable<Project> projectData = await _unitOfWork.ProjectRepository.GetAllAsync();
             IEnumerable<Employee> employeeData = await _unitOfWork.EmployeeRepository.GetAllAsync();
             IEnumerable<Status> statusData = await _unitOfWork.StatusRepository.GetAllAsync();
+            IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
+
 
             var latestStatusApprovals = approvalData
                 .GroupBy(approval => approval.RequestId)
@@ -246,6 +250,7 @@ namespace XtramileBackend.Services.TravelAdminService
                           join secondaryStatus in statusData on latestApproval.SecondaryStatusId equals secondaryStatus.StatusId
                           join employee in employeeData on requests.CreatedBy equals employee.EmpId
                           join project in projectData on requests.ProjectId equals project.ProjectId
+                          join mode in travelModeData on requests.TravelModeId equals mode.ModeId
                           where (primaryStatus.StatusCode == primaryStatusCode && secondaryStatus.StatusCode == secondaryStatusCode)
                           select new RequestTableViewTravelAdmin
                           {
@@ -255,7 +260,10 @@ namespace XtramileBackend.Services.TravelAdminService
                               CreatedOn = requests.CreatedOn,
                               TravelTypeName = requests.TravelType,
                               ApprovalDate = latestApproval.date,
-                              RequestCode = requests.RequestCode
+                              RequestCode = requests.RequestCode,
+                              From = requests.SourceCity,
+                              To = requests.DestinationCity,
+                              TravelType = mode.ModeName
                           }).OrderByDescending(result => result.date)
                             .ThenByDescending(result => result.RequestId)
                             .ToList();
@@ -952,7 +960,8 @@ namespace XtramileBackend.Services.TravelAdminService
                                       SourceCity = request.SourceCity,
                                       DestinationCity = request.DestinationCity,
                                       Date = requestStatus.date.ToString("dd/MM/yyyy"),
-                                      RequestCode = request.RequestCode
+                                      RequestCode = request.RequestCode,
+                                      CreatedOn= request.CreatedOn.ToString("dd/MM/yyyy")
                                   }).ToList();
 
                 int totalCount = closedData.Count();
