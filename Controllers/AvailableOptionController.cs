@@ -171,5 +171,41 @@ namespace XtramileBackend.Controllers
             }
         }
 
+        
+
+        //Get selected travel option details by req id
+        [HttpGet("selected-travel-option-details/{requestId}")]
+        public async Task<IActionResult> GetSelectedTravelOptionDetailsByRequestIdAsync(int requestId)
+        {
+            try
+            {
+                TravelOptionViewModel selectedTravelOptionData = await _availableOptionServices.GetSelectedTravelOptionDetailsByRequestIdAsync(requestId);
+                
+                return Ok(selectedTravelOptionData);
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting selected travel option: {ex.Message}");
+            }
+        }
+
+        //Confirm Selected Travel Option - by TA
+        [HttpPatch("confirm-selected-travel-option")]
+        public async Task<IActionResult> ConfirmSelectedTravelOptionAsync (TravelOptionMap travelOption)
+        {
+            try
+            {
+                await _availableOptionServices.ConfirmSelectedTravelOptionAsync(travelOption);
+                return Ok("Updated Successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating travel options : {ex.Message}");
+            }
+        }
+
+
     }
 }

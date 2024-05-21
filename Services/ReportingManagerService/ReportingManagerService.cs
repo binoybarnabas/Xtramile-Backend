@@ -9,6 +9,7 @@ using XtramileBackend.Data;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -23,13 +24,15 @@ namespace XtramileBackend.Services.ManagerService
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRequestStatusServices _requestStatusServices;
+        private readonly IStatusServices _statusService;
 
 
         // Constructor that initializes the service with the database context
-        public ReportingManagerService(IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices)
+        public ReportingManagerService(IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IStatusServices statusServices)
         {
             _unitOfWork = unitOfWork;
             _requestStatusServices = requestStatusServices;
+            _statusService = statusServices;
         }
 
         /// <summary>
@@ -37,7 +40,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsAsync(int managerId, string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -58,7 +61,7 @@ namespace XtramileBackend.Services.ManagerService
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join primaryStatus in statusData on statusApproval.PrimaryStatusId equals primaryStatus.StatusId
                   join secondaryStatus in statusData on statusApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                  where primaryStatus.StatusId == 1 && secondaryStatus.StatusId == 2
+                  where primaryStatus.StatusCode == statusCode
                   select new EmployeeRequestDto
                   {
                       RequestId = request.RequestId,
@@ -68,7 +71,9 @@ namespace XtramileBackend.Services.ManagerService
                       Date = request.CreatedOn,
                       Mode = null,
                       Status = "Open",
-                      RequestCode = request.RequestCode
+                      RequestCode = request.RequestCode,
+                      From = request.SourceCity,
+                      To = request.DestinationCity,
                   }).OrderByDescending(EmpRequest => EmpRequest.RequestId).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -89,7 +94,7 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId, string date,int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId,string statusCode, string date,int offset, int pageSize)
         {
             try
             {
@@ -109,7 +114,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP" && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode && request.CreatedOn.Date == DateTime.ParseExact(date, "yyyy-MM-dd", null)
 
                   select new EmployeeRequestDto
                   {
@@ -205,7 +210,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId,string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -225,7 +230,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                   orderby employee.FirstName, employee.LastName
                   select new EmployeeRequestDto
                   {
@@ -262,7 +267,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId,string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -282,7 +287,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                   orderby request.CreatedOn descending
 
                   select new EmployeeRequestDto
@@ -356,7 +361,10 @@ namespace XtramileBackend.Services.ManagerService
                         Mode = null,
                         Status = status.StatusName,
                         StatusDate = statusApproval.date,
-                        RequestCode = request.RequestCode
+                        RequestCode = request.RequestCode,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
+                        DepartureDate = request.DepartureDate
                     })
                     .OrderByDescending(result => result.StatusDate  ) // Add ordering based on the recent status change of a request
                     .ThenByDescending(result => result.RequestId) // Add existing ordering by requestId
@@ -454,7 +462,7 @@ namespace XtramileBackend.Services.ManagerService
         /// <returns>
         /// A list of Request data of a particular employee which contains information like Request Id, Employee name, Email, project code, date and status
         /// </returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string employeeName, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByEmployeeNameAsync(int managerId, string statusCode, string employeeName, int offset, int pageSize)
         {
             try
             {
@@ -474,7 +482,7 @@ namespace XtramileBackend.Services.ManagerService
                   join project in projectData on request.ProjectId equals project.ProjectId
                   join statusApproval in latestStatusApprovals on request.RequestId equals statusApproval.RequestId
                   join status in statusData on statusApproval.PrimaryStatusId equals status.StatusId
-                  where employee.ReportsTo == managerId && status.StatusCode == "OP"
+                  where employee.ReportsTo == managerId && status.StatusCode == statusCode
                    && (employee.FirstName + " " + employee.LastName).Contains(employeeName)
                   select new EmployeeRequestDto
                   {
@@ -538,9 +546,8 @@ namespace XtramileBackend.Services.ManagerService
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    where employee.ReportsTo == managerId
-                        && primaryStatus.StatusCode == "OG"
-                        && secondaryStatus.StatusCode == "OG"
+                    where employee.ReportsTo == managerId && ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
+                    (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
                     select new ManagerOngoingTravelRequest
                     {
                         RequestId = request.RequestId,
@@ -551,7 +558,11 @@ namespace XtramileBackend.Services.ManagerService
                         TravelTypeName = request.TravelType,
                         StatusName = primaryStatus.StatusName,
                         RequestCode = request.RequestCode,
-                        date = reqApproval.date
+                        date = reqApproval.date,
+                        From = request.SourceCity,
+                        To = request.DestinationCity,
+                        TicketStatus = secondaryStatus.StatusCode == "NST" ? "Not Attached" : "Attached",
+                        DepartureDate = request.DepartureDate
                     }
                 ).OrderByDescending(result => result.date).ThenByDescending(result => result.RequestId).ToList();
 
@@ -599,7 +610,9 @@ namespace XtramileBackend.Services.ManagerService
                 IEnumerable<Department> departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
                 IEnumerable<TravelMode> travelModeData = await _unitOfWork.TravelModeRepository.GetAllAsync();
 
-
+                var latestStatusApprovals = reqApprovals
+                    .GroupBy(approval => approval.RequestId)
+                    .Select(group => group.OrderByDescending(approval => approval.date).First());
 
                 var employeeRequestDetail = (from employee in employees
                                              join travelRequest in travelRequests on employee.EmpId equals travelRequest.CreatedBy
@@ -607,6 +620,7 @@ namespace XtramileBackend.Services.ManagerService
                                              join department in departments on project.DepartmentId equals department.DepartmentId
                                              join reportsToEmployee in employees on employee.ReportsTo equals reportsToEmployee.EmpId
                                              join travelMode in travelModeData on travelRequest.TravelModeId equals travelMode.ModeId
+                                             join requestStatus in latestStatusApprovals on travelRequest.RequestId equals requestStatus.RequestId
                                              where travelRequest.RequestId == requestId
                                              select new TravelRequestEmployeeViewModel
                                              {
@@ -636,22 +650,17 @@ namespace XtramileBackend.Services.ManagerService
                                                  AccommodationRequired = travelRequest.AccommodationRequired,
                                                  PrefDepartureTime = travelRequest.PrefDepartureTime,
                                                  CreatedBy = travelRequest.CreatedBy,
-                                                 /*TravelAuthorizationEmailCapture =
-                                                 PassportAttachment =
-                                                 IdCardAttachment = */
                                                  AdditionalComments = travelRequest.AdditionalComments,
-
                                                  TripType = travelRequest.TripType,
-
                                                  PrefPickUpTime = travelRequest.PrefPickUpTime,
-
-                                                 TravelMode = travelMode.ModeName
-
-                                                 
+                                                 TravelMode = travelMode.ModeName,
+                                                 TicketStatus = requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 8 ? "Not Attached" :
+                                                 ((requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 7) ||
+                                                 (requestStatus.PrimaryStatusId == 5 && requestStatus.SecondaryStatusId == 5)) ? "Attached" : ""
                                              }
-                                             );
+                                             ).FirstOrDefault() ;
 
-                return employeeRequestDetail.FirstOrDefault();
+                return employeeRequestDetail;
 
             }
             catch (Exception ex)
@@ -888,16 +897,28 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-        /// Submission of a travel option from the employee among a list of travel request
+        /// Submission of a travel option from the manager among a list of travel request
         /// </summary>
         /// <param name="travelOption"></param>
         /// <returns></returns>
         public async Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption)
         {
-            Console.WriteLine(travelOption);
             try
             {
                 await _unitOfWork.TravelOptionMappingRepository.AddAsync(travelOption);
+
+                //fetch status code from enum
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = travelOption.RequestId,
+                    PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("PE"),
+                    SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("SD"),
+                    date = DateTime.Now,
+                    EmpId = travelOption.EmpId
+                };
+
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+
                 _unitOfWork.Complete();
             }
             catch (Exception ex)

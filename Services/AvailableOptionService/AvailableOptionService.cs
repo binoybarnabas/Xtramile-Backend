@@ -7,6 +7,7 @@ using XtramileBackend.Services.FileMetaDataService;
 using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.RequestService;
 using XtramileBackend.Services.RequestStatusService;
+using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
@@ -21,10 +22,13 @@ namespace XtramileBackend.Services.AvailableOptionService
         private readonly IFileTypeServices _fileTypeServices;
         private readonly IFileMetaDataService _fileMetaDataServices;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IServiceScopeFactory serviceScopeFactory)
+        private readonly IStatusServices _statusService;
+
+        public AvailableOptionServices(IRequestServices requestServices, IUnitOfWork unitOfWork, IRequestStatusServices requestStatusServices, IStatusServices statusServices,IFileTypeServices fileTypeServices, IFileMetaDataService fileMetaDataServices, IServiceScopeFactory serviceScopeFactory)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _requestStatusService = requestStatusServices;
+            _statusService = statusServices;
             _requestServices = requestServices;
             _fileTypeServices = fileTypeServices;
             _fileMetaDataServices = fileMetaDataServices;
@@ -329,7 +333,7 @@ namespace XtramileBackend.Services.AvailableOptionService
 
                     await _unitOfWork.SaveChangesAsyn();
 
-                    _ = Task.Run(async () =>
+/*                    _ = Task.Run(async () =>
                     {
                         using (var scope = _serviceScopeFactory.CreateScope())
                         {
@@ -337,7 +341,7 @@ namespace XtramileBackend.Services.AvailableOptionService
                             if (mailService != null)
                                 await mailService.SendToManagerOnSelectedOptionUpdation(travelOption.RequestId);
                         }
-                    });
+                    });*/
                 }
             }
             catch (Exception ex)
@@ -346,6 +350,101 @@ namespace XtramileBackend.Services.AvailableOptionService
                 Console.WriteLine($"Error Updating Option Mapping: {ex.Message}");
             }
         }
+
+
+        //Get Selected Travel Options Details By Request Id
+        //Author : Muhammed Suhail
+        //Ongoing Process - Need Further Steps
+        public async Task<TravelOptionViewModel> GetSelectedTravelOptionDetailsByRequestIdAsync(int requestId)
+        {
+            try
+            {
+
+                IEnumerable<TravelOptionMap> selectedOptionsList = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+
+                var selectedTravelOptionId = selectedOptionsList.FirstOrDefault(options => options.RequestId == requestId).OptionId;
+
+/*                TravelOption travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync((int)selectedTravelOptionId);
+        
+              
+                var selectedTravelOptionFileId = travelOption?.FileId;
+                var selectedTravelOptionDescription = travelOption?.Description; */
+
+                TravelOptionViewModel selectedTravelOptionDetails = new TravelOptionViewModel
+                {
+                       //RequestId =  requestId.ToString(),
+                       //Description = selectedTravelOptionDescription,
+                       OptionId = (int)selectedTravelOptionId
+                };
+
+               
+                 //var selectedTravelOptionFileURL = _fileMetaDataServices.GetFilePathByFileIdAsync((int)selectedTravelOptionFileId);
+
+   
+                return selectedTravelOptionDetails;
+
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting options : {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+
+            }
+        }
+
+
+        //Needs Review
+        //Confirm Selected Travel Option
+        // Update Status to TA Approved(Option Confirmed)
+
+        public async Task ConfirmSelectedTravelOptionAsync(TravelOptionMap confirmedTravelOption)
+        {
+            try
+            {
+                IEnumerable<TravelOptionMap> travelOptionsData = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+                TravelOptionMap? existingTravelOption = travelOptionsData.FirstOrDefault(eto => eto.RequestId == confirmedTravelOption.RequestId);
+
+                if (existingTravelOption != null)
+                {
+                    existingTravelOption.EmpId = confirmedTravelOption.EmpId;
+                    existingTravelOption.OptionId = confirmedTravelOption.OptionId;
+
+                    //update req status
+                    //fetch status code from enum
+                    RequestApprove requestStatus = new RequestApprove
+                    {
+                        RequestId = confirmedTravelOption.RequestId,
+                        PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("AP"),
+                        SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("NST"),
+                        EmpId = confirmedTravelOption.EmpId
+                    };
+
+                    await _requestStatusService.AddRequestStatusAsync(requestStatus);
+
+                    await _unitOfWork.SaveChangesAsyn();
+
+                    _unitOfWork.Complete();
+
+
+/*                    _ = Task.Run(async () =>
+                    {
+                        using (var scope = _serviceScopeFactory.CreateScope())
+                        {
+                            var mailService = scope.ServiceProvider.GetService<MailService>();
+                            if (mailService != null)
+                                await mailService.SendToManagerOnSelectedOptionUpdation(confirmedTravelOption.RequestId);
+                        }
+                    });*/
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and handle any exceptions
+                Console.WriteLine($"Error Updating Option Mapping: {ex.Message}");
+            }
+        }
+
 
     }
 }

@@ -18,5 +18,7 @@ namespace XtramileBackend.Models.EntityModels
         public string DocId { get; set; }
         public DateTime UploadedDate { get; set; }
         public string Size { get; set; }
+        public DateTime? IssueDate { get; set; }
+        public string? Category { get; set; }
     }
 }

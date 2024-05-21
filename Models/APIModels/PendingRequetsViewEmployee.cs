@@ -40,6 +40,7 @@
         public string statusModifiedBy { get; set; }
 
         public DateTime date { get; set; }
+        public DateTime RequestedOn { get; set; }
     }
 
 

@@ -27,41 +27,42 @@ namespace XtramileBackend.Controllers
 
         // Get employee requests based on managerId
         [HttpGet("request")]
-        public async Task<IActionResult> GetEmployeeRequestAsync([FromQuery] int managerId, int offset = 1, int pageSize = 10)
+        public async Task<IActionResult> GetEmployeeRequestAsync([FromQuery] int managerId,string statusCode, int offset = 1, int pageSize = 10)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsAsync(managerId, offset, pageSize);
+            Console.WriteLine(statusCode);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsAsync(managerId,statusCode, offset, pageSize);
             return Ok(empRequests);
         }
 
         // Get employee requests for a specific date based on managerId and date
         [HttpGet("date")]
-        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, string date, int offset = 1, int pageSize = 10)
+        public async Task<IActionResult> GetEmployeeRequestByDateAsync([FromQuery] int managerId, string date, string statusCode, int offset = 1, int pageSize = 10)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsByDateAsync(managerId, date, offset, pageSize);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsByDateAsync(managerId, statusCode, date, offset, pageSize);
             return Ok(empRequests);
         }
 
         // Get employee requests sorted by date based on managerId
         [HttpGet("sort/date")]
-        public async Task<IActionResult> GetEmployeeRequestSortByDateAsync([FromQuery] int managerId, int offset = 1, int pageSize = 10)
+        public async Task<IActionResult> GetEmployeeRequestSortByDateAsync([FromQuery] int managerId, string statusCode, int offset = 1, int pageSize = 10)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByDateAsync(managerId, offset, pageSize);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByDateAsync(managerId, statusCode, offset, pageSize);
             return Ok(empRequests);
         }
 
         // Get employee requests sorted by email based on managerId
         [HttpGet("sort/employeename")]
-        public async Task<IActionResult> GetEmployeeRequestSortEmployeeNameAsync([FromQuery] int managerId, int offset = 1, int pageSize = 10)
+        public async Task<IActionResult> GetEmployeeRequestSortEmployeeNameAsync([FromQuery] int managerId, string statusCode, int offset = 1, int pageSize = 10)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByEmployeeNameAsync(managerId, offset, pageSize);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsSortByEmployeeNameAsync(managerId, statusCode, offset, pageSize);
             return Ok(empRequests);
         }
 
         // Get employee requests sorted by email based on managerId
         [HttpGet("search/employeename")]
-        public async Task<IActionResult> GetEmployeeRequestByEmployeeNameAsync([FromQuery] int managerId, string employeeName, int offset = 1, int pageSize = 10)
+        public async Task<IActionResult> GetEmployeeRequestByEmployeeNameAsync([FromQuery] int managerId, string statusCode, string employeeName, int offset = 1, int pageSize = 10)
         {
-            var empRequests = await _reportingManagerService.GetEmployeeRequestsByEmployeeNameAsync(managerId, employeeName, offset, pageSize);
+            var empRequests = await _reportingManagerService.GetEmployeeRequestsByEmployeeNameAsync(managerId, statusCode, employeeName, offset, pageSize);
             return Ok(empRequests);
         }
 

@@ -116,6 +116,8 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                     DocId = travelDocFile.DocId.ToUpper(),
                     Size = travelDocFile.Size,
                     UploadedDate = DateTime.Now,
+                    IssueDate = travelDocFile.IssueDate,
+                    Category = travelDocFile.Category
                 };
 
                 await _unitOfWork.TravelDocumentFileDataRepository.AddAsync(travelDocuments);
