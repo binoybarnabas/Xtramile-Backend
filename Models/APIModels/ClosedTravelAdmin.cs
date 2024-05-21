@@ -12,5 +12,6 @@
         public DateTime StatusDate { get; set; }
         public string Status { get; set; }
         public string RequestCode { get; set; }
+        public string CreatedOn { get; set; }
     }
 }
