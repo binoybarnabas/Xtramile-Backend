@@ -26,6 +26,7 @@ namespace XtramileBackend.Services.TravelAdminService
         public Task<TravelAdminDashboardRequests> GetTravelAdminDashboardRequests();
         public Task<TADashboardCountComponent> GetTADashboardCountComponent();
 
+        public Task SendTravelTicketsAsync(TravelTicketDetailsViewModel travelTicketDetails, HttpContext httpContext);
 
     }
 }

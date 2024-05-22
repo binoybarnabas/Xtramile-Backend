@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
+using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.TravelAdminService;
 
 namespace XtramileBackend.Controllers
@@ -272,11 +273,32 @@ namespace XtramileBackend.Controllers
                 TADashboardCountComponent counts = await _travelAdminService.GetTADashboardCountComponent();
                 return Ok(counts);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, $"An error occured while getting the counts: {ex.Message}");
             }
 
         }
+
+
+        [HttpPost("send-travel-tickets")]
+        public async Task<IActionResult> sendTravelTicketsAsync([FromForm] TravelTicketDetailsViewModel ticketDetails)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                await _travelAdminService.SendTravelTicketsAsync(ticketDetails, httpContext);
+                return Ok("Ticket Send Successfully");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while sending travel ticket: {ex.Message}");
+
+            }
+
+        }
+
     }
+
 }
