@@ -238,16 +238,11 @@ namespace XtramileBackend.Services.AvailableOptionService
                             try
                             {
                                 Directory.CreateDirectory(targetFolder);
-                                Console.WriteLine("Directory created successfully.");
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Error creating directory: {ex.Message}");
                             }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Directory already exists.");
                         }
 
 

@@ -79,16 +79,11 @@ namespace XtramileBackend.Services.TravelDocumentFileData
                     try
                     {
                         Directory.CreateDirectory(uploadsDirectory);
-                        Console.WriteLine("Directory created successfully.");
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error creating directory: {ex.Message}");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Directory already exists.");
                 }
 
                 if (httpContext.Request.Form.Files != null)
