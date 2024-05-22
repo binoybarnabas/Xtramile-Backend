@@ -357,7 +357,7 @@ namespace XtramileBackend.Services.AvailableOptionService
 
                 IEnumerable<TravelOptionMap> selectedOptionsList = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
 
-                var selectedTravelOptionId = selectedOptionsList.FirstOrDefault(options => options.RequestId == requestId).OptionId;
+                var selectedTravelOptionId = selectedOptionsList.FirstOrDefault(options => options.RequestId == requestId)?.OptionId;
 
 /*                TravelOption travelOption = await _unitOfWork.TravelOptionRepository.GetByIdAsync((int)selectedTravelOptionId);
         

@@ -1165,8 +1165,34 @@ namespace XtramileBackend.Services.TravelAdminService
             }
 
         }
+
+
+        public async Task SendTravelTicketsAsync(TravelTicketDetailsViewModel travelTicketDetails, HttpContext httpContext)
+        {
+            try
+            {
+
+                //Fetch ticket details
+                //Store Ticket Details
+                //Move Files
+                //Store Meta Data
+                //Send Email to Traveller With Ticket Files as attachment
+                
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+
+        }
+
+
+
     }
-   
+
+
+
 }
        
        
