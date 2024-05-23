@@ -24,6 +24,7 @@ using XtramileBackend.Repositories.TravelOptionRepository;
 using XtramileBackend.Repositories.TravelOptionMappingRepository;
 using XtramileBackend.Repositories.TravelDocumentFileData;
 using XtramileBackend.Repositories.NotificationRepository;
+using XtramileBackend.Repositories.TicketRepository;
 
 namespace XtramileBackend.UnitOfWork
 {
@@ -54,7 +55,7 @@ namespace XtramileBackend.UnitOfWork
         public ITravelOptionRepository TravelOptionRepository { get; }
         public ITravelOptionMappingRepository TravelOptionMappingRepository {  get; }        
         public ITravelDocumentFileDataRepository TravelDocumentFileDataRepository { get; }
-
+        public ITicketRepository TicketRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public readonly AppDBContext _dbContext;
         public UnitOfWork(AppDBContext dbContext)
@@ -85,6 +86,7 @@ namespace XtramileBackend.UnitOfWork
             TravelOptionMappingRepository = new TravelOptionMappingRepository(_dbContext);
             TravelDocumentFileDataRepository = new TravelDocumentFileDataRepository(_dbContext);
             NotificationRepository = new NotificationRepository(_dbContext);
+            TicketRepository = new TicketRepository(_dbContext);
         }
 
         public int Complete()
