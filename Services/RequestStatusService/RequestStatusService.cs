@@ -65,7 +65,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 }
 
 
-                //To run email service as a separate Taks
+                /*//To run email service as a separate Taks
                 _ = Task.Run(async () =>
                 {
                     using (var scope = _serviceScopeFactory.CreateScope())
@@ -128,7 +128,7 @@ namespace XtramileBackend.Services.RequestStatusService
                             }
                         }
                     }
-                });
+                });*/
             }
             catch (Exception ex)
             {
