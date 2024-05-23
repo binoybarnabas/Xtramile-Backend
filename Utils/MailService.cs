@@ -6,6 +6,7 @@ using XtramileBackend.UnitOfWork;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using XtramileBackend.Services.FileMetaDataService;
 
 namespace XtramileBackend.Utils
 {
@@ -13,6 +14,7 @@ namespace XtramileBackend.Utils
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly INotificationService _notificationService;
+
         public MailService(IUnitOfWork unitOfWork, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -338,6 +340,31 @@ namespace XtramileBackend.Utils
             }
         }
 
+        public async Task SendToEmployeeTravelTicket (int requestId)
+        {
+            Mail mail = new Mail();
+
+            Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(request.CreatedBy);
+
+
+            IEnumerable<FileMetaData> filesData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+            IEnumerable<FileMetaData> fileAttachments = filesData.Where(file => (file.RequestId == requestId && file.Description == "Ticket File")).ToList();
+
+            if (employee != null)
+            {
+                mail.recipientName = employee.FirstName + " " + employee.LastName;
+                mail.recipientEmail = employee.Email;
+                mail.emailBody = $"Dear {mail.recipientName},<br><br>The ticket for the request with code <b>{request.RequestCode}</b> has been sent by the Travel Admin Team.<br>Please find the ticket in the attachments or you can view them through the application.<br><br>Thank you.<br>";
+                foreach (FileMetaData attachment in fileAttachments)
+                {
+                    string filePath = attachment.FilePath + '/' + attachment.FileName;
+                    mail.attachments.Add(filePath);
+                }
+                await SendMail(mail);
+            }
+        }
+
         private async Task SendMail(Mail mailInfo)
         {
             try
@@ -358,6 +385,13 @@ namespace XtramileBackend.Utils
                 mail.Subject = "Travel Request Status";
                 var builder = new BodyBuilder();
                 builder.HtmlBody = mailInfo.emailBody;
+                if(mailInfo.attachments.Count > 0)
+                {
+                    foreach (var attachment in mailInfo.attachments)
+                    {
+                        builder.Attachments.Add(attachment);
+                    }
+                }
                 mail.Body = builder.ToMessageBody();
 
                 using (var client = new SmtpClient())

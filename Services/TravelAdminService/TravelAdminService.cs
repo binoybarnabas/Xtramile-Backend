@@ -1250,42 +1250,43 @@ namespace XtramileBackend.Services.TravelAdminService
                 };
                 await _requestStatusServices.AddRequestStatusAsync(requestStatus);
 
-/*                //deleting all other travel options
+                //deleting all other travel options
                 IEnumerable<FileMetaData> filedata = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
                 IEnumerable<TravelOption> optionsData = await _unitOfWork.TravelOptionRepository.GetAllAsync();
                 IEnumerable<TravelOptionMap> selectedOptionsData = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
 
+                //deleteing selected option
+                TravelOptionMap optionToDelete = selectedOptionsData.Single(option => option.RequestId == requestId);
+                if (optionToDelete != null)
+                {
+                    _unitOfWork.TravelOptionMappingRepository.Delete(optionToDelete);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+
+                //deleteing options
+                IEnumerable<TravelOption> optionsToDelete = optionsData.Where(option => option.RequestId == requestId).ToList();
+                foreach (TravelOption option in optionsToDelete)
+                {
+                    _unitOfWork.TravelOptionRepository.Delete(option);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+
                 //deleting files
-                IEnumerable<FileMetaData> filesToDelete = (from options in optionsData join
+                IEnumerable<FileMetaData> filesToDelete = (from options in optionsData
+                                                           join
                                                            files in filedata on options.FileId equals files.FileId
                                                            where options.RequestId == requestId
                                                            select files).ToList();
-                foreach(FileMetaData file in filesToDelete)
+                foreach (FileMetaData file in filesToDelete)
                 {
                     string filePath = file.FilePath + '/' + file.FileName;
-                    if(File.Exists(filePath))
+                    if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
                     }
                     _unitOfWork.FileMetaDataRepository.Delete(file);
                     await _unitOfWork.SaveChangesAsyn();
                 }
-
-                //deleteing options
-                IEnumerable<TravelOption> optionsToDelete = optionsData.Where(option => option.RequestId == requestId).ToList();
-                foreach(TravelOption option in optionsToDelete)
-                {
-                    _unitOfWork.TravelOptionRepository.Delete(option);
-                    await _unitOfWork.SaveChangesAsyn();
-                }
-
-                //deleteing selected option
-                TravelOptionMap optionToDelete = selectedOptionsData.Single(option => option.RequestId == requestId);
-                if(optionToDelete != null)
-                {
-                    _unitOfWork.TravelOptionMappingRepository.Delete(optionToDelete);
-                    await _unitOfWork.SaveChangesAsyn();
-                }*/
             }
             catch (Exception ex)
             {

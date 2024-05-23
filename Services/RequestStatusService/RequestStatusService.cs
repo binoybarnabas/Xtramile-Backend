@@ -65,7 +65,7 @@ namespace XtramileBackend.Services.RequestStatusService
                 }
 
 
-/*                //To run email service as a separate Taks
+                //To run email service as a separate Taks
                 _ = Task.Run(async () =>
                 {
                     using (var scope = _serviceScopeFactory.CreateScope())
@@ -120,9 +120,15 @@ namespace XtramileBackend.Services.RequestStatusService
                                 //mail to be sent to Employee on Travel Admin Approval
                                 await mailService.SendToEmployeeOnTravelAdminApproval(requestStatus.RequestId);
                             }
+
+                            if(requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 7)
+                            {
+                                //mail to be sent to Employee with Travel Ticket
+                                await mailService.SendToEmployeeTravelTicket(requestStatus.RequestId);
+                            }
                         }
                     }
-                });*/
+                });
             }
             catch (Exception ex)
             {

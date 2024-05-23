@@ -7,5 +7,6 @@
         public string? managerName { get; set; }
         public string? requestSubmittedBy { get; set; }
         public string emailBody { get; set; }
+        public List<string>? attachments { get; set; } = new List<string>();
     }
 }
