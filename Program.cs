@@ -60,6 +60,7 @@ using XtramileBackend.Services.TravelDocumentFileData;
 using Microsoft.Extensions.FileProviders;
 using XtramileBackend.Repositories.NotificationRepository;
 using XtramileBackend.Services.NotificationService;
+using XtramileBackend.Repositories.TicketRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -153,6 +154,7 @@ builder.Services.AddScoped<IFileMetaDataRepository, FileMetaDataRepository>();
 builder.Services.AddScoped<ITravelOptionRepository, TravelOptionRepository>();
 builder.Services.AddScoped<ITravelDocumentFileDataRepository,  TravelDocumentFileDataRepository>();
 builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
+builder.Services.AddScoped<ITicketRepository,TicketRepository>();
 
 
 builder.Services.AddScoped<IPriorityServices, PriorityServices>();

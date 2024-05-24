@@ -1,19 +1,15 @@
 ﻿namespace XtramileBackend.Models.APIModels
 {
+    public class TicketDetails
+    {
+        public IFormFile TicketFile { get; set; }
+        public string? Description { get; set; }
+    }
+
     public class TravelTicketDetailsViewModel
     {
-        //public IFormFile? TravelAuthorizationEmailCapture { get; set; }
-
-        public required string RequestId { get; set; }
-
-        public required string EmpId { get; set; }
-
-        public required IFormFile[] Tickets { get; set; }
-
-        public string[]? Description { get; set; }
-
-
+        public IEnumerable<TicketDetails> Tickets { get; set; }
+        public string RequestId { get; set; }
+        public string EmpId { get; set; }
     }
 }
-
-

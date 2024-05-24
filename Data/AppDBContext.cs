@@ -63,6 +63,7 @@ namespace XtramileBackend.Data
         public DbSet<TravelDocumentFileDataModel> TravelDocumentFileData {  get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<User> TBL_USER { get; set; }
+        public DbSet<Ticket> TBL_TICKET { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //migrations if needed.

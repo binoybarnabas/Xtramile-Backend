@@ -282,21 +282,18 @@ namespace XtramileBackend.Controllers
 
 
         [HttpPost("send-travel-tickets")]
-        public async Task<IActionResult> sendTravelTicketsAsync([FromForm] TravelTicketDetailsViewModel ticketDetails)
+        public async Task<IActionResult> SendTravelTicketsAsync([FromForm] TravelTicketDetailsViewModel ticketDetails)
         {
             try
             {
                 var httpContext = HttpContext;
                 await _travelAdminService.SendTravelTicketsAsync(ticketDetails, httpContext);
                 return Ok("Ticket Send Successfully");
-
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while sending travel ticket: {ex.Message}");
-
             }
-
         }
 
     }

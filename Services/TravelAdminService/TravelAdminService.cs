@@ -8,6 +8,9 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks.Dataflow;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
+using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.FileTypeService;
+using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
 using Xunit.Sdk;
@@ -21,9 +24,19 @@ namespace XtramileBackend.Services.TravelAdminService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IStatusServices _statusServices;
-        public TravelAdminService(IUnitOfWork unitOfWork, IStatusServices statusServices) { 
+        private readonly IFileTypeServices _fileTypeServices;
+        private readonly IFileMetaDataService _fileMetaDataService;
+        private readonly IStatusServices _statusService;
+        private readonly IRequestStatusServices _requestStatusServices;
+
+        public TravelAdminService(IUnitOfWork unitOfWork, IStatusServices statusServices, IFileTypeServices fileTypeServices, 
+            IFileMetaDataService fileMetaDataService, IStatusServices statusService, IRequestStatusServices requestStatusServices) { 
             _unitOfWork = unitOfWork;
             _statusServices = statusServices;
+            _fileTypeServices = fileTypeServices;
+            _fileMetaDataService = fileMetaDataService;
+            _statusService = statusService;
+            _requestStatusServices = requestStatusServices;
         }
 
         /// <summary>
@@ -1166,34 +1179,122 @@ namespace XtramileBackend.Services.TravelAdminService
 
         }
 
-
         public async Task SendTravelTicketsAsync(TravelTicketDetailsViewModel travelTicketDetails, HttpContext httpContext)
         {
             try
             {
+                //adding tickets
+                string uploadsDirectory = "Uploads/RequestFiles/Tickets";
+                int i = 0;
+                int requestId = int.Parse(travelTicketDetails.RequestId);
+                if (!Directory.Exists(uploadsDirectory))
+                {
+                    // Create directory
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsDirectory);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error creating directory: {ex.Message}");
+                    }
+                }
+                foreach (TicketDetails ticket in travelTicketDetails.Tickets)
+                {
+                    if(httpContext.Request.Form.Files != null)
+                    {
+                        var file = httpContext.Request.Form.Files[i];
+                        string fileName = $"Ticket_{requestId}_{file.FileName}";
+                        string filePath = Path.Combine(uploadsDirectory, fileName).Replace("\\", "/");
+                        string fileExtension = Path.GetExtension(filePath);
+                        int fileTypeId = await _fileTypeServices.GetFileTypeIdByExtensionAsync(fileExtension.Substring(1));
 
-                //Fetch ticket details
-                //Store Ticket Details
-                //Move Files
-                //Store Meta Data
-                //Send Email to Traveller With Ticket Files as attachment
-                
+                        FileMetaData fileData = new FileMetaData
+                        {
+                            RequestId = requestId,
+                            FileName = fileName,
+                            FilePath = uploadsDirectory,
+                            Description = "Ticket File",
+                            FileTypeId = fileTypeId,
+                            CreatedBy = int.Parse(travelTicketDetails.EmpId),
+                            CreatedOn = DateTime.Now
+                        };
+                        await _unitOfWork.FileMetaDataRepository.AddAsync(fileData);
+                        _unitOfWork.Complete();
+
+                        int fileId = await _fileMetaDataService.GetFileIdByFileNameAsync(fileName);
+
+                        Ticket ticketData = new Ticket
+                        {
+                            Description = ticket.Description,
+                            FileId = fileId,
+                        };
+                        await _unitOfWork.TicketRepository.AddAsync(ticketData);
+                        _unitOfWork.Complete();
+
+                        using (var stream = File.Create(filePath))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                    }
+                    i++;
+                }
+
+                //adding new status
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestId,
+                    EmpId = int.Parse(travelTicketDetails.EmpId),
+                    PrimaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("AP"),
+                    SecondaryStatusId = await _statusService.GetStatusIdByStatusCodeAsync("ST"),
+                };
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+
+                //deleting all other travel options
+                IEnumerable<FileMetaData> filedata = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+                IEnumerable<TravelOption> optionsData = await _unitOfWork.TravelOptionRepository.GetAllAsync();
+                IEnumerable<TravelOptionMap> selectedOptionsData = await _unitOfWork.TravelOptionMappingRepository.GetAllAsync();
+
+                //deleteing selected option
+                TravelOptionMap optionToDelete = selectedOptionsData.Single(option => option.RequestId == requestId);
+                if (optionToDelete != null)
+                {
+                    _unitOfWork.TravelOptionMappingRepository.Delete(optionToDelete);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+
+                //deleteing options
+                IEnumerable<TravelOption> optionsToDelete = optionsData.Where(option => option.RequestId == requestId).ToList();
+                foreach (TravelOption option in optionsToDelete)
+                {
+                    _unitOfWork.TravelOptionRepository.Delete(option);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
+
+                //deleting files
+                IEnumerable<FileMetaData> filesToDelete = (from options in optionsData
+                                                           join
+                                                           files in filedata on options.FileId equals files.FileId
+                                                           where options.RequestId == requestId
+                                                           select files).ToList();
+                foreach (FileMetaData file in filesToDelete)
+                {
+                    string filePath = file.FilePath + '/' + file.FileName;
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                    _unitOfWork.FileMetaDataRepository.Delete(file);
+                    await _unitOfWork.SaveChangesAsyn();
+                }
             }
             catch (Exception ex)
             {
-                
+                Console.WriteLine($"An error occurred while sending the travel ticket: {ex.Message}");
+                throw;
             }
 
 
         }
-
-
-
     }
-
-
-
 }
-       
-       
-

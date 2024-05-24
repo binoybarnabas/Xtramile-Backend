@@ -13,6 +13,8 @@
         Task SendToTrvaelAdminTeamOnOptionSelection(int requestId);
         Task SendToEmployeeOnTravelAdminApproval(int requestId);
         Task SendToManagerOnSelectedOptionUpdation(int requestId);
+        Task SendToEmployeeTravelTicket(int requestId);
+
 
     }
 }
