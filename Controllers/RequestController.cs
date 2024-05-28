@@ -388,5 +388,20 @@ namespace XtramileBackend.Controllers
             }
         }
 
+        [HttpGet("get_ticket_details_by_request_id/{requestId}")]
+        public async Task<IActionResult> GetTicketDetailsByRequestId(int requestId)
+        {
+            try
+            {
+                var httpContext = HttpContext;
+                IEnumerable<TravelTicketDetails> ticketDetails = await _requestServices.GetTravelTicketDetailsByRequestId(requestId, httpContext);
+                return Ok(ticketDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ticket details: {ex.Message}");
+            }
+        }
+
     }
 }

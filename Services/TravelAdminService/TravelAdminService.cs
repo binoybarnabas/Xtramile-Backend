@@ -67,8 +67,10 @@ namespace XtramileBackend.Services.TravelAdminService
                                    join project in projectData on request.ProjectId equals project.ProjectId
                                    join primaryStatus in statusData on requestStatus.PrimaryStatusId equals primaryStatus.StatusId
                                    join secondaryStatus in statusData on requestStatus.SecondaryStatusId equals secondaryStatus.StatusId
-                                   where ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
-                                   (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
+                                   where ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") //Approved by TA, ticket not sent
+                                   ||(primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") //Approved by TA, ticket sent
+                                   ||(primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") //Trip Ongoing
+                                   ||(primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "PE")) //Trip Completed (Close initiated)
                                    select new OngoingTravelAdmin
                                    {
                                        requestId = request.RequestId,
@@ -83,7 +85,7 @@ namespace XtramileBackend.Services.TravelAdminService
                                        To = request.DestinationCity,
                                        DepartureDate = request.DepartureDate,
                                        ReturnDate = request.ReturnDate,
-                                       TripStatus = primaryStatus.StatusName,
+                                       TripStatus = _statusService.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId),
                                        TicketStatus = secondaryStatus.StatusCode == "NST" ? "Not Attached" : "Attached",
                                        PickUpRequested = request.CabRequired
                                    })

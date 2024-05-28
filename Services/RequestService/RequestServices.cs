@@ -208,5 +208,34 @@ namespace XtramileBackend.Services.RequestService
                 throw; // Re-throw the exception to propagate it
             }
         }
+
+        public async Task<IEnumerable<TravelTicketDetails>> GetTravelTicketDetailsByRequestId(int requestId, HttpContext httpContext)
+        {
+            try
+            {
+                IEnumerable<FileMetaData> fileData = await _unitOfWork.FileMetaDataRepository.GetAllAsync();
+                IEnumerable<Ticket> ticketData = await _unitOfWork.TicketRepository.GetAllAsync();
+                var urlRequest = httpContext.Request;
+
+                IEnumerable<TravelTicketDetails> ticketDetails = (from ticket in ticketData
+                                                                  join file in fileData on ticket.FileId equals file.FileId
+                                                                  where file.RequestId == requestId
+                                                                  select new TravelTicketDetails
+                                                                  {
+                                                                      TicketId = ticket.TicketId,
+                                                                      Description = ticket.Description,
+                                                                      TicketFileURL = $"{urlRequest.Scheme}://{urlRequest.Host}/{file.FilePath}/{Uri.EscapeDataString(file.FileName)}"
+                                                                  }).ToList();
+
+                return ticketDetails;
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while getting ticket details: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+
     }
 }
