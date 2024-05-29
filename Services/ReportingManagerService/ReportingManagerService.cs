@@ -547,8 +547,11 @@ namespace XtramileBackend.Services.ManagerService
                     join reqApproval in latestStatusApprovals on request.RequestId equals reqApproval.RequestId
                     join primaryStatus in statusData on reqApproval.PrimaryStatusId equals primaryStatus.StatusId
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
-                    where employee.ReportsTo == managerId && ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") ||
-                    (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG"))
+                    where employee.ReportsTo == managerId &&
+                    ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") //Approved by TA, ticket not sent
+                    ||(primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") //Approved by TA, ticket sent
+                    ||(primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") //Trip Ongoing
+                    ||(primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "PE")) //Trip Completed (Close initiated)
                     select new ManagerOngoingTravelRequest
                     {
                         RequestId = request.RequestId,
@@ -557,7 +560,7 @@ namespace XtramileBackend.Services.ManagerService
                         ProjectCode = project.ProjectCode,
                         CreatedOn = request.CreatedOn,
                         TravelTypeName = request.TravelType,
-                        StatusName = primaryStatus.StatusName,
+                        StatusName = _statusService.GetStatusName(primaryStatus.StatusId, secondaryStatus.StatusId),
                         RequestCode = request.RequestCode,
                         date = reqApproval.date,
                         From = request.SourceCity,
@@ -657,7 +660,8 @@ namespace XtramileBackend.Services.ManagerService
                                                  TravelMode = travelMode.ModeName,
                                                  TicketStatus = requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 8 ? "Not Attached" :
                                                  ((requestStatus.PrimaryStatusId == 4 && requestStatus.SecondaryStatusId == 7) ||
-                                                 (requestStatus.PrimaryStatusId == 5 && requestStatus.SecondaryStatusId == 5)) ? "Attached" : ""
+                                                 (requestStatus.PrimaryStatusId == 5 && requestStatus.SecondaryStatusId == 5) ||
+                                                 (requestStatus.PrimaryStatusId == 3 && requestStatus.SecondaryStatusId == 2)) ? "Attached" : ""
                                              }
                                              ).FirstOrDefault() ;
 
