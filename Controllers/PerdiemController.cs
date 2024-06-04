@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
-using XtramileBackend.Services.CountryService;
 using XtramileBackend.Services.PerdiemService;
 
 namespace XtramileBackend.Controllers

@@ -158,7 +158,7 @@ namespace XtramileBackend.Controllers
         }
 
         [HttpPatch("travel/request/cancel/")]
-        public async Task<IActionResult> CancelRequest([FromBody] ManagerCancelRequest managerCancelRequest)
+        public async Task<IActionResult> CancelRequest([FromBody] UpdateRequest managerCancelRequest)
         {
             try
             {

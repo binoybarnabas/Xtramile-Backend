@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
@@ -40,7 +39,7 @@ namespace XtramileBackend.Data
 
         public DbSet<Request> TBL_REQUEST { get; set; }
 
-        public DbSet<TravelType>TBL_TRAVEL_TYPE  { get; set; }
+        public DbSet<TravelType> TBL_TRAVEL_TYPE { get; set; }
 
         public DbSet<TravelMode> TBL_TRAVEL_MODE { get; set; }
 
@@ -53,14 +52,14 @@ namespace XtramileBackend.Data
         public DbSet<ProjectEmployeeMap> TBL_PROJECT_MAPPING { get; set; }
 
         public DbSet<TBL_REQ_MAPPING> TBL_REQ_MAPPING { get; set; }
-       
+
         public DbSet<FileMetaData> TBL_FILE_METADATA { get; set; }
 
         public DbSet<TravelOption> TBL_TRAVEL_OPTIONS { get; set; }
 
-        public DbSet<TravelOptionMap> TBL_TRAVEL_OPTION_MAPPING { get; set; } 
+        public DbSet<TravelOptionMap> TBL_TRAVEL_OPTION_MAPPING { get; set; }
 
-        public DbSet<TravelDocumentFileDataModel> TravelDocumentFileData {  get; set; }
+        public DbSet<TravelDocumentFileDataModel> TravelDocumentFileData { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<User> TBL_USER { get; set; }
         public DbSet<Ticket> TBL_TICKET { get; set; }

@@ -177,7 +177,7 @@ namespace XtramileBackend.Services.EmployeeService
                         DepartmentName = department.DepartmentName,
                         ProjectCode = project.ProjectCode,
                         ProjectName = project.ProjectName,
-                        ProfilePicture = profilePictureURL
+                        ProfilePicture = profilePictureURL != null ? profilePictureURL : null
                     }
                 ).FirstOrDefault();
 

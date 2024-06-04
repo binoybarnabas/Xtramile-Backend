@@ -5,6 +5,7 @@ using System.Dynamic;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.UnitOfWork;
 using XtramileBackend.Utils;
 using Request = XtramileBackend.Models.EntityModels.Request;
@@ -17,13 +18,15 @@ namespace XtramileBackend.Services.RequestService
         private readonly IUnitOfWork _unitOfWork;
         private Random random;
         private readonly IFileMetaDataService _fileMetaDataService;
+        private readonly IRequestStatusServices _requestStatusServices;
 
-        public RequestServices(IUnitOfWork unitOfWork, IFileMetaDataService fileMetaDataService)
+        public RequestServices(IUnitOfWork unitOfWork, IFileMetaDataService fileMetaDataService, IRequestStatusServices requestStatusServices)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _fileMetaDataService = fileMetaDataService;
             // Initialize Random with a unique seed (e.g., based on the current time)
             random = new Random(Guid.NewGuid().GetHashCode());
+            _requestStatusServices = requestStatusServices;
         }
 
 
@@ -236,6 +239,25 @@ namespace XtramileBackend.Services.RequestService
                 throw; // Re-throw the exception to propagate it
             }
         }
-
+        public async Task UpdateRequestStatusAsCompleted(UpdateRequest requestData)
+        {
+            try
+            {
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestData.RequestId,
+                    EmpId = requestData.EmpId,
+                    PrimaryStatusId = 3,
+                    SecondaryStatusId = 2
+                };
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
     }
 }
