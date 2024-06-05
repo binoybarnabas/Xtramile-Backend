@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.APIModels;
-using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.TravelAdminService;
 
 namespace XtramileBackend.Controllers

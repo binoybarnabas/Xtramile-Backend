@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using XtramileBackend.Models.APIModels;
+﻿using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.RequestStatusService;
 

@@ -177,7 +177,7 @@ namespace XtramileBackend.Services.EmployeeService
                         DepartmentName = department.DepartmentName,
                         ProjectCode = project.ProjectCode,
                         ProjectName = project.ProjectName,
-                        ProfilePicture = profilePictureURL
+                        ProfilePicture = profilePictureURL != null ? profilePictureURL : null
                     }
                 ).FirstOrDefault();
 
@@ -820,56 +820,6 @@ namespace XtramileBackend.Services.EmployeeService
                 throw;
             }
         }
-
-
-        /// <summary>
-        /// An employee cancels a request after raising the request and before the request is being approved or rejected by the reporting manager
-        /// </summary>
-        /// <param name="requestId"></param>
-        /// <param name="empId"></param>
-        /// <returns></returns>
-        public async Task<bool> EmployeeCancelRequest(int requestId, int empId)
-        {
-            try
-            {
-                Request existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(requestId);
-
-                if (existingRequestData != null)
-                {
-
-                    var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
-
-                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "CL");
-
-                    RequestApprove approve = new RequestApprove();
-
-                    approve.RequestId = requestId;
-
-                    approve.EmpId = empId;
-
-                    approve.PrimaryStatusId = primaryStatus.StatusId;
-
-                    approve.SecondaryStatusId = primaryStatus.StatusId;
-
-                    approve.date = DateTime.Now;
-
-                    await _unitOfWork.RequestStatusRepository.AddAsync(approve);
-
-                    _unitOfWork.Complete();
-
-                }
-
-                return true;
-
-            }
-            catch (Exception ex)
-            {
-                // Logging and rethrowing the exception
-                Console.WriteLine($"An error occurred while updating the request {requestId}: {ex.Message}");
-                throw;
-            }
-        }
-
 
         /// <summary>
         /// Submission of a travel option from the employee among a list of travel request

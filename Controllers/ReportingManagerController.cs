@@ -157,39 +157,6 @@ namespace XtramileBackend.Controllers
             }
         }
 
-        [HttpPatch("travel/request/cancel/")]
-        public async Task<IActionResult> CancelRequest([FromBody] ManagerCancelRequest managerCancelRequest)
-        {
-            try
-            {
-                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
-                bool requestData = await _reportingManagerService.CancelRequest(managerCancelRequest);
-                // Return a 200 OK response with the retrieved ongoing travel request details
-                return Ok(requestData);
-            }
-            catch (Exception ex)
-            {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
-            }
-        }
-
-        //To post to reason table and patch reason id to request table 
-        [HttpPost("travel/request/deny")]
-        public async Task<IActionResult> PostReasonAndPatchRequest([FromBody] Reason reason, int reqId)
-        {
-            try
-            {
-                await _reportingManagerService.PostReasonForCancellation(reason, reqId);
-                return Ok(reason);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding reason for request: {ex.Message}");
-            }
-
-        }
-
         [HttpGet("travel/request/forwarded")]
         public async Task<IActionResult> GetTravelRequestForwardedAsync(int managerId, int offset = 1, int pageSize = 10)
         {

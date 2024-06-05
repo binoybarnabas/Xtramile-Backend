@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
-using XtramileBackend.Services.EmployeeService;
 using XtramileBackend.Services.TravelModeService;
 
 namespace XtramileBackend.Controllers

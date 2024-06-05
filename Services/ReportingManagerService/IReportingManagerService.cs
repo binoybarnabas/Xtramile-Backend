@@ -30,11 +30,7 @@ namespace XtramileBackend.Services.ManagerService
         public Task<TravelRequestEmployeeViewModel> GetEmployeeRequestDetail(int requestId);
 
         public Task<bool> UpdateRequestPriorityAndStatus(UpdatePriorityAndStatusModel updatePriorityAndStatus);
-
-        public Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest);
-        public Task PostReasonForCancellation(Reason reason, int reqId);
-
-         
+        
         // forwarded travel requests
         public Task<PagedEmployeeRequestDto> GetEmployeeRequestsForwardedAsync(int managerId, int offset, int pageSize);
 

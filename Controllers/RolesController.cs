@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using XtramileBackend.Models.EntityModels;
-using XtramileBackend.Services.ProjectService;
 using XtramileBackend.Services.RolesService;
 
 namespace XtramileBackend.Controllers

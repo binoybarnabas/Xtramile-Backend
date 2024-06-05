@@ -1,12 +1,8 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
-using System.Dynamic;
-using XtramileBackend.Models.APIModels;
+﻿using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.FileMetaDataService;
+using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.UnitOfWork;
-using XtramileBackend.Utils;
 using Request = XtramileBackend.Models.EntityModels.Request;
 
 namespace XtramileBackend.Services.RequestService
@@ -17,13 +13,15 @@ namespace XtramileBackend.Services.RequestService
         private readonly IUnitOfWork _unitOfWork;
         private Random random;
         private readonly IFileMetaDataService _fileMetaDataService;
+        private readonly IRequestStatusServices _requestStatusServices;
 
-        public RequestServices(IUnitOfWork unitOfWork, IFileMetaDataService fileMetaDataService)
+        public RequestServices(IUnitOfWork unitOfWork, IFileMetaDataService fileMetaDataService, IRequestStatusServices requestStatusServices)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _fileMetaDataService = fileMetaDataService;
             // Initialize Random with a unique seed (e.g., based on the current time)
             random = new Random(Guid.NewGuid().GetHashCode());
+            _requestStatusServices = requestStatusServices;
         }
 
 
@@ -47,8 +45,8 @@ namespace XtramileBackend.Services.RequestService
         {
             try
             {
-                await _unitOfWork.RequestRepository.AddAsync(request);         
-                 _unitOfWork.Complete();
+                await _unitOfWork.RequestRepository.AddAsync(request);
+                _unitOfWork.Complete();
             }
             catch (Exception ex)
             {
@@ -122,8 +120,8 @@ namespace XtramileBackend.Services.RequestService
                 IEnumerable<Reason> reasonData = await _unitOfWork.ReasonRepository.GetAllAsync();
 
                 string? reasonDescription = (from reason in reasonData
-                                            where reason.ReasonId == request.ReasonId
-                                            select reason.Description).FirstOrDefault();
+                                             where reason.ReasonId == request.ReasonId
+                                             select reason.Description).FirstOrDefault();
 
                 return reasonDescription;
             }
@@ -189,7 +187,7 @@ namespace XtramileBackend.Services.RequestService
                     existingRequest.TravelModeId = int.Parse(requestData.TravelModeId);
                     existingRequest.PrefPickUpTime = requestData.PrefPickUpTime;
 
-                    if(existingfileData != null)
+                    if (existingfileData != null)
                     {
                         var filePath = Path.Combine(targetFolder, existingfileData.FileName).Replace("\\", "/");
                         File.Delete(filePath);
@@ -236,6 +234,104 @@ namespace XtramileBackend.Services.RequestService
                 throw; // Re-throw the exception to propagate it
             }
         }
+        public async Task UpdateRequestStatusAsCompleted(UpdateRequest requestData)
+        {
+            try
+            {
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestData.RequestId,
+                    EmpId = requestData.EmpId,
+                    PrimaryStatusId = 3,
+                    SecondaryStatusId = 2
+                };
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
+        public async Task WithdrawRequest(UpdateRequest requestData)
+        {
+            try
+            {
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestData.RequestId,
+                    EmpId = requestData.EmpId,
+                    PrimaryStatusId = 9,
+                    SecondaryStatusId = 9
+                };
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
 
+                if(requestData.Description != null)
+                {
+                    Reason reason = new Reason
+                    {
+                        ReasonCode = "CDR",
+                        Description = requestData.Description,
+                        CreatedBy = requestData.EmpId,
+                        CreatedOn = DateTime.Now,
+                    };
+                    await _unitOfWork.ReasonRepository.AddAsync(reason);
+                    _unitOfWork.Complete();
+
+                    Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestData.RequestId);
+                    request.ReasonId = reason.ReasonId;
+                    _unitOfWork.RequestRepository.Update(request);
+                    _unitOfWork.Complete();
+                }
+                await _unitOfWork.SaveChangesAsyn();
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }        
+        
+        public async Task RejectRequest(UpdateRequest requestData)
+        {
+            try
+            {
+                RequestApprove requestStatus = new RequestApprove
+                {
+                    RequestId = requestData.RequestId,
+                    EmpId = requestData.EmpId,
+                    PrimaryStatusId = 6,
+                    SecondaryStatusId = 2
+                };
+                await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+
+                if(requestData.Description != null)
+                {
+                    Reason reason = new Reason
+                    {
+                        ReasonCode = "DDR",
+                        Description = requestData.Description,
+                        CreatedBy = requestData.EmpId,
+                        CreatedOn = DateTime.Now,
+                    };
+                    await _unitOfWork.ReasonRepository.AddAsync(reason);
+                    _unitOfWork.Complete();
+
+                    Request request = await _unitOfWork.RequestRepository.GetByIdAsync(requestData.RequestId);
+                    request.ReasonId = reason.ReasonId;
+                    _unitOfWork.RequestRepository.Update(request);
+                    _unitOfWork.Complete();
+                }
+                await _unitOfWork.SaveChangesAsyn();
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
+        }
     }
 }

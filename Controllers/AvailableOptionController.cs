@@ -1,19 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using Org.BouncyCastle.Ocsp;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.AvailableOptionService;
 using XtramileBackend.Services.FileMetaDataService;
-using XtramileBackend.Services.FileTypeService;
-using XtramileBackend.Services.RequestService;
-using XtramileBackend.Services.RequestStatusService;
 using AvailableOption = XtramileBackend.Models.EntityModels.AvailableOption;
 using TravelOption = XtramileBackend.Models.EntityModels.TravelOption;
 
@@ -28,13 +18,13 @@ namespace XtramileBackend.Controllers
         private readonly IAvailableOptionServices _availableOptionServices;
 
         private readonly IFileMetaDataService _fileMetaDataServices;
-        
+
         public AvailableOptionController(IAvailableOptionServices availableOptionServices, IFileMetaDataService fileMetaDataServices)
         {
             _availableOptionServices = availableOptionServices;
-            
+
             _fileMetaDataServices = fileMetaDataServices;
-            
+
         }
 
         [HttpGet("traveloptions")]
@@ -70,16 +60,18 @@ namespace XtramileBackend.Controllers
         [HttpPost("addoption")]
         public async Task<IActionResult> AddTravelAvailableOption([FromForm] TravelOptionAPI travelOption)
         {
-            try {
+            try
+            {
                 var httpContext = HttpContext;
                 Console.WriteLine(httpContext);
                 await _availableOptionServices.AddTravelAvailableOption(travelOption, httpContext);
                 return Ok("Option Added successfully:-");
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding an available option: {ex.Message}");
             }
-           
+
         }
 
 
@@ -171,7 +163,7 @@ namespace XtramileBackend.Controllers
             }
         }
 
-        
+
 
         //Get selected travel option details by req id
         [HttpGet("selected-travel-option-details/{requestId}")]
@@ -180,7 +172,7 @@ namespace XtramileBackend.Controllers
             try
             {
                 TravelOptionViewModel selectedTravelOptionData = await _availableOptionServices.GetSelectedTravelOptionDetailsByRequestIdAsync(requestId);
-                
+
                 return Ok(selectedTravelOptionData);
 
             }
@@ -193,7 +185,7 @@ namespace XtramileBackend.Controllers
 
         //Confirm Selected Travel Option - by TA
         [HttpPatch("confirm-selected-travel-option")]
-        public async Task<IActionResult> ConfirmSelectedTravelOptionAsync (TravelOptionMap travelOption)
+        public async Task<IActionResult> ConfirmSelectedTravelOptionAsync(TravelOptionMap travelOption)
         {
             try
             {

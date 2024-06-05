@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic.FileIO;
-using System.Globalization;
 using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
-using XtramileBackend.Services.FileTypeService;
 using XtramileBackend.Services.TravelDocumentFileData;
 
 namespace XtramileBackend.Controllers

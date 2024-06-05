@@ -1,18 +1,8 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using XtramileBackend.Data;
-using XtramileBackend.Models.APIModels;
+﻿using XtramileBackend.Models.APIModels;
 using XtramileBackend.Models.EntityModels;
 using XtramileBackend.Services.RequestStatusService;
 using XtramileBackend.Services.StatusService;
 using XtramileBackend.UnitOfWork;
-using XtramileBackend.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Request = XtramileBackend.Models.EntityModels.Request;
 
 
@@ -95,7 +85,7 @@ namespace XtramileBackend.Services.ManagerService
             }
         }
 
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId,string statusCode, string date,int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsByDateAsync(int managerId, string statusCode, string date, int offset, int pageSize)
         {
             try
             {
@@ -211,7 +201,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto>  GetEmployeeRequestsSortByEmployeeNameAsync(int managerId,string statusCode, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByEmployeeNameAsync(int managerId, string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -268,7 +258,7 @@ namespace XtramileBackend.Services.ManagerService
         /// </summary>
         /// <param name="managerId">Manager ID for retrieving the travel request</param>
         /// <returns>List of EmployeeRequestDto</returns>
-        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId,string statusCode, int offset, int pageSize)
+        public async Task<PagedEmployeeRequestDto> GetEmployeeRequestsSortByDateAsync(int managerId, string statusCode, int offset, int pageSize)
         {
             try
             {
@@ -323,7 +313,7 @@ namespace XtramileBackend.Services.ManagerService
         }
 
         /// <summary>
-       /// to retreives the forwarded travel requests for a manager
+        /// to retreives the forwarded travel requests for a manager
         /// </summary>
         /// <param name="managerId">to retrieve the travel requests for a particular manager</param>
         /// <param name="offset">to set the  page index of the table</param>
@@ -367,13 +357,13 @@ namespace XtramileBackend.Services.ManagerService
                         To = request.DestinationCity,
                         DepartureDate = request.DepartureDate
                     })
-                    .OrderByDescending(result => result.StatusDate  ) // Add ordering based on the recent status change of a request
+                    .OrderByDescending(result => result.StatusDate) // Add ordering based on the recent status change of a request
                     .ThenByDescending(result => result.RequestId) // Add existing ordering by requestId
                     .ToList();
 
-                var totalCount = EmpRequest.Count();    
-                var totalPages= (int)Math.Ceiling((double   )totalCount / pageSize);
-                var pagedEmployeeRequests= EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
+                var totalCount = EmpRequest.Count();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                var pagedEmployeeRequests = EmpRequest.Skip((offset - 1) * pageSize).Take(pageSize).ToList();
                 return new PagedEmployeeRequestDto
                 {
                     EmployeeRequest = pagedEmployeeRequests,
@@ -432,7 +422,7 @@ namespace XtramileBackend.Services.ManagerService
                         Mode = null,
                         RequestCode = request.RequestCode,
                         StatusDate = statusApproval.date
-                        
+
                     }).ToList();
 
                 var totalCount = EmpRequest.Count();
@@ -549,9 +539,9 @@ namespace XtramileBackend.Services.ManagerService
                     join secondaryStatus in statusData on reqApproval.SecondaryStatusId equals secondaryStatus.StatusId
                     where employee.ReportsTo == managerId &&
                     ((primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "NST") //Approved by TA, ticket not sent
-                    ||(primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") //Approved by TA, ticket sent
-                    ||(primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") //Trip Ongoing
-                    ||(primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "PE")) //Trip Completed (Close initiated)
+                    || (primaryStatus.StatusCode == "AP" && secondaryStatus.StatusCode == "ST") //Approved by TA, ticket sent
+                    || (primaryStatus.StatusCode == "OG" && secondaryStatus.StatusCode == "OG") //Trip Ongoing
+                    || (primaryStatus.StatusCode == "CL" && secondaryStatus.StatusCode == "PE")) //Trip Completed (Close initiated)
                     select new ManagerOngoingTravelRequest
                     {
                         RequestId = request.RequestId,
@@ -663,7 +653,7 @@ namespace XtramileBackend.Services.ManagerService
                                                  (requestStatus.PrimaryStatusId == 5 && requestStatus.SecondaryStatusId == 5) ||
                                                  (requestStatus.PrimaryStatusId == 3 && requestStatus.SecondaryStatusId == 2)) ? "Attached" : ""
                                              }
-                                             ).FirstOrDefault() ;
+                                             ).FirstOrDefault();
 
                 return employeeRequestDetail;
 
@@ -722,7 +712,7 @@ namespace XtramileBackend.Services.ManagerService
                 _unitOfWork.RequestRepository.Update(existingRequest);
 
                 _unitOfWork.Complete();
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -732,83 +722,6 @@ namespace XtramileBackend.Services.ManagerService
                 throw;
             }
 
-        }
-
-        /// <summary>
-        /// Cancellation of request by a manager based on a particular request that comes under the status open by the employee
-        /// </summary>
-        /// <param name="managerCancelRequest"></param>
-        /// <returns>
-        /// returns true if the request is cancelled.
-        /// </returns>
-        public async Task<bool> CancelRequest(ManagerCancelRequest managerCancelRequest)
-        {
-            try
-            {
-                Request existingRequestData = await _unitOfWork.RequestRepository.GetByIdAsync(managerCancelRequest.RequestId);
-
-                if (existingRequestData != null) {
-
-                    var allStatus = await _unitOfWork.StatusRepository.GetAllAsync();
-
-                    var previousPrimaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "OP");
-
-                    var primaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "DD");
-
-                    var secondaryStatus = allStatus.FirstOrDefault(statusData => statusData.StatusCode == "PE");
-
-                    RequestApprove approve = new RequestApprove();
-
-                    approve.RequestId = managerCancelRequest.RequestId;
-
-                    approve.EmpId = managerCancelRequest.ManagerId;
-
-                    approve.PrimaryStatusId = primaryStatus.StatusId;
-
-                    approve.SecondaryStatusId = secondaryStatus.StatusId;
-
-                    approve.date = DateTime.Now;
-
-                    await _requestStatusServices.AddRequestStatusAsync(approve);
-
-                    _unitOfWork.Complete();
-
-                    
-                }
-                
-                return true;
-
-            }
-            catch (Exception ex)
-            {
-                // Logging and rethrowing the exception
-                Console.WriteLine($"An error occurred while updating the request {managerCancelRequest.RequestId}: {ex.Message}");
-                throw;
-            }
-        }
-        /// <summary>
-        /// To post the reason data to TBL_REASON and patch the reasonid to \
-        /// corresponding request using requestid.
-        /// </summary>
-        /// <param name="reason"></param>
-        /// <param name="reqId"></param>
-        /// <returns></returns>
-        public async Task PostReasonForCancellation(Reason reason, int reqId)
-        {
-            try
-            {
-                reason.ReasonCode = GenerateReasonCode(reqId);
-                await _unitOfWork.ReasonRepository.AddAsync(reason);
-                _unitOfWork.Complete();
-                var request = await _unitOfWork.RequestRepository.GetByIdAsync(reqId);//to get the corresponding request
-                request.ReasonId = reason.ReasonId;
-                _unitOfWork.RequestRepository.Update(request);
-                _unitOfWork.Complete();
-            }
-            catch (Exception ex) {
-                Console.WriteLine($"An error occurred while adding reason to the request {ex.Message}");
-                throw;
-            }
         }
 
         /// <summary>
@@ -928,7 +841,7 @@ namespace XtramileBackend.Services.ManagerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occured",ex);
+                Console.WriteLine("An error occured", ex);
                 throw;
             }
         }
