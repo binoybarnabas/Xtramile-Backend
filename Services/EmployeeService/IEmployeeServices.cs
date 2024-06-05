@@ -29,19 +29,12 @@ namespace XtramileBackend.Services.EmployeeService
         public Task AddSelectedOptionForRequest(TBL_REQ_MAPPING option);
 
         public Task<IEnumerable<EmployeeCurrentRequest>> getEmployeeCurrentTravel(int empId);
-
         public Task<User> updatePassword(string email, string newPassword);
-
         public Task<IEnumerable<DashboardUpcomingTrip>> GetEmployeeDashboardUpcomingTripByIdAsync(int employeeId);
         public Task<IEnumerable<DashboardEmployeeprogress>> GetEmployeeDashboardProgressAsync(int employeeId);
-
         public Task<IEnumerable<RequestNotification>> GetEmployeeRequestNotificationsAsync(int empId);
         public Task<object> GetCompletedTrips(int empId);
-
-        public Task<bool> EmployeeCancelRequest(int requestId, int empId);
-
         public Task SubmitSelectedTravelOptionAsync(TravelOptionMap travelOption);
-
         public Task<IEnumerable<PendingRequetsViewEmployee>> GetFilteredPendingRequestsByEmpId(int empId, string primaryStatusCode, string secondaryStatusCode);
         public Task<FileMetaData> AddEmployeeProfilePicture(IFormFile profilePicture, int employeeId, HttpContext context);
         public Task UpdateProfilePicture(IFormFile profilePicture, int employeeId, HttpContext httpContext);

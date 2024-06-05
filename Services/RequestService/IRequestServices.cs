@@ -15,6 +15,9 @@ namespace XtramileBackend.Services.RequestService
         public Task UpdateRequestDetails(TravelRequestViewModel requestData, HttpContext httpContext);
         public Task<IEnumerable<TravelTicketDetails>> GetTravelTicketDetailsByRequestId(int requestId, HttpContext httpContext);
         public Task UpdateRequestStatusAsCompleted(UpdateRequest requestData);
+        public Task WithdrawRequest(UpdateRequest requestData);
+        public Task RejectRequest(UpdateRequest requestData);
+
 
     }
 }

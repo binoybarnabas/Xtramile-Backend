@@ -404,7 +404,6 @@ namespace XtramileBackend.Controllers
         }
 
         [HttpPost("update-completed-travel")]
-
         public async Task<IActionResult> updateTravelRequestAsCompleted(UpdateRequest requestDetails)
         {
             try
@@ -417,5 +416,34 @@ namespace XtramileBackend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating status: {ex.Message}");
             }
         }
+
+        [HttpPost("withdraw-travel-request")]
+        public async Task<IActionResult> withdrawTravelRequest(UpdateRequest requestDetails)
+        {
+            try
+            {
+                await _requestServices.WithdrawRequest(requestDetails);
+                return Ok("Status Updated");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating status: {ex.Message}");
+            }
+        }
+        
+        [HttpPost("reject-travel-request")]
+        public async Task<IActionResult> rejectTravelRequest(UpdateRequest requestDetails)
+        {
+            try
+            {
+                await _requestServices.RejectRequest(requestDetails);
+                return Ok("Status Updated");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating status: {ex.Message}");
+            }
+        }
+        
     }
 }

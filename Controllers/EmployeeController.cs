@@ -317,23 +317,6 @@ namespace XtramileBackend.Controllers
             }
         }
 
-        [HttpPost("request/cancel")]
-        public async Task<IActionResult> CancelRequest([FromBody] UpdateRequest cancelRequest)
-        {
-            try
-            {
-                // Call the service method to retrieve ongoing travel request details for employees reporting to the specified manager
-                bool requestData = await _employeeService.EmployeeCancelRequest(cancelRequest.RequestId, cancelRequest.EmpId);
-                // Return a 200 OK response with the retrieved ongoing travel request details
-                return Ok(requestData);
-            }
-            catch (Exception ex)
-            {
-                // Handle or log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting ongoing travel request details: {ex.Message}");
-            }
-        }
-
         //submit selected option-
 
         [HttpPost("submit_selected_travel_option")]
