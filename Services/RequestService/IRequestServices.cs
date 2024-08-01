@@ -17,6 +17,7 @@ namespace XtramileBackend.Services.RequestService
         public Task UpdateRequestStatusAsCompleted(UpdateRequest requestData);
         public Task WithdrawRequest(UpdateRequest requestData);
         public Task RejectRequest(UpdateRequest requestData);
+        public Task CloseRequest(UpdateRequest requestData);
 
 
     }

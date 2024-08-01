@@ -444,6 +444,20 @@ namespace XtramileBackend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating status: {ex.Message}");
             }
         }
-        
+
+        [HttpPost("close-travel-request")]
+        public async Task<IActionResult> closeTravelRequest(UpdateRequest requestDetails)
+        {
+            try
+            {
+                await _requestServices.CloseRequest(requestDetails);
+                return Ok("Status Updated");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while updating status: {ex.Message}");
+            }
+        }
+
     }
 }

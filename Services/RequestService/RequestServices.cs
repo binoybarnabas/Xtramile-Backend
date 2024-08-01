@@ -332,6 +332,39 @@ namespace XtramileBackend.Services.RequestService
                 Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
                 throw; // Re-throw the exception to propagate it
             }
+        }public async Task CloseRequest(UpdateRequest requestData)
+        {
+            try
+            {
+                if(requestData.Action == "initiate")
+                {
+                    RequestApprove requestStatus = new RequestApprove
+                    {
+                        RequestId = requestData.RequestId,
+                        EmpId = requestData.EmpId,
+                        PrimaryStatusId = 3,
+                        SecondaryStatusId = 2
+                    };
+                    await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+                }
+                else if(requestData.Action == "approve")
+                {
+                    RequestApprove requestStatus = new RequestApprove
+                    {
+                        RequestId = requestData.RequestId,
+                        EmpId = requestData.EmpId,
+                        PrimaryStatusId = 3,
+                        SecondaryStatusId = 3
+                    };
+                    await _requestStatusServices.AddRequestStatusAsync(requestStatus);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception
+                Console.WriteLine($"An error occurred while updating request status: {ex.Message}");
+                throw; // Re-throw the exception to propagate it
+            }
         }
     }
 }
