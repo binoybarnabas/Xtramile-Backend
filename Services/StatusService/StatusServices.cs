@@ -131,7 +131,7 @@ namespace XtramileBackend.Services.StatusService
             else if (primaryStatusId == 3 && secondaryStatusId == 3)
                 return "Closed";
             else if (primaryStatusId == 3 && secondaryStatusId == 2)
-                return "Completed";
+                return "Close Initiated";
             else
                 return " ";            
         }
